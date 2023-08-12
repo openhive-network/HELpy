@@ -1,0 +1,111 @@
+[build-system]
+requires = ["poetry-core>=1.1.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+name = "hive_transfer_protocol"
+version = "0.0.0"
+description = "Out of the box library for interactions with hive blockchain"
+readme = "README.md"
+repository = "https://gitlab.syncad.com/hive/hive-transfer-protocol"
+authors = [
+    "Mateusz Żebrak <mzebrak@syncad.com>",
+    "Krzysztof Mochocki <kmochocki@syncad.com>"
+]
+packages = [
+    { include = "hive_transfer_protocol" },
+]
+source = [
+    { name = "PyPI", priority = "primary" },
+    { name = "gitlab", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental" },
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+poetry = "^1.5.1"
+wax = "0.0.1a3+99ad1da"
+schemas = { path = "schemas", develop = true }
+
+
+[tool.poetry.group.dev.dependencies]
+black = "23.3.0"
+mypy = "1.4.1"
+pre-commit = "2.21.0"
+pytest = "7.2.0"
+pytest-asyncio = "0.21.0"
+pytest-xdist = "3.1.0"
+ruff = "0.0.277"
+types-pyyaml = "6.0.12.4"
+
+
+[tool.black]
+line-length = 120
+preview = true
+
+
+[tool.mypy]
+strict = true
+disallow_untyped_decorators = false
+plugins = "pydantic.mypy"
+
+
+[tool.ruff]
+line-length = 120
+select = [# https://beta.ruff.rs/docs/rules/
+    "F",
+    "E",
+    "W",
+    "C",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "YTT",
+    "ASYNC",
+    "BLE",
+    "B",
+    "A",
+    "C4",
+    "INP",
+    "PIE",
+    "T20",
+    "PYI",
+    "PT",
+    "RSE",
+    "RET",
+    "SIM",
+    "TID",
+    "TCH",
+    "ARG",
+    "PTH",
+    "ERA",
+    "PL",
+    "TRY",
+    "FLY",
+    "RUF",
+]
+ignore = [
+    "E501", # line too long, handled by black
+    "D203", # 1 blank line required before class docstring; because we re using D211
+    "D212", # Multi-line docstring summary should start at the first line; because we re using D213
+    "D401", # first line should be in imperative mood
+    "PT004", # fixture does not return anything, add leading underscore;  issue: pytest seems to ignore (not launch) auto-use fixtures with leading underscode
+
+    "TRY003", # too restrictive
+    "PLR0913", # too restrictive, too many arguments to function call
+
+    "D104", # missing docstring in public package
+    "D100", # missing docstring in public module
+]
+
+
+[tool.ruff.isort]
+known-first-party = ["schemas", "wax"]
+required-imports = ["from __future__ import annotations"]
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
