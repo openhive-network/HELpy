@@ -25,6 +25,7 @@ source = [
 [tool.poetry.dependencies]
 python = "^3.10"
 poetry = "^1.5.1"
+httpx = { extras = ["http2"], version = "0.23.3" }
 wax = "0.0.1a3+99ad1da"
 schemas = { path = "schemas", develop = true }
 
