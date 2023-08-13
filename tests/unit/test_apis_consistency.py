@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from hive_transfer_protocol.__private.handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
@@ -12,9 +13,7 @@ if TYPE_CHECKING:
 
 @pytest.mark.parametrize(
     ("async_api", "sync_api"),
-    [
-        (AsyncBeekeeperApi, SyncBeekeeperApi),
-    ],
+    [(AsyncBeekeeperApi, SyncBeekeeperApi), (AsyncDatabaseApi, SyncDatabaseApi)],
 )
 def test_is_api_consistent(
     registered_apis: RegisteredApisT, async_api: AbstractAsyncApi, sync_api: AbstractSyncApi

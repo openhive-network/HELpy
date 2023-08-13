@@ -1,0 +1,24 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from hive_transfer_protocol.__private.handles.abc.api_collection import (
+    AbstractAsyncApiCollection,
+    AbstractSyncApiCollection,
+)
+from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+
+if TYPE_CHECKING:
+    from hive_transfer_protocol.__private.handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
+
+
+class HivedAsyncApiCollection(AbstractAsyncApiCollection):
+    def __init__(self, owner: AbstractAsyncHandle) -> None:
+        super().__init__(owner)
+        self.database = AsyncDatabaseApi(owner=self._owner)
+
+
+class HivedSyncApiCollection(AbstractSyncApiCollection):
+    def __init__(self, owner: AbstractSyncHandle) -> None:
+        super().__init__(owner)
+        self.database = SyncDatabaseApi(owner=self._owner)
