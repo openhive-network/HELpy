@@ -20,6 +20,10 @@ from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api im
 )
 from hive_transfer_protocol.__private.handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
 from hive_transfer_protocol.__private.handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
+from hive_transfer_protocol.__private.handles.hived.api.transaction_status_api import (
+    AsyncTransactionStatusApi,
+    SyncTransactionStatusApi,
+)
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
@@ -35,6 +39,7 @@ if TYPE_CHECKING:
         (AsyncRcApi, SyncRcApi),
         (AsyncReputationApi, SyncReputationApi),
         (AsyncAccountByKeyApi, SyncAccountByKeyApi),
+        (AsyncTransactionStatusApi, SyncTransactionStatusApi),
     ],
 )
 def test_is_api_consistent(
