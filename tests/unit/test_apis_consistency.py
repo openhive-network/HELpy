@@ -5,6 +5,10 @@ from typing import TYPE_CHECKING
 import pytest
 
 from hive_transfer_protocol.__private.handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+from hive_transfer_protocol.__private.handles.hived.api.account_by_key_api import (
+    AsyncAccountByKeyApi,
+    SyncAccountByKeyApi,
+)
 from hive_transfer_protocol.__private.handles.hived.api.account_history_api import (
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
@@ -30,6 +34,7 @@ if TYPE_CHECKING:
         (AsyncNetworkBroadcastApi, SyncNetworkBroadcastApi),
         (AsyncRcApi, SyncRcApi),
         (AsyncReputationApi, SyncReputationApi),
+        (AsyncAccountByKeyApi, SyncAccountByKeyApi),
     ],
 )
 def test_is_api_consistent(
