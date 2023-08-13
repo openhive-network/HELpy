@@ -14,6 +14,7 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
     SyncAccountHistoryApi,
 )
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
 from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
@@ -42,6 +43,7 @@ if TYPE_CHECKING:
         (AsyncAccountByKeyApi, SyncAccountByKeyApi),
         (AsyncTransactionStatusApi, SyncTransactionStatusApi),
         (AsyncNetworkNodeApi, SyncNetworkNodeApi),
+        (AsyncJsonrpc, SyncJsonrpc),
     ],
 )
 def test_is_api_consistent(

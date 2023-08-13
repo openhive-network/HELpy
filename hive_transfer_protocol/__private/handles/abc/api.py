@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-R = TypeVar("R", bound=PreconfiguredBaseModel)
+R = TypeVar("R", bound=PreconfiguredBaseModel | list[Any])
 HandleT = TypeVar("HandleT", bound=AbstractAsyncHandle | AbstractSyncHandle)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
