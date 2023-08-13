@@ -19,6 +19,7 @@ from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api im
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
 )
+from hive_transfer_protocol.__private.handles.hived.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
 from hive_transfer_protocol.__private.handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
 from hive_transfer_protocol.__private.handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
 from hive_transfer_protocol.__private.handles.hived.api.transaction_status_api import (
@@ -40,6 +41,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.reputation = AsyncReputationApi(owner=self._owner)
         self.account_by_key = AsyncAccountByKeyApi(owner=self._owner)
         self.transaction_status = AsyncTransactionStatusApi(owner=self._owner)
+        self.network_node = AsyncNetworkNodeApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -52,3 +54,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.reputation = SyncReputationApi(owner=self._owner)
         self.account_by_key = SyncAccountByKeyApi(owner=self._owner)
         self.transaction_status = SyncTransactionStatusApi(owner=self._owner)
+        self.network_node = SyncNetworkNodeApi(owner=self._owner)
