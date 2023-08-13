@@ -10,6 +10,7 @@ class AccountHistoryApi(AbstractSyncApi):
     @api
     def get_account_history(
         self,
+        *,
         account: str,
         start: int = -1,
         limit: int = 1_000,
@@ -20,12 +21,13 @@ class AccountHistoryApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def get_transaction(self, id_: str, include_reversible: bool = True) -> account_history_api.GetTransaction:
+    def get_transaction(self, *, id_: str, include_reversible: bool = True) -> account_history_api.GetTransaction:
         raise NotImplementedError
 
     @api
     def enum_virtual_ops(
         self,
+        *,
         block_range_begin: int,
         block_range_end: int,
         operation_begin: int | None = None,
@@ -37,6 +39,6 @@ class AccountHistoryApi(AbstractSyncApi):
         raise NotImplementedError
 
     def get_ops_in_block(
-        self, block_num: int, only_virtual: bool = False, include_reversible: bool = True
+        self, *, block_num: int, only_virtual: bool = False, include_reversible: bool = True
     ) -> account_history_api.GetOpsInBlock:
         raise NotImplementedError

@@ -12,5 +12,5 @@ class Jsonrpc(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def get_signature(self, method: str = "") -> jsonrpc.GetSignature:
+    def get_signature(self, *, method: str = "") -> jsonrpc.GetSignature:
         raise NotImplementedError

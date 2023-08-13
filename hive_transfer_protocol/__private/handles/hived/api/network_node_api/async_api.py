@@ -12,11 +12,11 @@ class NetworkNodeApi(AbstractAsyncApi):
         raise NotImplementedError
 
     @api
-    async def add_node(self, endpoint: str) -> network_node_api.AddNode:
+    async def add_node(self, *, endpoint: str) -> network_node_api.AddNode:
         raise NotImplementedError
 
     @api
-    async def set_allowed_peers(self, allowed_peers: list[str]) -> network_node_api.SetAllowedPeers:
+    async def set_allowed_peers(self, *, allowed_peers: list[str]) -> network_node_api.SetAllowedPeers:
         raise NotImplementedError
 
     @api
