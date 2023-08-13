@@ -11,6 +11,10 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
     SyncAccountHistoryApi,
 )
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
+    AsyncNetworkBroadcastApi,
+    SyncNetworkBroadcastApi,
+)
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
@@ -21,6 +25,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         super().__init__(owner)
         self.database = AsyncDatabaseApi(owner=self._owner)
         self.account_history = AsyncAccountHistoryApi(owner=self._owner)
+        self.network_broadcast = AsyncNetworkBroadcastApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -28,3 +33,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         super().__init__(owner)
         self.database = SyncDatabaseApi(owner=self._owner)
         self.account_history = SyncAccountHistoryApi(owner=self._owner)
+        self.network_broadcast = SyncNetworkBroadcastApi(owner=self._owner)

@@ -10,6 +10,10 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
     SyncAccountHistoryApi,
 )
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
+    AsyncNetworkBroadcastApi,
+    SyncNetworkBroadcastApi,
+)
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
@@ -21,6 +25,7 @@ if TYPE_CHECKING:
         (AsyncBeekeeperApi, SyncBeekeeperApi),
         (AsyncDatabaseApi, SyncDatabaseApi),
         (AsyncAccountHistoryApi, SyncAccountHistoryApi),
+        (AsyncNetworkBroadcastApi, SyncNetworkBroadcastApi),
     ],
 )
 def test_is_api_consistent(
