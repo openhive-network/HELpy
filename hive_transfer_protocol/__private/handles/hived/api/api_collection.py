@@ -14,6 +14,7 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
+from hive_transfer_protocol.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
 from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
 from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
@@ -44,6 +45,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.transaction_status = AsyncTransactionStatusApi(owner=self._owner)
         self.network_node = AsyncNetworkNodeApi(owner=self._owner)
         self.jsonrpc = AsyncJsonrpc(owner=self._owner)
+        self.condenser = AsyncCondenserApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -58,3 +60,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.transaction_status = SyncTransactionStatusApi(owner=self._owner)
         self.network_node = SyncNetworkNodeApi(owner=self._owner)
         self.jsonrpc = SyncJsonrpc(owner=self._owner)
+        self.condenser = SyncCondenserApi(owner=self._owner)
