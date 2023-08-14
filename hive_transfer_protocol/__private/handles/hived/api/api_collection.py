@@ -14,6 +14,7 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
+from hive_transfer_protocol.__private.handles.hived.api.blocks_api import AsyncBlocksApi, SyncBlocksApi
 from hive_transfer_protocol.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
 from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
@@ -56,6 +57,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.condenser = AsyncCondenserApi(owner=self._owner)
         self.wallet_bridge = AsyncWalletBridgeApi(owner=self._owner)
         self.market_history = AsyncMarketHistoryApi(owner=self._owner)
+        self.blocks_api = AsyncBlocksApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -73,3 +75,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.condenser = SyncCondenserApi(owner=self._owner)
         self.wallet_bridge = SyncWalletBridgeApi(owner=self._owner)
         self.market_history = SyncMarketHistoryApi(owner=self._owner)
+        self.blocks_api = SyncBlocksApi(owner=self._owner)
