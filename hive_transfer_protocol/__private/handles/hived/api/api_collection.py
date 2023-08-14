@@ -17,6 +17,7 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
 from hive_transfer_protocol.__private.handles.hived.api.blocks_api import AsyncBlocksApi, SyncBlocksApi
 from hive_transfer_protocol.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from hive_transfer_protocol.__private.handles.hived.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
 from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
 from hive_transfer_protocol.__private.handles.hived.api.market_history_api import (
     AsyncMarketHistoryApi,
@@ -58,6 +59,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.wallet_bridge = AsyncWalletBridgeApi(owner=self._owner)
         self.market_history = AsyncMarketHistoryApi(owner=self._owner)
         self.blocks_api = AsyncBlocksApi(owner=self._owner)
+        self.debug_node = AsyncDebugNodeApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -76,3 +78,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.wallet_bridge = SyncWalletBridgeApi(owner=self._owner)
         self.market_history = SyncMarketHistoryApi(owner=self._owner)
         self.blocks_api = SyncBlocksApi(owner=self._owner)
+        self.debug_node = SyncDebugNodeApi(owner=self._owner)
