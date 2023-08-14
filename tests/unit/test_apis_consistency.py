@@ -16,6 +16,10 @@ from hive_transfer_protocol.__private.handles.hived.api.account_history_api impo
 from hive_transfer_protocol.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
 from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
+from hive_transfer_protocol.__private.handles.hived.api.market_history_api import (
+    AsyncMarketHistoryApi,
+    SyncMarketHistoryApi,
+)
 from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
@@ -51,6 +55,7 @@ if TYPE_CHECKING:
         (AsyncJsonrpc, SyncJsonrpc),
         (AsyncCondenserApi, SyncCondenserApi),
         (AsyncWalletBridgeApi, SyncWalletBridgeApi),
+        (AsyncMarketHistoryApi, SyncMarketHistoryApi),
     ],
 )
 def test_is_api_consistent(
