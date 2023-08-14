@@ -27,6 +27,10 @@ from hive_transfer_protocol.__private.handles.hived.api.transaction_status_api i
     AsyncTransactionStatusApi,
     SyncTransactionStatusApi,
 )
+from hive_transfer_protocol.__private.handles.hived.api.wallet_bridge_api import (
+    AsyncWalletBridgeApi,
+    SyncWalletBridgeApi,
+)
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
@@ -46,6 +50,7 @@ if TYPE_CHECKING:
         (AsyncNetworkNodeApi, SyncNetworkNodeApi),
         (AsyncJsonrpc, SyncJsonrpc),
         (AsyncCondenserApi, SyncCondenserApi),
+        (AsyncWalletBridgeApi, SyncWalletBridgeApi),
     ],
 )
 def test_is_api_consistent(

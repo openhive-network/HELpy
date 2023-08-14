@@ -28,6 +28,10 @@ from hive_transfer_protocol.__private.handles.hived.api.transaction_status_api i
     AsyncTransactionStatusApi,
     SyncTransactionStatusApi,
 )
+from hive_transfer_protocol.__private.handles.hived.api.wallet_bridge_api import (
+    AsyncWalletBridgeApi,
+    SyncWalletBridgeApi,
+)
 
 if TYPE_CHECKING:
     from hive_transfer_protocol.__private.handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
@@ -46,6 +50,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.network_node = AsyncNetworkNodeApi(owner=self._owner)
         self.jsonrpc = AsyncJsonrpc(owner=self._owner)
         self.condenser = AsyncCondenserApi(owner=self._owner)
+        self.wallet_bridge = AsyncWalletBridgeApi(owner=self._owner)
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
@@ -61,3 +66,4 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.network_node = SyncNetworkNodeApi(owner=self._owner)
         self.jsonrpc = SyncJsonrpc(owner=self._owner)
         self.condenser = SyncCondenserApi(owner=self._owner)
+        self.wallet_bridge = SyncWalletBridgeApi(owner=self._owner)
