@@ -13,17 +13,20 @@ class Url(Generic[ProtocolT]):
 
     def __init__(self, url: str, *, protocol: ProtocolT | Literal[""] = "") -> None:
         parsed_url = urlparse(url, scheme=protocol)
+        if not parsed_url.netloc:
+            parsed_url = urlparse(f"//{url}", scheme=protocol)
+
         if not parsed_url.hostname:
             raise ValueError("Address was not specified.")
 
-        self.__protocol = protocol
+        self.__protocol = parsed_url.scheme
         self.__address: str = parsed_url.hostname
         self.__port: int | None = parsed_url.port
 
     @property
     def protocol(self) -> ProtocolT | Literal[""]:
         """Return protocol of url, e.x: http, https."""
-        return self.__protocol
+        return self.__protocol  # type: ignore[return-value]
 
     @property
     def address(self) -> str:
