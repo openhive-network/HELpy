@@ -122,3 +122,6 @@ required-imports = ["from __future__ import annotations"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.ruff.pydocstyle]
+convention = "pep257"

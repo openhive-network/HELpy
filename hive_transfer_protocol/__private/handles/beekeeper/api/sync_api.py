@@ -45,10 +45,6 @@ class BeekeeperApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def list_keys(self, *, wallet_name: str, password: str) -> beekeeper_api.ListKeys:
-        raise NotImplementedError
-
-    @api
     def get_public_keys(self) -> beekeeper_api.GetPublicKeys:
         raise NotImplementedError
 

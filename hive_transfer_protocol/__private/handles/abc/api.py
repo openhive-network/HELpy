@@ -29,6 +29,8 @@ def _convert_pascal_case_to_sneak_case(pascal_case_input: str) -> str:
 
 
 class AbstractApi(ABC, Generic[HandleT]):
+    """Base class for apis."""
+
     __registered_apis: ClassVar[RegisteredApisT] = defaultdict(lambda: defaultdict(lambda: set()))
 
     @staticmethod
@@ -69,6 +71,8 @@ class AbstractApi(ABC, Generic[HandleT]):
 
 
 class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
+    """Base class for all apis, that provides synchronous endpoints."""
+
     def __init__(self, owner: AbstractSyncHandle) -> None:
         super().__init__(owner)
 
@@ -92,6 +96,8 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
 
 
 class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
+    """Base class for all apis, that provides asynchronous endpoints."""
+
     def __init__(self, owner: AbstractAsyncHandle) -> None:
         super().__init__(owner)
 

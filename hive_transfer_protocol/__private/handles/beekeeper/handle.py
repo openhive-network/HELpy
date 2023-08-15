@@ -10,6 +10,8 @@ from hive_transfer_protocol.__private.handles.beekeeper.api.api_collection impor
 
 
 class Beekeeper(AbstractSyncHandle):
+    """Synchronous handle for beekeeper service communication."""
+
     def _clone(self) -> Beekeeper:
         return Beekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 
@@ -22,6 +24,8 @@ class Beekeeper(AbstractSyncHandle):
 
 
 class AsyncBeekeeper(AbstractAsyncHandle):
+    """Asynchronous handle for beekeeper service communication."""
+
     def _clone(self) -> AsyncBeekeeper:
         return AsyncBeekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 

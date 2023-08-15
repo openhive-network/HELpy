@@ -112,6 +112,8 @@ class AbstractHandle:
 
 
 class AbstractAsyncHandle(ABC, AbstractHandle):
+    """Base class for service handlers that uses asynchronous communication."""
+
     async def _async_send(self, *, endpoint: str, params: str, expected_type: type[ExpectedT]) -> HiveResult[ExpectedT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         response = await self._communicator.async_send(
@@ -121,6 +123,8 @@ class AbstractAsyncHandle(ABC, AbstractHandle):
 
 
 class AbstractSyncHandle(ABC, AbstractHandle):
+    """Base class for service handlers that uses synchronous communication."""
+
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectedT]) -> HiveResult[ExpectedT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         response = self._communicator.send(

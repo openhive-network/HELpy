@@ -13,12 +13,16 @@ if TYPE_CHECKING:
 
 
 class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
+    """Beekeepers collection of available apis in async version."""
+
     def __init__(self, owner: AbstractAsyncHandle) -> None:
         super().__init__(owner)
         self.beekeeper = AsyncBeekeeperApi(owner=self._owner)
 
 
 class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
+    """Beekeepers collection of available apis in async version."""
+
     def __init__(self, owner: AbstractSyncHandle) -> None:
         super().__init__(owner)
         self.beekeeper = SyncBeekeeperApi(owner=self._owner)

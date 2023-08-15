@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
 
 class HttpxCommunicator(AbstractCommunicator):
+    """Provides support for httpx library."""
+
     __async_client: ClassVar[httpx.AsyncClient | None] = None
 
     @classmethod
