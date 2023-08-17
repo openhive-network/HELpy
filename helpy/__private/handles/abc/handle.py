@@ -36,9 +36,16 @@ class MissingResultError(HelpyError):
 class AbstractHandle:
     """Provides basic interface for all network handles."""
 
-    def __init__(self, *, http_url: HttpUrl, communicator: type[AbstractCommunicator] = HttpxCommunicator) -> None:
+    def __init__(self, *, http_url: HttpUrl, communicator: AbstractCommunicator | None = None) -> None:
+        """Constructs handle to network service.
+
+        Keyword Arguments:
+            http_url -- http url where, service is available.
+
+            communicator -- communicator class to use for communication (default: {HttpxCommunicator})
+        """
         self.__http_endpoint = http_url
-        self.__communicator = communicator
+        self.__communicator = communicator or HttpxCommunicator()
         self.__api = self._construct_api()
 
     @property
@@ -56,7 +63,7 @@ class AbstractHandle:
         return self.__api
 
     @property
-    def _communicator(self) -> type[AbstractCommunicator]:
+    def _communicator(self) -> AbstractCommunicator:
         """Return communicator. Internal only."""
         return self.__communicator
 

@@ -27,14 +27,12 @@ class AbstractCommunicator(ABC):
     period_between_retries: ClassVar[timedelta] = timedelta(seconds=1)
     timeout: ClassVar[timedelta] = timedelta(seconds=2)
 
-    @classmethod
     @abstractmethod
-    def send(cls, url: HttpUrl, data: str) -> str:
+    def send(self, url: HttpUrl, data: str) -> str:
         """Sends to given url given data synchronously."""
 
-    @classmethod
     @abstractmethod
-    async def async_send(cls, url: HttpUrl, data: str) -> str:
+    async def async_send(self, url: HttpUrl, data: str) -> str:
         """Sends to given url given data asynchronously."""
 
     @classmethod
