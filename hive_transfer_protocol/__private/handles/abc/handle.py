@@ -50,8 +50,8 @@ class AbstractHandle:
         """Return endpoint where handle is connected to."""
         return self.__http_endpoint
 
-    @http_endpoint.setter  # type: ignore[attr-defined]  # https://github.com/python/mypy/issues/1465
-    def set_http_endpoint(self, value: HttpUrl) -> None:
+    @http_endpoint.setter
+    def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
         self.__http_endpoint = value
 
