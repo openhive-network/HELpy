@@ -1266,6 +1266,17 @@ docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (>=0.931)", "pytest-trio (>=0.7.0)"]
 
 [[package]]
+name = "pytest-is-running"
+version = "1.5.0"
+description = "pytest plugin providing a function to check if pytest is running."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest_is_running-1.5.0-py3-none-any.whl", hash = "sha256:2bba7f7f4343bf8fbd5eb7ebb895ab21083b2779b89475211deba2d9bfa40f49"},
+    {file = "pytest_is_running-1.5.0.tar.gz", hash = "sha256:dc227f6d33f76c003c2e5b408734fb2cae02dbd627a1018f78d6196a796943e2"},
+]
+
+[[package]]
 name = "pytest-xdist"
 version = "3.1.0"
 description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
@@ -1982,4 +1993,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "71939e482633c6cb5acb616a449748b29ea89872fadd919d0e2fda86b505ef27"
+content-hash = "b29bc08f13b6151b896df82f8e1f98d3ddf88779423fba99241fd7f85a24ece6"
