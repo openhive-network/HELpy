@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 import pytest
@@ -18,12 +18,12 @@ if TYPE_CHECKING:
     from schemas.notification_model.notifications.abc.notification_base import NotificationBase
 
 CounterGetterT = Callable[[CountingAppbaseNotificationHandler], int]
-smoke_test_cases: Iterable[tuple[CounterGetterT, NotificationBase]] = (
+smoke_test_cases: list[tuple[CounterGetterT, NotificationBase]] = [
     (lambda h: h.on_ws_webserver_bind_count, WebserverListening(type_="WS", address="127.0.0.1", port=9090)),
     (lambda h: h.on_http_webserver_bind_count, WebserverListening(type_="HTTP", address="127.0.0.1", port=9090)),
     (lambda h: h.on_error_count, Error(message="some error message")),
     (lambda h: h.on_status_changed_count, Status(current_status="syncing")),
-)
+]
 
 
 @pytest.mark.parametrize(("counter_getter", "notification"), smoke_test_cases)
