@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 
-class HiveTransferProtocolError(Exception):
-    """Base class for all Hive Transfer Protocol Errors."""
+class HelpyError(Exception):
+    """Base class for all helpy Errors."""
 
 
-class ParseError(HiveTransferProtocolError):
+class ParseError(HelpyError):
     """Raised if cannot parse given str, e.x. url, date, asset."""
 
 
-class BlockWaitTimeoutError(HiveTransferProtocolError):
+class BlockWaitTimeoutError(HelpyError):
     """Raised if reached not expected block number."""
 
     def __init__(self, last_block_number: int, block_number: int, last_irreversible_block_number: int) -> None:

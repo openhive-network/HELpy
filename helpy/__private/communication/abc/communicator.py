@@ -6,13 +6,13 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, ClassVar
 
-from helpy.exceptions import HiveTransferProtocolError
+from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
     from helpy.__private.interfaces.url import HttpUrl
 
 
-class CommunicationError(HiveTransferProtocolError):
+class CommunicationError(HelpyError):
     """Base class for all communication related errors."""
 
 

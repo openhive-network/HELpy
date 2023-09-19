@@ -4,7 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 import wax
-from helpy.exceptions import HiveTransferProtocolError
+from helpy.exceptions import HelpyError
 from schemas.__private.hive_fields_basic_schemas import PublicKey
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from schemas.transaction_model.transaction import Hf26Transaction
 
 
-class WaxOperationFailedError(HiveTransferProtocolError):
+class WaxOperationFailedError(HelpyError):
     pass
 
 
