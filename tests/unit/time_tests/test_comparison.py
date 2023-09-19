@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hive_transfer_protocol import Time
+from helpy import Time
 
 
 def test_comparison_without_tolerance() -> None:

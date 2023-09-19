@@ -4,17 +4,17 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry]
-name = "hive_transfer_protocol"
+name = "helpy"
 version = "0.0.0"
 description = "Out of the box library for interactions with hive blockchain"
 readme = "README.md"
-repository = "https://gitlab.syncad.com/hive/hive-transfer-protocol"
+repository = "https://gitlab.syncad.com/hive/helpy"
 authors = [
     "Mateusz Żebrak <mzebrak@syncad.com>",
     "Krzysztof Mochocki <kmochocki@syncad.com>"
 ]
 packages = [
-    { include = "hive_transfer_protocol" },
+    { include = "helpy" },
 ]
 source = [
     { name = "PyPI", priority = "primary" },

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from hive_transfer_protocol import HttpUrl, WsUrl
+from helpy import HttpUrl, WsUrl
 
 URL_TYPES = type[HttpUrl] | type[WsUrl]
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hive_transfer_protocol import Time, TimeFormats
+from helpy import Time, TimeFormats
 
 
 def test_time_serialization_in_default_format() -> None:
