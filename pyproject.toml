@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "helpy"
 version = "0.0.0"
-description = "Out of the box library for interactions with hive blockchain"
+description = "Easily interact with the Hive blockchain using Python."
 readme = "README.md"
 repository = "https://gitlab.syncad.com/hive/helpy"
 authors = [
