@@ -4,14 +4,14 @@ import decimal
 import warnings
 from decimal import Decimal
 
-from helpy.exceptions import HiveTransferProtocolError
+from helpy.exceptions import HelpyError
 
 
-class DecimalConversionError(HiveTransferProtocolError):
+class DecimalConversionError(HelpyError):
     """Raised when decimal conversion fails."""
 
 
-class DecimalConversionNotANumberError(HiveTransferProtocolError):
+class DecimalConversionNotANumberError(HelpyError):
     """Raised when decimal conversion fails because the value is not a number."""
 
 

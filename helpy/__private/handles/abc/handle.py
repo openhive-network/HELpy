@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, TypeVar
 
 from helpy.__private.communication.httpx_communicator import HttpxCommunicator
-from helpy.exceptions import HiveTransferProtocolError
+from helpy.exceptions import HelpyError
 from schemas.__private.hive_factory import HiveResult
 from schemas.__private.preconfigured_base_model import PreconfiguredBaseModel
 
@@ -26,14 +26,14 @@ ExpectedT = TypeVar("ExpectedT", bound=PreconfiguredBaseModel)
 
 
 @dataclass
-class RequestError(HiveTransferProtocolError):
+class RequestError(HelpyError):
     """Raised if error field is in the response."""
 
     send: str
     error: str
 
 
-class MissingResultError(HiveTransferProtocolError):
+class MissingResultError(HelpyError):
     """Raised if response does not have any response."""
 
 

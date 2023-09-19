@@ -7,7 +7,7 @@ from helpy.__private.interfaces.asset.decimal_converter import (
     DecimalConversionNotANumberError,
     DecimalConverter,
 )
-from helpy.exceptions import HiveTransferProtocolError
+from helpy.exceptions import HelpyError
 from schemas.__private.hive_fields_basic_schemas import (
     AssetHbdHF26,
     AssetHbdLegacy,
@@ -22,16 +22,16 @@ AssetAmountT = int | float | str
 AssetT = TypeVar("AssetT", AssetHiveHF26, AssetHbdHF26, AssetVestsHF26)
 
 
-class AssetError(HiveTransferProtocolError):
+class AssetError(HelpyError):
     """Base class for all asset related errors."""
 
 
-class AssetLegacyInvalidFormatError(HiveTransferProtocolError):
+class AssetLegacyInvalidFormatError(HelpyError):
     def __init__(self, value: str) -> None:
         super().__init__(f"Invalid asset format: {value}")
 
 
-class AssetAmountInvalidFormatError(HiveTransferProtocolError):
+class AssetAmountInvalidFormatError(HelpyError):
     def __init__(self, value: str) -> None:
         self.message = f"Invalid asset amount format: '{value}'. Should be a number."
         super().__init__(self.message)
