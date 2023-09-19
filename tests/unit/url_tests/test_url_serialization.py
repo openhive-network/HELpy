@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from hive_transfer_protocol import HttpUrl, WsUrl
+from helpy import HttpUrl, WsUrl
 from tests.unit.constants import DEFAULT_ADDRESS, DEFAULT_PORT, URL_TYPES
 
 

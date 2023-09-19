@@ -5,7 +5,7 @@ from datetime import timedelta
 import pytest
 from dateutil.relativedelta import relativedelta
 
-from hive_transfer_protocol import Time
+from helpy import Time
 
 
 @pytest.mark.parametrize(

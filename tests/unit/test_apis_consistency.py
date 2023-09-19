@@ -4,42 +4,42 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from hive_transfer_protocol.__private.handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
-from hive_transfer_protocol.__private.handles.hived.api.account_by_key_api import (
+from helpy.__private.handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+from helpy.__private.handles.hived.api.account_by_key_api import (
     AsyncAccountByKeyApi,
     SyncAccountByKeyApi,
 )
-from hive_transfer_protocol.__private.handles.hived.api.account_history_api import (
+from helpy.__private.handles.hived.api.account_history_api import (
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
-from hive_transfer_protocol.__private.handles.hived.api.blocks_api import AsyncBlocksApi, SyncBlocksApi
-from hive_transfer_protocol.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
-from hive_transfer_protocol.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
-from hive_transfer_protocol.__private.handles.hived.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
-from hive_transfer_protocol.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
-from hive_transfer_protocol.__private.handles.hived.api.market_history_api import (
+from helpy.__private.handles.hived.api.blocks_api import AsyncBlocksApi, SyncBlocksApi
+from helpy.__private.handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
+from helpy.__private.handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from helpy.__private.handles.hived.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
+from helpy.__private.handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
+from helpy.__private.handles.hived.api.market_history_api import (
     AsyncMarketHistoryApi,
     SyncMarketHistoryApi,
 )
-from hive_transfer_protocol.__private.handles.hived.api.network_broadcast_api import (
+from helpy.__private.handles.hived.api.network_broadcast_api import (
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
 )
-from hive_transfer_protocol.__private.handles.hived.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
-from hive_transfer_protocol.__private.handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
-from hive_transfer_protocol.__private.handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
-from hive_transfer_protocol.__private.handles.hived.api.transaction_status_api import (
+from helpy.__private.handles.hived.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
+from helpy.__private.handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
+from helpy.__private.handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
+from helpy.__private.handles.hived.api.transaction_status_api import (
     AsyncTransactionStatusApi,
     SyncTransactionStatusApi,
 )
-from hive_transfer_protocol.__private.handles.hived.api.wallet_bridge_api import (
+from helpy.__private.handles.hived.api.wallet_bridge_api import (
     AsyncWalletBridgeApi,
     SyncWalletBridgeApi,
 )
 
 if TYPE_CHECKING:
-    from hive_transfer_protocol.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
+    from helpy.__private.handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
 
 
 @pytest.mark.parametrize(

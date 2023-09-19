@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from hive_transfer_protocol import Time, TimeFormats
-from hive_transfer_protocol.exceptions import ParseError
+from helpy import Time, TimeFormats
+from helpy.exceptions import ParseError
 
 
 @pytest.mark.parametrize(
