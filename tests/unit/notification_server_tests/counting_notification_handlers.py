@@ -3,13 +3,13 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from helpy.__private.communication.appbase_notification_handler import AppbaseNotificationHandler
-from helpy.__private.communication.httpx_communicator import HttpxCommunicator
+from helpy._communication.appbase_notification_handler import AppbaseNotificationHandler
+from helpy._communication.httpx_communicator import HttpxCommunicator
 from schemas.jsonrpc import JSONRPCResult
 from schemas.notifications import Notification
 
 if TYPE_CHECKING:
-    from helpy.__private.interfaces.url import HttpUrl
+    from helpy._interfaces.url import HttpUrl
     from schemas.notifications import Error, Status, WebserverListening
     from schemas.notifications.abc import NotificationBase
 

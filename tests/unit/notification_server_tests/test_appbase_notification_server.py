@@ -12,7 +12,7 @@ from tests.unit.notification_server_tests.counting_notification_handlers import 
 )
 
 if TYPE_CHECKING:
-    from helpy.__private.interfaces.url import HttpUrl
+    from helpy._interfaces.url import HttpUrl
     from schemas.notifications.abc import NotificationBase
 
 CounterGetterT = Callable[[CountingAppbaseNotificationHandler], int]
