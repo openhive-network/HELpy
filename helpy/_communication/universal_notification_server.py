@@ -1,79 +1,26 @@
 from __future__ import annotations
 
 import asyncio
-from abc import ABC, abstractmethod
 from collections import defaultdict
-from collections.abc import Awaitable, Callable  # noqa: TCH003
 from threading import Thread
 from time import sleep
-from typing import Any, Final, Generic
+from typing import TYPE_CHECKING, Any, Final
 
-from pydantic.generics import GenericModel
-
+from helpy._communication.abc.notification_handler import NotificationHandler
 from helpy._communication.async_server import AsyncHttpServer
-from helpy._communication.observer import Observer
+from helpy._communication.notification_decorator import _NotificationHandlerWrapper
+from helpy._interfaces.context import ContextSync
 from helpy.exceptions import HelpyError
-from schemas.jsonrpc import JSONRPCResult, get_response_model
-from schemas.notifications import KnownNotificationT, Notification
 
-AnyNotification = Notification[Any]
+if TYPE_CHECKING:
+    from schemas.notifications import KnownNotificationT, Notification
 
 
 class UnhandledNotificationError(HelpyError):
-    def __init__(self, notification: AnyNotification) -> None:
+    def __init__(self, notification: Notification[KnownNotificationT]) -> None:
         super().__init__(
             f"Notification `{notification.name}` does not have any registered method to be passed to.", notification
         )
-
-
-class NotificationHandler(Observer, ABC):
-    async def data_received(self, data: dict[str, Any]) -> None:
-        deserialized_notification = get_response_model(Notification[KnownNotificationT], **data)
-        assert isinstance(deserialized_notification, JSONRPCResult)
-        await self.handle_notification(deserialized_notification.result)
-
-    @abstractmethod
-    async def handle_notification(self, notification: Notification[KnownNotificationT]) -> None:
-        """Method called after properly serializing notification.
-
-        Args:
-            notification (Notification[T]): received notification object
-        """
-
-
-class _NotificationHandlerWrapper(GenericModel, Generic[KnownNotificationT]):
-    notification_name: str
-    notification_handler: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]
-    notification_condition: Callable[[Notification[KnownNotificationT]], bool]
-
-    async def call(self, this: Any, notification: Notification[KnownNotificationT]) -> None:
-        await self.notification_handler(this, notification)
-
-    async def __call__(self, this: Any, notification: Notification[KnownNotificationT]) -> Any:
-        return self.call(this, notification)
-
-
-def notification(
-    type_: type[KnownNotificationT],
-    /,
-    *,
-    condition: Callable[[Notification[KnownNotificationT]], bool] | None = None,
-) -> Callable[
-    [Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]],
-    _NotificationHandlerWrapper[KnownNotificationT],
-]:
-    def wrapper(
-        callback: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]
-    ) -> _NotificationHandlerWrapper[KnownNotificationT]:
-        result_cls = _NotificationHandlerWrapper[type_]  # type: ignore[valid-type]
-        result_cls.update_forward_refs(**locals())
-        return result_cls(  # type: ignore[return-value]
-            notification_name=type_.get_notification_name(),
-            notification_handler=callback,
-            notification_condition=condition or (lambda _: True),
-        )
-
-    return wrapper
 
 
 class UniversalNotificationHandler(NotificationHandler):
@@ -97,7 +44,7 @@ class UniversalNotificationHandler(NotificationHandler):
         raise UnhandledNotificationError(notification)
 
 
-class UniversalNotificationServer:
+class UniversalNotificationServer(ContextSync[int]):
     def __init__(self, event_handler: UniversalNotificationHandler) -> None:
         self.__event_handler = event_handler
         self.__event_handler.setup()
@@ -123,3 +70,9 @@ class UniversalNotificationServer:
     @property
     def port(self) -> int:
         return self.__http_server.port
+
+    def _enter(self) -> int:
+        return self.run()
+
+    def _finally(self) -> None:
+        self.close()
