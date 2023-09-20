@@ -10,7 +10,8 @@ from typing import Any, Final, Generic
 
 from pydantic.generics import GenericModel
 
-from helpy.__private.communication.async_server import AsyncHttpServer, Observer
+from helpy.__private.communication.async_server import AsyncHttpServer
+from helpy.__private.communication.observer import Observer
 from helpy.exceptions import HelpyError
 from schemas.jsonrpc import JSONRPCResult, get_response_model
 from schemas.notifications import KnownNotificationT, Notification

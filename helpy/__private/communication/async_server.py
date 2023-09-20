@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from abc import ABC, abstractmethod
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from aiohttp import web
 
@@ -11,6 +10,8 @@ from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
     from socket import socket
+
+    from helpy.__private.communication.observer import Observer
 
 
 class AsyncHttpServerError(HelpyError):
@@ -30,19 +31,6 @@ class ServerAlreadyRunningError(AsyncHttpServerError):
 class ServerSetupError(AsyncHttpServerError):
     def __init__(self, message: str) -> None:
         super().__init__(message)
-
-
-class Observer(ABC):
-    @abstractmethod
-    async def data_received(self, data: dict[str, Any]) -> None:
-        """Called when any data is received via PUT method.
-
-        Arguments:
-            data -- data received as body
-
-        Returns:
-            Nothing.
-        """
 
 
 class AsyncHttpServer:
