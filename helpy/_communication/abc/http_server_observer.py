@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 
-class Observer(ABC):
+class HttpServerObserver(ABC):
     @abstractmethod
     async def data_received(self, data: dict[str, Any]) -> None:
         """Called when any data is received via PUT method.

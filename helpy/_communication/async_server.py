@@ -5,13 +5,15 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 from aiohttp import web
+from typing_extensions import Self
 
+from helpy._interfaces.context import ContextAsync
 from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
     from socket import socket
 
-    from helpy._communication.observer import Observer
+    from helpy._communication.abc.http_server_observer import HttpServerObserver
 
 
 class AsyncHttpServerError(HelpyError):
@@ -33,10 +35,10 @@ class ServerSetupError(AsyncHttpServerError):
         super().__init__(message)
 
 
-class AsyncHttpServer:
+class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
     __ADDRESS = ("0.0.0.0", 0)
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: HttpServerObserver) -> None:
         self.__observer = observer
         self.__app = web.Application()
         self.__site: web.TCPSite | None = None
@@ -88,3 +90,10 @@ class AsyncHttpServer:
         if not self.__site:
             raise ServerNotRunningError
         self.__running = False
+
+    async def _enter(self) -> Self:
+        await self.run()
+        return self
+
+    async def _finally(self) -> None:
+        self.close()

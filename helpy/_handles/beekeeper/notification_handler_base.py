@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from helpy._communication.appbase_notification_handler import AppbaseNotificationHandler
-from helpy._communication.universal_notification_server import notification
+from helpy._communication.notification_decorator import notification
 from schemas.notifications import AttemptClosingWallets, OpeningBeekeeperFailed
 
 if TYPE_CHECKING:

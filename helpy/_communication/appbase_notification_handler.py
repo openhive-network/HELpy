@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._communication.universal_notification_server import (
-    UniversalNotificationHandler,
-    notification,
-)
+from helpy._communication.notification_decorator import notification
+from helpy._communication.universal_notification_server import UniversalNotificationHandler
 from schemas.notifications import Error, Status, WebserverListening
 
 if TYPE_CHECKING:
