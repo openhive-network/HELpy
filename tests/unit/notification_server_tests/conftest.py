@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.__private.communication.universal_notification_server import UniversalNotificationServer
-from helpy.__private.interfaces.url import HttpUrl
+from helpy._communication.universal_notification_server import UniversalNotificationServer
+from helpy._interfaces.url import HttpUrl
 from tests.unit.notification_server_tests.counting_notification_handlers import CountingAppbaseNotificationHandler
 
 if TYPE_CHECKING:

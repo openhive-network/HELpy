@@ -1,9 +1,27 @@
 from __future__ import annotations
 
-from helpy.__private.handles.beekeeper.handle import AsyncBeekeeper, Beekeeper
-from helpy.__private.handles.hived.handle import AsyncHived, Hived
-from helpy.__private.interfaces import wax
-from helpy.__private.interfaces.time import Time, TimeFormats
-from helpy.__private.interfaces.url import HttpUrl, WsUrl
+from helpy._handles import (
+    AsyncBeekeeper,
+    AsyncHived,
+    Beekeeper,
+    BeekeeperNotificationHandler,
+    Hived,
+    HivedNotificationHandler,
+)
+from helpy._interfaces import wax
+from helpy._interfaces.time import Time, TimeFormats
+from helpy._interfaces.url import HttpUrl, WsUrl
 
-__all__ = ["Beekeeper", "AsyncBeekeeper", "AsyncHived", "Hived", "HttpUrl", "WsUrl", "Time", "TimeFormats", "wax"]
+__all__ = [
+    "AsyncBeekeeper",
+    "AsyncHived",
+    "Beekeeper",
+    "BeekeeperNotificationHandler",
+    "Hived",
+    "HivedNotificationHandler",
+    "HttpUrl",
+    "Time",
+    "TimeFormats",
+    "wax",
+    "WsUrl",
+]
