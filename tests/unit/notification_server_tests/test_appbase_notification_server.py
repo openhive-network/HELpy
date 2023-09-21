@@ -5,9 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from schemas.notification_model.notifications.error_notification import Error
-from schemas.notification_model.notifications.listening_notification import WebserverListening
-from schemas.notification_model.notifications.status_notification import Status
+from schemas.notifications import Error, Status, WebserverListening
 from tests.unit.notification_server_tests.counting_notification_handlers import (
     CountingAppbaseNotificationHandler,
     send_notification,
@@ -15,7 +13,7 @@ from tests.unit.notification_server_tests.counting_notification_handlers import 
 
 if TYPE_CHECKING:
     from helpy.__private.interfaces.url import HttpUrl
-    from schemas.notification_model.notifications.abc.notification_base import NotificationBase
+    from schemas.notifications.abc import NotificationBase
 
 CounterGetterT = Callable[[CountingAppbaseNotificationHandler], int]
 smoke_test_cases: list[tuple[CounterGetterT, NotificationBase]] = [

@@ -11,14 +11,14 @@ from helpy.__private.handles.abc.handle import (
     AbstractAsyncHandle,
     AbstractSyncHandle,
 )
-from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
 
+    from schemas.jsonrpc import ExpectResultT
+
 
 P = ParamSpec("P")
-R = TypeVar("R", bound=PreconfiguredBaseModel | list[Any] | str | int | None)
 HandleT = TypeVar("HandleT", bound=AbstractAsyncHandle | AbstractSyncHandle)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
@@ -34,7 +34,7 @@ class AbstractApi(ABC, Generic[HandleT]):
     __registered_apis: ClassVar[RegisteredApisT] = defaultdict(lambda: defaultdict(lambda: set()))
 
     @staticmethod
-    def _get_api_name_from_method(method: Callable[P, R] | Callable[P, Awaitable[R]]) -> str:
+    def _get_api_name_from_method(method: Callable[P, ExpectResultT] | Callable[P, Awaitable[ExpectResultT]]) -> str:
         """Converts __qualname__ to api name."""
         return _convert_pascal_case_to_sneak_case(method.__qualname__.split(".")[0])
 
@@ -77,7 +77,7 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
         super().__init__(owner)
 
     @classmethod
-    def _endpoint(cls, wrapped_function: Callable[P, R]) -> Callable[P, R]:
+    def _endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)
@@ -85,7 +85,7 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=True)
 
         @wraps(wrapped_function)
-        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
+        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             return this._owner._send(  # type: ignore[no-any-return]
                 endpoint=f"{api_name}.{wrapped_function_name}",
                 params=cls._serialize_params(args=args, kwargs=kwargs),
@@ -102,7 +102,9 @@ class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
         super().__init__(owner)
 
     @classmethod
-    def _endpoint(cls, wrapped_function: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+    def _endpoint(
+        cls, wrapped_function: Callable[P, Awaitable[ExpectResultT]]
+    ) -> Callable[P, Awaitable[ExpectResultT]]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)  # type: ignore[arg-type]
@@ -110,7 +112,7 @@ class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=False)
 
         @wraps(wrapped_function)
-        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
+        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             return (  # type: ignore[no-any-return]
                 await this._owner._async_send(
                     endpoint=f"{api_name}.{wrapped_function_name}",

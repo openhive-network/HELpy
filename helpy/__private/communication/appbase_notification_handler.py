@@ -6,12 +6,10 @@ from helpy.__private.communication.universal_notification_server import (
     UniversalNotificationHandler,
     notification,
 )
-from schemas.notification_model import WebserverListening
-from schemas.notification_model.notifications.error_notification import Error
-from schemas.notification_model.notifications.status_notification import Status
+from schemas.notifications import Error, Status, WebserverListening
 
 if TYPE_CHECKING:
-    from schemas.notification_model.notification import Notification
+    from schemas.notifications import Notification
 
 
 class AppbaseNotificationHandler(UniversalNotificationHandler):

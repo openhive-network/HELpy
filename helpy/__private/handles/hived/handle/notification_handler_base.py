@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING
 
 from helpy.__private.communication.appbase_notification_handler import AppbaseNotificationHandler
 from helpy.__private.communication.universal_notification_server import notification
-from schemas.notification_model.notifications.p2p_listening import P2PListening
-from schemas.notification_model.notifications.switching_forks_notification import SwitchingForks
+from schemas.notifications import P2PListening, SwitchingForks
 
 if TYPE_CHECKING:
-    from schemas.notification_model.notification import Notification
+    from schemas.notifications import Notification
 
 
 class HivedNotificationHandler(AppbaseNotificationHandler):

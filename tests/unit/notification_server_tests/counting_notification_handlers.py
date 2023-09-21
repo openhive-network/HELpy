@@ -5,15 +5,13 @@ from typing import TYPE_CHECKING, Any
 
 from helpy.__private.communication.appbase_notification_handler import AppbaseNotificationHandler
 from helpy.__private.communication.httpx_communicator import HttpxCommunicator
-from schemas.__private.hive_factory import HiveResult
-from schemas.notification_model.notification import Notification
+from schemas.jsonrpc import JSONRPCResult
+from schemas.notifications import Notification
 
 if TYPE_CHECKING:
     from helpy.__private.interfaces.url import HttpUrl
-    from schemas.notification_model import WebserverListening
-    from schemas.notification_model.notifications.abc.notification_base import NotificationBase
-    from schemas.notification_model.notifications.error_notification import Error
-    from schemas.notification_model.notifications.status_notification import Status
+    from schemas.notifications import Error, Status, WebserverListening
+    from schemas.notifications.abc import NotificationBase
 
 
 async def send_notification(address: HttpUrl, notification: NotificationBase) -> None:
@@ -21,7 +19,7 @@ async def send_notification(address: HttpUrl, notification: NotificationBase) ->
     await communicator.get_async_client().put(
         address.as_string(),
         headers=communicator._json_headers(),
-        content=HiveResult(
+        content=JSONRPCResult(
             id_=0,
             jsonrpc="2.0",
             result=Notification(name=notification.get_notification_name(), time=datetime.now(), value=notification),
