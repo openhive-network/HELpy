@@ -6,8 +6,8 @@ from typing import Any
 from helpy.__private.handles.abc.api import AbstractSyncApi
 from helpy.__private.handles.hived.api.wallet_bridge_api.common import WalletBridgeApiCommons
 from helpy.__private.interfaces.asset.asset import Hf26Asset  # noqa: TCH001
-from schemas.transaction_model.transaction import Hf26Transaction  # noqa: TCH001
-from schemas.wallet_bridge_api import response_schemas as wallet_bridge_api  # noqa: TCH001
+from schemas.apis import wallet_bridge_api  # noqa: TCH001
+from schemas.transaction import Transaction  # noqa: TCH001
 
 
 class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
@@ -153,12 +153,12 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
 
     @api
     def broadcast_transaction_synchronous(
-        self, /, transaction: Hf26Transaction
+        self, /, transaction: Transaction
     ) -> wallet_bridge_api.BroadcastTransactionSynchronous:
         raise NotImplementedError
 
     @api
-    def broadcast_transaction(self, /, transaction: Hf26Transaction) -> wallet_bridge_api.BroadcastTransaction:
+    def broadcast_transaction(self, /, transaction: Transaction) -> wallet_bridge_api.BroadcastTransaction:
         raise NotImplementedError
 
     @api

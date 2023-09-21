@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
 from helpy.__private.interfaces.asset.asset import Hf26Asset  # noqa: TCH001
-from schemas import rc_api  # noqa: TCH001
+from schemas.apis import rc_api  # noqa: TCH001
 
 
 class RcApi(AbstractAsyncApi):

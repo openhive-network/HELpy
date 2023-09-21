@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractSyncApi
-from schemas.network_broadcast_api.response_schemas import BroadcastTransaction  # noqa: TCH001
-from schemas.transaction_model.transaction import Hf26Transaction  # noqa: TCH001
+from schemas.apis import network_broadcast_api  # noqa: TCH001
+from schemas.transaction import Transaction  # noqa: TCH001
 
 
 class NetworkBroadcastApi(AbstractSyncApi):
     @AbstractSyncApi._endpoint
-    def broadcast_transaction(self, *, trx: Hf26Transaction) -> BroadcastTransaction:
+    def broadcast_transaction(self, *, trx: Transaction) -> network_broadcast_api.BroadcastTransaction:
         raise NotImplementedError

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
-from schemas import network_node_api  # noqa: TCH001
+from schemas.apis import network_node_api  # noqa: TCH001
 
 
 class NetworkNodeApi(AbstractAsyncApi):

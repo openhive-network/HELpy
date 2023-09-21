@@ -6,8 +6,8 @@ from typing import Literal
 from helpy.__private.handles.abc.api import AbstractAsyncApi
 from helpy.__private.handles.hived.api.database_api.common import DatabaseApiCommons
 from helpy.__private.interfaces.asset import Hf26Asset  # noqa: TCH001
-from schemas import database_api  # noqa: TCH001
-from schemas.transaction_model.transaction import Hf26Transaction  # noqa: TCH001
+from schemas.apis import database_api  # noqa: TCH001
+from schemas.transaction import Transaction  # noqa: TCH001
 
 
 class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
@@ -132,11 +132,11 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_potential_signatures(self, *, trx: Hf26Transaction) -> database_api.GetPotentialSignatures:
+    async def get_potential_signatures(self, *, trx: Transaction) -> database_api.GetPotentialSignatures:
         raise NotImplementedError
 
     @api
-    async def get_required_signatures(self, *, trx: Hf26Transaction) -> database_api.GetRequiredSignatures:
+    async def get_required_signatures(self, *, trx: Transaction) -> database_api.GetRequiredSignatures:
         raise NotImplementedError
 
     @api
@@ -144,7 +144,7 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_transaction_hex(self, *, trx: Hf26Transaction) -> database_api.GetTransactionHex:
+    async def get_transaction_hex(self, *, trx: Transaction) -> database_api.GetTransactionHex:
         raise NotImplementedError
 
     @api
@@ -288,7 +288,7 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
 
     @api
     async def verify_authority(
-        self, *, trx: Hf26Transaction, pack: DatabaseApi.PACK_TYPES = "hf26"
+        self, *, trx: Transaction, pack: DatabaseApi.PACK_TYPES = "hf26"
     ) -> database_api.VerifyAuthority:
         raise NotImplementedError
 
