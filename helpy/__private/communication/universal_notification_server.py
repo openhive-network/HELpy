@@ -3,20 +3,17 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from dataclasses import dataclass
+from collections.abc import Awaitable, Callable  # noqa: TCH003
 from threading import Thread
 from time import sleep
-from typing import TYPE_CHECKING, Any, Final
+from typing import Any, Final, Generic
+
+from pydantic.generics import GenericModel
 
 from helpy.__private.communication.async_server import AsyncHttpServer, Observer
 from helpy.exceptions import HelpyError
-from schemas.__private.hive_factory import HiveError, HiveResult
-from schemas.notification_model.notification import Notification
-
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-
-    from schemas.notification_model.notifications import SupportedNotificationT
+from schemas.jsonrpc import JSONRPCResult, get_response_model
+from schemas.notifications import KnownNotificationT, Notification
 
 AnyNotification = Notification[Any]
 
@@ -30,12 +27,12 @@ class UnhandledNotificationError(HelpyError):
 
 class NotificationHandler(Observer, ABC):
     async def data_received(self, data: dict[str, Any]) -> None:
-        deserialized_notification: HiveResult[AnyNotification] | HiveError = HiveResult.factory(Notification, **data)
-        assert isinstance(deserialized_notification, HiveResult)
+        deserialized_notification = get_response_model(Notification[KnownNotificationT], **data)
+        assert isinstance(deserialized_notification, JSONRPCResult)
         await self.handle_notification(deserialized_notification.result)
 
     @abstractmethod
-    async def handle_notification(self, notification: Notification[SupportedNotificationT]) -> None:
+    async def handle_notification(self, notification: Notification[KnownNotificationT]) -> None:
         """Method called after properly serializing notification.
 
         Args:
@@ -43,26 +40,33 @@ class NotificationHandler(Observer, ABC):
         """
 
 
-@dataclass
-class _NotificationHandlerWrapper:
+class _NotificationHandlerWrapper(GenericModel, Generic[KnownNotificationT]):
     notification_name: str
-    notification_handler: Callable[[Any, Notification[SupportedNotificationT]], Awaitable[None]]
-    notification_condition: Callable[[Notification[SupportedNotificationT]], bool]
+    notification_handler: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]
+    notification_condition: Callable[[Notification[KnownNotificationT]], bool]
 
-    async def call(self, this: Any, notification: Notification[SupportedNotificationT]) -> None:
+    async def call(self, this: Any, notification: Notification[KnownNotificationT]) -> None:
         await self.notification_handler(this, notification)
+
+    async def __call__(self, this: Any, notification: Notification[KnownNotificationT]) -> Any:
+        return self.call(this, notification)
 
 
 def notification(
-    type_: type[SupportedNotificationT],
+    type_: type[KnownNotificationT],
     /,
     *,
-    condition: Callable[[Notification[SupportedNotificationT]], bool] | None = None,
-) -> Callable[[Callable[[Any, Notification[SupportedNotificationT]], Awaitable[None]]], _NotificationHandlerWrapper]:
+    condition: Callable[[Notification[KnownNotificationT]], bool] | None = None,
+) -> Callable[
+    [Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]],
+    _NotificationHandlerWrapper[KnownNotificationT],
+]:
     def wrapper(
-        callback: Callable[[Any, Notification[SupportedNotificationT]], Awaitable[None]]
-    ) -> _NotificationHandlerWrapper:
-        return _NotificationHandlerWrapper(
+        callback: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]
+    ) -> _NotificationHandlerWrapper[KnownNotificationT]:
+        result_cls = _NotificationHandlerWrapper[type_]  # type: ignore[valid-type]
+        result_cls.update_forward_refs(**locals())
+        return result_cls(  # type: ignore[return-value]
             notification_name=type_.get_notification_name(),
             notification_handler=callback,
             notification_condition=condition or (lambda _: True),
@@ -74,7 +78,7 @@ def notification(
 class UniversalNotificationHandler(NotificationHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.__registered_notifications: defaultdict[str, list[_NotificationHandlerWrapper]] = defaultdict(list)
+        self.__registered_notifications: defaultdict[str, list[_NotificationHandlerWrapper[Any]]] = defaultdict(list)
 
     def setup(self) -> None:
         for member_name in dir(self):
@@ -82,7 +86,7 @@ class UniversalNotificationHandler(NotificationHandler):
             if isinstance(member_value, _NotificationHandlerWrapper):
                 self.__registered_notifications[member_value.notification_name].append(member_value)
 
-    async def handle_notification(self, notification: Notification[SupportedNotificationT]) -> None:
+    async def handle_notification(self, notification: Notification[KnownNotificationT]) -> None:
         if (callbacks := self.__registered_notifications.get(notification.name)) is not None:
             for callback in callbacks:
                 if callback.notification_condition(notification):

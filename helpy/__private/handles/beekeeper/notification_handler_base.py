@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING
 
 from helpy.__private.communication.appbase_notification_handler import AppbaseNotificationHandler
 from helpy.__private.communication.universal_notification_server import notification
-from schemas.notification_model.notifications.attempt_closing_wallets import AttemptClosingWallets
-from schemas.notification_model.notifications.opening_beekeeper_failed import OpeningBeekeeperFailed
+from schemas.notifications import AttemptClosingWallets, OpeningBeekeeperFailed
 
 if TYPE_CHECKING:
-    from schemas.notification_model.notification import Notification
+    from schemas.notifications import Notification
 
 
 class BeekeeperNotificationHandler(AppbaseNotificationHandler):

@@ -9,22 +9,22 @@ from helpy.__private.interfaces.url import HttpUrl
 from tests.unit.notification_server_tests.counting_notification_handlers import CountingAppbaseNotificationHandler
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import Iterator
 
 
 @pytest.fixture()
-async def counting_appbase_notification_handler() -> CountingAppbaseNotificationHandler:
+def counting_appbase_notification_handler() -> CountingAppbaseNotificationHandler:
     return CountingAppbaseNotificationHandler()
 
 
 @pytest.fixture()
-async def counting_appbase_notification_server(
+def counting_appbase_notification_server(
     counting_appbase_notification_handler: CountingAppbaseNotificationHandler,
-) -> AsyncIterator[UniversalNotificationServer]:
+) -> Iterator[UniversalNotificationServer]:
     server = UniversalNotificationServer(counting_appbase_notification_handler)
     server.run()
     yield server
-    await server.close()
+    server.close()
 
 
 @pytest.fixture()
