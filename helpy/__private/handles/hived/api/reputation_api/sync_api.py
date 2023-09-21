@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractSyncApi
-from schemas.reputation_api import response_schemas as reputation_api  # noqa: TCH001
+from schemas.apis import reputation_api  # noqa: TCH001
 
 
 class ReputationApi(AbstractSyncApi):

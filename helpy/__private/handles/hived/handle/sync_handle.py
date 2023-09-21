@@ -14,7 +14,7 @@ from helpy.exceptions import BlockWaitTimeoutError
 if TYPE_CHECKING:
     from datetime import datetime, timedelta
 
-    from schemas.__private.hive_fields_basic_schemas import AccountName
+    from schemas.fields.basic import AccountName
 
 
 class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):

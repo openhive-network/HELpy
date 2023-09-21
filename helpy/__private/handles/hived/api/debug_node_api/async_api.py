@@ -4,8 +4,8 @@ from datetime import datetime  # noqa: TCH003
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
 from helpy.__private.interfaces.asset.asset import Hf26Asset  # noqa: TCH001
-from schemas.__private.hive_fields_custom_schemas import Price  # noqa: TCH001
-from schemas.debug_node_api import response_schemas as debug_node_api  # noqa: TCH001
+from schemas.apis import debug_node_api  # noqa: TCH001
+from schemas.fields.compound import Price  # noqa: TCH001
 
 
 class DebugNodeApi(AbstractAsyncApi):

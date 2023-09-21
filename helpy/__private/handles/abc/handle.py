@@ -3,12 +3,11 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from helpy.__private.communication.httpx_communicator import HttpxCommunicator
 from helpy.exceptions import HelpyError
-from schemas.__private.hive_factory import HiveResult
-from schemas.__private.preconfigured_base_model import PreconfiguredBaseModel
+from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -20,9 +19,6 @@ if TYPE_CHECKING:
         AbstractApiCollection,
     )
     from helpy.__private.interfaces.url import HttpUrl
-
-
-ExpectedT = TypeVar("ExpectedT", bound=PreconfiguredBaseModel)
 
 
 @dataclass
@@ -85,7 +81,9 @@ class AbstractHandle:
         """Required from context managers, does nothing."""
 
     @classmethod
-    def _response_handle(cls, params: str, response: str, expected_type: type[ExpectedT]) -> HiveResult[ExpectedT]:
+    def _response_handle(
+        cls, params: str, response: str, expected_type: type[ExpectResultT]
+    ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
         parsed_response = json.loads(response)
 
@@ -95,8 +93,8 @@ class AbstractHandle:
         if "result" not in parsed_response:
             raise MissingResultError
 
-        serialized_data = HiveResult.factory(expected_type, **parsed_response)  # type: ignore[var-annotated]
-        assert isinstance(serialized_data, HiveResult)
+        serialized_data = get_response_model(expected_type, **parsed_response)
+        assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
     @classmethod
@@ -114,7 +112,9 @@ class AbstractHandle:
 class AbstractAsyncHandle(ABC, AbstractHandle):
     """Base class for service handlers that uses asynchronous communication."""
 
-    async def _async_send(self, *, endpoint: str, params: str, expected_type: type[ExpectedT]) -> HiveResult[ExpectedT]:
+    async def _async_send(
+        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+    ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         response = await self._communicator.async_send(
             self.http_endpoint, data=self._build_json_rpc_call(method=endpoint, params=params)
@@ -125,7 +125,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle):
 class AbstractSyncHandle(ABC, AbstractHandle):
     """Base class for service handlers that uses synchronous communication."""
 
-    def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectedT]) -> HiveResult[ExpectedT]:
+    def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         response = self._communicator.send(
             self.http_endpoint, data=self._build_json_rpc_call(method=endpoint, params=params)

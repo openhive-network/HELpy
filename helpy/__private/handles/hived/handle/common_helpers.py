@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from helpy.__private.interfaces.asset.asset import Hf26Asset
-from schemas.database_api import GetDynamicGlobalProperties
+from schemas.apis.database_api import GetDynamicGlobalProperties
 
 if TYPE_CHECKING:
     from datetime import datetime
     from typing import TypeAlias
 
-    from schemas.__private.hive_fields_basic_schemas import AccountName
+    from schemas.fields.basic import AccountName
 
 
 class HiveHandleCommonHelpers:

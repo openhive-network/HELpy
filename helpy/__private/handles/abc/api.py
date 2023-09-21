@@ -11,7 +11,7 @@ from helpy.__private.handles.abc.handle import (
     AbstractAsyncHandle,
     AbstractSyncHandle,
 )
-from schemas.__private.preconfigured_base_model import PreconfiguredBaseModel
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

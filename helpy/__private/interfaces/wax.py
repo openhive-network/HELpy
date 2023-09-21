@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 import wax
 from helpy.exceptions import HelpyError
-from schemas.__private.hive_fields_basic_schemas import PublicKey
+from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
-    from schemas.__private.operations import Hf26OperationRepresentation
-    from schemas.transaction_model.transaction import Hf26Transaction
+    from schemas.operations.representations import Hf26OperationRepresentation
+    from schemas.transaction import Transaction
 
 
 class WaxOperationFailedError(HelpyError):
@@ -21,11 +21,11 @@ def __validate_wax_response(response: wax.python_result) -> None:
         raise WaxOperationFailedError(response.exception_message.decode())
 
 
-def __as_binary_json(item: Hf26OperationRepresentation | Hf26Transaction) -> bytes:
+def __as_binary_json(item: Hf26OperationRepresentation | Transaction) -> bytes:
     return item.json(by_alias=True).encode()
 
 
-def validate_transaction(transaction: Hf26Transaction) -> None:
+def validate_transaction(transaction: Transaction) -> None:
     return __validate_wax_response(wax.validate_transaction(__as_binary_json(transaction)))
 
 
@@ -33,19 +33,19 @@ def validate_operation(operation: Hf26OperationRepresentation) -> None:
     return __validate_wax_response(wax.validate_operation(__as_binary_json(operation)))
 
 
-def calculate_sig_digest(transaction: Hf26Transaction, chain_id: str) -> str:
+def calculate_sig_digest(transaction: Transaction, chain_id: str) -> str:
     result = wax.calculate_sig_digest(__as_binary_json(transaction), chain_id.encode())
     __validate_wax_response(result)
     return result.result.decode()
 
 
-def calculate_transaction_id(transaction: Hf26Transaction) -> str:
+def calculate_transaction_id(transaction: Transaction) -> str:
     result = wax.calculate_transaction_id(__as_binary_json(transaction))
     __validate_wax_response(result)
     return result.result.decode()
 
 
-def serialize_transaction(transaction: Hf26Transaction) -> bytes:
+def serialize_transaction(transaction: Transaction) -> bytes:
     result = wax.serialize_transaction(__as_binary_json(transaction))
     __validate_wax_response(result)
     return result.result

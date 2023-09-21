@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import schemas.beekeeper_api.response_schemas as beekeeper_api  # noqa: TCH001
 from helpy.__private.handles.abc.api import AbstractAsyncApi
-from schemas.transaction_model.transaction import Hf26Transaction  # noqa: TCH001
+from schemas.apis import beekeeper_api  # noqa: TCH001
+from schemas.transaction import Transaction  # noqa: TCH001
 
 
 class BeekeeperApi(AbstractAsyncApi):
@@ -151,7 +151,7 @@ class BeekeeperApi(AbstractAsyncApi):
 
     @api
     async def sign_transaction(
-        self, *, transaction: Hf26Transaction, chain_id: str, public_key: str, sig_digest: str
+        self, *, transaction: Transaction, chain_id: str, public_key: str, sig_digest: str
     ) -> beekeeper_api.SignTransaction:
         """Signs transaction with given key.
 

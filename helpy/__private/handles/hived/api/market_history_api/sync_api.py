@@ -4,7 +4,7 @@ from datetime import datetime  # noqa: TCH003
 
 from helpy.__private.handles.abc.api import AbstractSyncApi
 from helpy.__private.interfaces.asset.asset import Hf26Asset  # noqa: TCH001
-from schemas.market_history_api import response_schemas as market_history_api  # noqa: TCH001
+from schemas.apis import market_history_api  # noqa: TCH001
 
 
 class MarketHistoryApi(AbstractSyncApi):

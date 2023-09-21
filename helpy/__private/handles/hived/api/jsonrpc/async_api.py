@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
-from schemas.jsonrpc import response_schemas as jsonrpc  # noqa: TCH001
+from schemas.apis import jsonrpc  # noqa: TCH001
 
 
 class Jsonrpc(AbstractAsyncApi):

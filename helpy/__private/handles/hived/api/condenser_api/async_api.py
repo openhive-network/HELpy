@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Any
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
 from helpy.__private.handles.hived.api.condenser_api.common import CondenserApiCommons
-from schemas.condenser_api import response_schemas as condenser_api  # noqa: TCH001
-from schemas.transaction_model.transaction import LegacyTransaction  # noqa: TCH001
+from schemas.apis import condenser_api  # noqa: TCH001
+from schemas.transaction import TransactionLegacy  # noqa: TCH001
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -173,7 +173,7 @@ class CondenserApi(AbstractAsyncApi, CondenserApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_transaction_hex(self, /, transaction: LegacyTransaction) -> condenser_api.GetTransactionHex:
+    async def get_transaction_hex(self, /, transaction: TransactionLegacy) -> condenser_api.GetTransactionHex:
         raise NotImplementedError
 
     @api
@@ -182,20 +182,20 @@ class CondenserApi(AbstractAsyncApi, CondenserApiCommons):
 
     @api
     async def get_required_signatures(
-        self, /, transaction: LegacyTransaction, public_key: str
+        self, /, transaction: TransactionLegacy, public_key: str
     ) -> condenser_api.GetRequiredSignatures:
         raise NotImplementedError
 
     @api
-    async def get_potential_signatures(self, /, transaction: LegacyTransaction) -> condenser_api.GetPotentialSignatures:
+    async def get_potential_signatures(self, /, transaction: TransactionLegacy) -> condenser_api.GetPotentialSignatures:
         raise NotImplementedError
 
     @api
-    async def verify_authority(self, /, transaction: LegacyTransaction) -> condenser_api.VerifyAuthority:
+    async def verify_authority(self, /, transaction: TransactionLegacy) -> condenser_api.VerifyAuthority:
         raise NotImplementedError
 
     @api
-    async def verify_account_authority(self, /, transaction: LegacyTransaction) -> condenser_api.VerifyAccountAuthority:
+    async def verify_account_authority(self, /, transaction: TransactionLegacy) -> condenser_api.VerifyAccountAuthority:
         raise NotImplementedError
 
     @api
@@ -214,12 +214,12 @@ class CondenserApi(AbstractAsyncApi, CondenserApiCommons):
         raise NotImplementedError
 
     @api
-    async def broadcast_transaction(self, /, transaction: LegacyTransaction) -> condenser_api.BroadcastTransaction:
+    async def broadcast_transaction(self, /, transaction: TransactionLegacy) -> condenser_api.BroadcastTransaction:
         raise NotImplementedError
 
     @api
     async def broadcast_transaction_synchronous(
-        self, /, transaction: LegacyTransaction
+        self, /, transaction: TransactionLegacy
     ) -> condenser_api.BroadcastTransactionSynchronous:
         raise NotImplementedError
 

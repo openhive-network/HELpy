@@ -8,7 +8,7 @@ from helpy.__private.interfaces.asset.decimal_converter import (
     DecimalConverter,
 )
 from helpy.exceptions import HelpyError
-from schemas.__private.hive_fields_basic_schemas import (
+from schemas.fields.assets import (
     AssetHbdHF26,
     AssetHbdLegacy,
     AssetHiveHF26,

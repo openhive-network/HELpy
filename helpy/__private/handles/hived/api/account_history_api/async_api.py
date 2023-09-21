@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from helpy.__private.handles.abc.api import AbstractAsyncApi
-from schemas.account_history_api import response_schemas as account_history_api  # noqa: TCH001
+from schemas.apis import account_history_api  # noqa: TCH001
 
 
 class AccountHistoryApi(AbstractAsyncApi):
