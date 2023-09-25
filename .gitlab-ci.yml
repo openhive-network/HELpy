@@ -23,8 +23,9 @@ variables:
 
 image: ${CI_BASE_IMAGE}
 
-.shared_tags: &shared_tags
-  - public-runner-docker
+default:
+  tags:
+    - public-runner-docker
 
 .configuration:
   interruptible: true
@@ -35,7 +36,6 @@ image: ${CI_BASE_IMAGE}
     - source venv/bin/activate
     - poetry install
     - pip list
-  tags: *shared_tags
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| STATIC CODE ANALYSIS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
