@@ -29,7 +29,7 @@ pytest-is-running = "1.5.0"
 python-dateutil = "2.8.2"
 httpx = { extras = ["http2"], version = "0.23.3" }
 aiohttp = "3.8.5"
-wax = "0.0.1a3+99ad1da"
+wax = "0.0.1a5+f650c37"
 schemas = { path = "schemas", develop = true }
 
 
