@@ -54,8 +54,8 @@ class DebugNodeApi(AbstractAsyncApi):
         raise NotImplementedError
 
     @api
-    async def debug_set_vest_pric(
-        self, *, price: Price[Hf26Asset.Hive, Hf26Asset.Hbd]
+    async def debug_set_vest_price(
+        self, *, price: Price[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]
     ) -> debug_node_api.DebugSetVestPrice:
         raise NotImplementedError
 

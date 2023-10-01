@@ -19,7 +19,9 @@ class MarketHistoryApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def get_order_book(self, *, limit: int = 500) -> market_history_api.GetOrderBook[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    def get_order_book(
+        self, *, limit: int = 500
+    ) -> market_history_api.GetOrderBook[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]:
         raise NotImplementedError
 
     @api
