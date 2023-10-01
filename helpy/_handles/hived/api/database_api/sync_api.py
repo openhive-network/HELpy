@@ -100,7 +100,7 @@ class DatabaseApi(AbstractSyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    def get_config(self) -> database_api.GetConfig[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    def get_config(self) -> database_api.GetConfig:
         raise NotImplementedError
 
     @api
@@ -110,11 +110,11 @@ class DatabaseApi(AbstractSyncApi, DatabaseApiCommons):
     @api
     def get_dynamic_global_properties(
         self,
-    ) -> database_api.GetDynamicGlobalProperties[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]:
+    ) -> database_api.GetDynamicGlobalProperties:
         raise NotImplementedError
 
     @api
-    def get_feed_history(self) -> database_api.GetFeedHistory[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    def get_feed_history(self) -> database_api.GetFeedHistory:
         raise NotImplementedError
 
     @api
@@ -146,7 +146,7 @@ class DatabaseApi(AbstractSyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    def get_witness_schedule(self) -> database_api.GetWitnessSchedule[Hf26Asset.Hive]:
+    def get_witness_schedule(self) -> database_api.GetWitnessSchedule:
         raise NotImplementedError
 
     @api

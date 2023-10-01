@@ -104,7 +104,7 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_config(self) -> database_api.GetConfig[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    async def get_config(self) -> database_api.GetConfig:
         raise NotImplementedError
 
     @api
@@ -114,11 +114,11 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
     @api
     async def get_dynamic_global_properties(
         self,
-    ) -> database_api.GetDynamicGlobalProperties[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]:
+    ) -> database_api.GetDynamicGlobalProperties:
         raise NotImplementedError
 
     @api
-    async def get_feed_history(self) -> database_api.GetFeedHistory[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    async def get_feed_history(self) -> database_api.GetFeedHistory:
         raise NotImplementedError
 
     @api
@@ -152,7 +152,7 @@ class DatabaseApi(AbstractAsyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_witness_schedule(self) -> database_api.GetWitnessSchedule[Hf26Asset.Hive]:
+    async def get_witness_schedule(self) -> database_api.GetWitnessSchedule:
         raise NotImplementedError
 
     @api
