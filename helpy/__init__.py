@@ -10,7 +10,7 @@ from helpy._handles import (
 )
 from helpy._interfaces import wax
 from helpy._interfaces.time import Time, TimeFormats
-from helpy._interfaces.url import HttpUrl, WsUrl
+from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 
 __all__ = [
     "AsyncBeekeeper",
@@ -20,6 +20,7 @@ __all__ = [
     "Hived",
     "HivedNotificationHandler",
     "HttpUrl",
+    "P2PUrl",
     "Time",
     "TimeFormats",
     "wax",
