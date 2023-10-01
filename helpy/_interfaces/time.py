@@ -292,3 +292,34 @@ class Time:
     ) -> None:
         if timeout_secs - already_waited <= 0:
             raise TimeoutError(timeout_error_message or "Waited too long, timeout was reached")
+
+    @staticmethod
+    def wait_for(
+        predicate: Callable[[], bool],
+        *,
+        timeout: float | timedelta = math.inf,
+        timeout_error_message: str | None = None,
+        poll_time: float = 1.0,
+    ) -> float:
+        """
+        Waits for the predicate to return True in the given timeout and raises TimeoutError if it was exceeded.
+
+        :param predicate: Callable that returns boolean value.
+        :param timeout: Timeout in seconds or preferably timedelta (e.g. tt.Time.minutes(1)).
+        :param timeout_error_message: Message that will be displayed if timeout is reached.
+        :param poll_time: Time between predicate calls.
+        :return: Time in seconds that was spent on waiting.
+        """
+        timeout_secs: float = timeout.total_seconds() if isinstance(timeout, timedelta) else timeout
+        assert timeout_secs >= 0, "The `timeout` argument must be non-negative value."
+
+        already_waited = 0.0
+        while not predicate():
+            if timeout_secs - already_waited <= 0:
+                raise TimeoutError(timeout_error_message or "Waited too long, timeout was reached")
+
+            sleep_time = min(poll_time, timeout_secs)
+            time.sleep(sleep_time)
+            already_waited += sleep_time
+
+        return already_waited
