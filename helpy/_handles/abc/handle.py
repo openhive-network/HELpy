@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy.exceptions import HelpyError
@@ -36,7 +36,13 @@ class MissingResultError(HelpyError):
 class AbstractHandle:
     """Provides basic interface for all network handles."""
 
-    def __init__(self, *, http_url: HttpUrl, communicator: AbstractCommunicator | None = None) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        http_url: HttpUrl | None = None,
+        communicator: AbstractCommunicator | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Constructs handle to network service.
 
         Keyword Arguments:
@@ -44,6 +50,7 @@ class AbstractHandle:
 
             communicator -- communicator class to use for communication (default: {HttpxCommunicator})
         """
+        super().__init__(*args, **kwargs)
         self.__http_endpoint = http_url
         self.__communicator = communicator or HttpxCommunicator()
         self.__api = self._construct_api()
@@ -51,6 +58,7 @@ class AbstractHandle:
     @property
     def http_endpoint(self) -> HttpUrl:
         """Return endpoint where handle is connected to."""
+        assert self.__http_endpoint is not None
         return self.__http_endpoint
 
     @http_endpoint.setter
