@@ -24,6 +24,9 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
     def _construct_api(self) -> HivedSyncApiCollection:
         return HivedSyncApiCollection(owner=self)
 
+    def _target_service(self) -> str:
+        return self._hived_target_service_name()
+
     @property
     def api(self) -> HivedSyncApiCollection:
         return cast(HivedSyncApiCollection, super().api)

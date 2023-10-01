@@ -8,6 +8,8 @@ from helpy._handles.beekeeper.api.api_collection import (
     BeekeeperSyncApiCollection,
 )
 
+_handle_target_service_name = "beekeeper"
+
 
 class Beekeeper(AbstractSyncHandle):
     """Synchronous handle for beekeeper service communication."""
@@ -22,6 +24,9 @@ class Beekeeper(AbstractSyncHandle):
     def api(self) -> BeekeeperSyncApiCollection:
         return cast(BeekeeperSyncApiCollection, super().api)
 
+    def _target_service(self) -> str:
+        return _handle_target_service_name
+
 
 class AsyncBeekeeper(AbstractAsyncHandle):
     """Asynchronous handle for beekeeper service communication."""
@@ -35,3 +40,6 @@ class AsyncBeekeeper(AbstractAsyncHandle):
     @property
     def api(self) -> BeekeeperAsyncApiCollection:
         return cast(BeekeeperAsyncApiCollection, super().api)
+
+    def _target_service(self) -> str:
+        return _handle_target_service_name
