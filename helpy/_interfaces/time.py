@@ -4,7 +4,8 @@ import asyncio
 import math
 import time
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, TypeAlias
+from enum import Enum
+from typing import TYPE_CHECKING, Any
 
 from dateutil.relativedelta import relativedelta
 
@@ -14,19 +15,13 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
 
 
-class TimeFormats:
+class TimeFormats(Enum):
     DEFAULT_FORMAT = "%Y-%m-%dT%H:%M:%S"
     DEFAULT_FORMAT_WITH_MILLIS = "%Y-%m-%dT%H:%M:%S.%f"
     TIME_OFFSET_FORMAT = "@%Y-%m-%d %H:%M:%S.%f"
 
 
-def _get_avail_formats() -> TypeAlias:
-    return Literal[TimeFormats.DEFAULT_FORMAT, TimeFormats.DEFAULT_FORMAT_WITH_MILLIS, TimeFormats.TIME_OFFSET_FORMAT]
-
-
 class Time:
-    _AVAIL_FORMATS: ClassVar[TypeAlias] = _get_avail_formats()
-
     def __new__(cls, *_: Any, **__: Any) -> Time:
         raise TypeError(f"Creation object of {Time.__name__} class is forbidden.")
 
@@ -35,7 +30,7 @@ class Time:
         cls,
         time: str,
         *,
-        format_: _AVAIL_FORMATS | None = None,
+        format_: TimeFormats | str | None = None,
         time_zone: timezone | None = timezone.utc,
     ) -> datetime:
         """Parses given string with given format in given timezone.
@@ -60,9 +55,11 @@ class Time:
         if isinstance(time, datetime):
             return time
 
-        def __parse_in_specified_format(_format: str) -> datetime:
+        def __parse_in_specified_format(_format: TimeFormats | str) -> datetime:
+            if isinstance(_format, str):
+                _format = TimeFormats(_format)
             try:
-                parsed = datetime.strptime(time, _format)
+                parsed = datetime.strptime(time, _format.value)
                 return parsed.replace(tzinfo=time_zone) if time_zone else parsed
             except ValueError as exception:
                 format_info = (
@@ -83,8 +80,8 @@ class Time:
             return __parse_in_specified_format(TimeFormats.DEFAULT_FORMAT_WITH_MILLIS)
 
     @staticmethod
-    def serialize(time: datetime, *, format_: str = TimeFormats.DEFAULT_FORMAT) -> str:
-        return datetime.strftime(time, format_)
+    def serialize(time: datetime, *, format_: TimeFormats | str = TimeFormats.DEFAULT_FORMAT) -> str:
+        return datetime.strftime(time, TimeFormats(format_).value)
 
     @staticmethod
     def milliseconds(milliseconds: float) -> timedelta:
@@ -137,7 +134,7 @@ class Time:
         *,
         serialize: bool = True,
         time_zone: timezone | None = timezone.utc,
-        serialize_format: str = TimeFormats.DEFAULT_FORMAT,
+        serialize_format: TimeFormats | str = TimeFormats.DEFAULT_FORMAT,
     ) -> str | datetime:
         time = datetime.now(time_zone)
         return cls.serialize(time, format_=serialize_format) if serialize else time
@@ -156,7 +153,7 @@ class Time:
         years: int = 0,
         time_zone: timezone | None = timezone.utc,
         serialize: bool = True,
-        serialize_format: str = TimeFormats.DEFAULT_FORMAT,
+        serialize_format: TimeFormats | str = TimeFormats.DEFAULT_FORMAT,
     ) -> str | datetime:
         """Adds to current time given time periods.
 
