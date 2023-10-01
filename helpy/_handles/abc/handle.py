@@ -5,14 +5,15 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from typing_extensions import Self
+
 from helpy._communication.httpx_communicator import HttpxCommunicator
+from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy.exceptions import HelpyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
     from types import TracebackType
-
-    from typing_extensions import Self
 
     from helpy._communication.abc.communicator import AbstractCommunicator
     from helpy._handles.abc.api_collection import (
@@ -124,7 +125,7 @@ class AbstractHandle:
         )
 
 
-class AbstractAsyncHandle(ABC, AbstractHandle):
+class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses asynchronous communication."""
 
     async def _async_send(
@@ -136,8 +137,14 @@ class AbstractAsyncHandle(ABC, AbstractHandle):
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
+    async def _enter(self) -> Self:
+        return self._clone()
 
-class AbstractSyncHandle(ABC, AbstractHandle):
+    async def _finally(self) -> None:
+        """Does nothing."""
+
+
+class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses synchronous communication."""
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
@@ -146,3 +153,9 @@ class AbstractSyncHandle(ABC, AbstractHandle):
             self.http_endpoint, data=self._build_json_rpc_call(method=endpoint, params=params)
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
+
+    def _enter(self) -> Self:
+        return self._clone()
+
+    def _finally(self) -> None:
+        """Does nothing."""
