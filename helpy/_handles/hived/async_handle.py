@@ -24,6 +24,9 @@ class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
     def _construct_api(self) -> HivedAsyncApiCollection:
         return HivedAsyncApiCollection(owner=self)
 
+    def _target_service(self) -> str:
+        return self._hived_target_service_name()
+
     @property
     def api(self) -> HivedAsyncApiCollection:
         return cast(HivedAsyncApiCollection, super().api)

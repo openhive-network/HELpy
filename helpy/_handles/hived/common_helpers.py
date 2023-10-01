@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._interfaces.asset.asset import Hf26Asset
 from schemas.apis.database_api import GetDynamicGlobalProperties
 
 if TYPE_CHECKING:
@@ -13,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class HiveHandleCommonHelpers:
-    GetDynamicGlobalPropertiesT: TypeAlias = GetDynamicGlobalProperties[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]
+    GetDynamicGlobalPropertiesT: TypeAlias = GetDynamicGlobalProperties
 
     def _get_last_block_number(self, dynamic_global_properties: GetDynamicGlobalPropertiesT) -> int:
         return dynamic_global_properties.head_block_number
@@ -26,3 +25,6 @@ class HiveHandleCommonHelpers:
 
     def _get_current_witness(self, dynamic_global_properties: GetDynamicGlobalPropertiesT) -> AccountName:
         return dynamic_global_properties.current_witness
+
+    def _hived_target_service_name(self) -> str:
+        return "hived"

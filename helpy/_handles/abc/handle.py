@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from loguru import logger
 from typing_extensions import Self
 
 from helpy._communication.httpx_communicator import HttpxCommunicator
@@ -13,7 +14,7 @@ from helpy.exceptions import HelpyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
-    from types import TracebackType
+    from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
     from helpy._handles.abc.api_collection import (
@@ -52,6 +53,7 @@ class AbstractHandle:
             communicator -- communicator class to use for communication (default: {HttpxCommunicator})
         """
         super().__init__(*args, **kwargs)
+        self.__logger = self.__configure_logger()
         self.__http_endpoint = http_url
         self.__communicator = communicator or HttpxCommunicator()
         self.__api = self._construct_api()
@@ -65,6 +67,7 @@ class AbstractHandle:
     @http_endpoint.setter
     def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
+        self.logger.debug(f"setting http endpoint to: {value.as_string()}")
         self.__http_endpoint = value
 
     @property
@@ -76,6 +79,10 @@ class AbstractHandle:
         """Return communicator. Internal only."""
         return self.__communicator
 
+    @property
+    def logger(self) -> Logger:
+        return self.__logger
+
     @abstractmethod
     def _construct_api(self) -> AbstractApiCollection[AbstractAsyncHandle] | AbstractApiCollection[AbstractSyncHandle]:
         """Return api collection."""
@@ -84,17 +91,21 @@ class AbstractHandle:
     def _clone(self) -> Self:
         """Return clone of itself."""
 
-    def __enter__(self) -> Self:
-        """Return clone of itself with immutable address."""
-        return self._clone()
+    @abstractmethod
+    def _is_synchronous(self) -> bool:
+        """Returns is handle is asynchronous."""
 
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> bool | None:
-        """Required from context managers, does nothing."""
+    @abstractmethod
+    def _target_service(self) -> str:
+        """Returns name of service that following handle is connecting to."""
+
+    def _logger_extras(self) -> dict[str, Any]:
+        """
+        Override to pass additional extras to loguru.logger.bind.
+
+        Learn more: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.bind
+        """
+        return {"asynchronous": self._is_synchronous(), "handle_target": self._target_service()}
 
     @classmethod
     def _response_handle(
@@ -124,6 +135,9 @@ class AbstractHandle:
             + "}"
         )
 
+    def __configure_logger(self) -> Logger:
+        return logger.bind(**self._logger_extras())
+
 
 class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses asynchronous communication."""
@@ -132,9 +146,10 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
-        response = await self._communicator.async_send(
-            self.http_endpoint, data=self._build_json_rpc_call(method=endpoint, params=params)
-        )
+        request = self._build_json_rpc_call(method=endpoint, params=params)
+        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        response = await self._communicator.async_send(self.http_endpoint, data=request)
+        self.logger.debug(f"got response from `{self.http_endpoint.as_string()}`: `{response}`")
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
     async def _enter(self) -> Self:
@@ -143,15 +158,19 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
     async def _finally(self) -> None:
         """Does nothing."""
 
+    def _is_synchronous(self) -> bool:
+        return True
+
 
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses synchronous communication."""
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
-        response = self._communicator.send(
-            self.http_endpoint, data=self._build_json_rpc_call(method=endpoint, params=params)
-        )
+        request = self._build_json_rpc_call(method=endpoint, params=params)
+        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        response = self._communicator.send(self.http_endpoint, data=request)
+        self.logger.debug(f"got response from `{self.http_endpoint.as_string()}`: `{response}`")
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
     def _enter(self) -> Self:
@@ -159,3 +178,6 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
 
     def _finally(self) -> None:
         """Does nothing."""
+
+    def _is_synchronous(self) -> bool:
+        return False
