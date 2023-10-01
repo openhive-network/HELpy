@@ -43,6 +43,10 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
     def get_current_witness(self) -> AccountName:
         return self._get_current_witness(self.get_dynamic_global_properties())
 
+    def wait_number_of_blocks(self, blocks_to_wait: int, *, timeout: float = math.inf) -> None:
+        assert blocks_to_wait > 0
+        self.wait_for_block_with_number(self.get_last_block_number() + blocks_to_wait, timeout=timeout)
+
     def wait_for_block_with_number(self, block_number: int, *, timeout: float | timedelta = math.inf) -> None:
         def __is_block_with_number_reached() -> bool:
             last = self.get_last_block_number()
