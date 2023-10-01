@@ -45,17 +45,18 @@ class UniversalNotificationHandler(NotificationHandler):
 
 
 class UniversalNotificationServer(ContextSync[int]):
-    def __init__(self, event_handler: UniversalNotificationHandler) -> None:
+    def __init__(self, event_handler: UniversalNotificationHandler, *, thread_name: str | None = None) -> None:
         self.__event_handler = event_handler
         self.__event_handler.setup()
         self.__http_server = AsyncHttpServer(self.__event_handler)
         self.__server_thread: Thread | None = None
+        self.__thread_name = thread_name
 
     def run(self) -> int:
         time_to_launch_notification_server: Final[float] = 0.5
         assert self.__server_thread is None
 
-        self.__server_thread = Thread(target=asyncio.run, args=(self.__http_server.run(),))
+        self.__server_thread = Thread(target=asyncio.run, args=(self.__http_server.run(),), name=self.__thread_name)
         self.__server_thread.start()
         sleep(time_to_launch_notification_server)
         return self.__http_server.port
