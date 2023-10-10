@@ -25,8 +25,8 @@ class UnhandledNotificationError(HelpyError):
 
 class UniversalNotificationHandler(NotificationHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
         self.__registered_notifications: defaultdict[str, list[_NotificationHandlerWrapper[Any]]] = defaultdict(list)
+        super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
         for member_name in dir(self):
