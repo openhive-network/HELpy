@@ -13,7 +13,7 @@ from helpy._handles.hived.api.account_history_api import (
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
-from helpy._handles.hived.api.blocks_api import AsyncBlocksApi, SyncBlocksApi
+from helpy._handles.hived.api.block_api import AsyncBlockApi, SyncBlockApi
 from helpy._handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from helpy._handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
 from helpy._handles.hived.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
         (AsyncAccountByKeyApi, SyncAccountByKeyApi),
         (AsyncAccountHistoryApi, SyncAccountHistoryApi),
         (AsyncBeekeeperApi, SyncBeekeeperApi),
-        (AsyncBlocksApi, SyncBlocksApi),
+        (AsyncBlockApi, SyncBlockApi),
         (AsyncCondenserApi, SyncCondenserApi),
         (AsyncDatabaseApi, SyncDatabaseApi),
         (AsyncDebugNodeApi, SyncDebugNodeApi),
