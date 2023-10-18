@@ -34,7 +34,7 @@ class HttpxCommunicator(AbstractCommunicator):
     async def async_send(self, url: HttpUrl, data: str) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
-        while self._is_amount_of_retries_exceeded(amount=amount_of_retries):
+        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
                 response: httpx.Response = await self.get_async_client().post(
@@ -56,7 +56,7 @@ class HttpxCommunicator(AbstractCommunicator):
     def send(self, url: HttpUrl, data: str) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
-        while self._is_amount_of_retries_exceeded(amount=amount_of_retries):
+        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
                 response: httpx.Response = httpx.post(url.as_string(), content=data, headers=self._json_headers())
