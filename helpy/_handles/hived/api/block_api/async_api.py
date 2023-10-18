@@ -4,7 +4,7 @@ from helpy._handles.abc.api import AbstractAsyncApi
 from schemas.apis import block_api  # noqa: TCH001
 
 
-class BlocksApi(AbstractAsyncApi):
+class BlockApi(AbstractAsyncApi):
     api = AbstractAsyncApi._endpoint
 
     @api
