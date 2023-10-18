@@ -19,11 +19,9 @@ async def send_notification(address: HttpUrl, notification: NotificationBase) ->
     await communicator.get_async_client().put(
         address.as_string(),
         headers=communicator._json_headers(),
-        content=JSONRPCResult(
-            id_=0,
-            jsonrpc="2.0",
-            result=Notification(name=notification.get_notification_name(), time=datetime.now(), value=notification),
-        ).json(by_alias=True),
+        content=Notification(name=notification.get_notification_name(), time=datetime.now(), value=notification).json(
+            by_alias=True
+        ),
     )
 
 

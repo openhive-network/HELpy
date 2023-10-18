@@ -10,9 +10,8 @@ from schemas.notifications import KnownNotificationT, Notification
 
 class NotificationHandler(HttpServerObserver, ABC):
     async def data_received(self, data: dict[str, Any]) -> None:
-        deserialized_notification = get_response_model(Notification[KnownNotificationT], **data)  # type: ignore[valid-type]
-        assert isinstance(deserialized_notification, JSONRPCResult)
-        await self.handle_notification(deserialized_notification.result)
+        deserialized_notification = Notification(**data)
+        await self.handle_notification(deserialized_notification)
 
     @abstractmethod
     async def handle_notification(self, notification: Notification[KnownNotificationT]) -> None:
