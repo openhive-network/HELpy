@@ -48,7 +48,7 @@ class Url(Generic[ProtocolT]):
 
     def as_string(self, *, with_protocol: bool = True) -> str:
         """Serializes url."""
-        protocol_prefix = f"{self.protocol}://" if with_protocol else ""
+        protocol_prefix = f"{self.protocol}://" if with_protocol and self.__protocol else ""
         port_suffix = f":{self.port}" if self.port else ""
 
         return f"{protocol_prefix}{self.address}{port_suffix}"
