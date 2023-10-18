@@ -74,7 +74,7 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
 
         time_between_checks_is_server_running = 0.5
 
-        runner = web.AppRunner(self.__app)
+        runner = web.AppRunner(self.__app, access_log=False)
         await runner.setup()
         self.__site = web.TCPSite(runner, *self.__ADDRESS)
         await self.__site.start()
