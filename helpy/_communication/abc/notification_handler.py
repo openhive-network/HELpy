@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from helpy._communication.abc.http_server_observer import HttpServerObserver
-from schemas.jsonrpc import JSONRPCResult, get_response_model
 from schemas.notifications import KnownNotificationT, Notification
 
 

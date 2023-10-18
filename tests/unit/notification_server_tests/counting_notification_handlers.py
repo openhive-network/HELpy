@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 from helpy._communication.appbase_notification_handler import AppbaseNotificationHandler
 from helpy._communication.httpx_communicator import HttpxCommunicator
-from schemas.jsonrpc import JSONRPCResult
 from schemas.notifications import Notification
 
 if TYPE_CHECKING:
