@@ -4,13 +4,22 @@ import json
 import re
 from abc import ABC
 from collections import defaultdict
-from functools import wraps
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, ParamSpec, TypeVar, get_type_hints
+from functools import partial, wraps
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Generic,
+    ParamSpec,
+    TypeVar,
+    get_type_hints,
+)
 
 from helpy._handles.abc.handle import (
     AbstractAsyncHandle,
     AbstractSyncHandle,
 )
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -39,9 +48,18 @@ class AbstractApi(ABC, Generic[HandleT]):
         return _convert_pascal_case_to_sneak_case(method.__qualname__.split(".")[0])
 
     @classmethod
-    def _serialize_params(cls, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG003
+    def json_dumps(cls) -> Callable[[Any], str]:
+        class JsonEncoder(json.JSONEncoder):
+            def default(self, o: Any) -> Any:
+                if isinstance(o, PreconfiguredBaseModel):
+                    return o.shallow_dict()
+                return super().default(o)
+
+        return partial(json.dumps, cls=JsonEncoder)
+
+    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
         """Return serialized given params. Can be overloaded."""
-        return json.dumps(kwargs)
+        return AbstractApi.json_dumps()(kwargs)
 
     @classmethod
     def _api_name(cls) -> str:
@@ -86,9 +104,9 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
 
         @wraps(wrapped_function)
         def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
-            return this._owner._send(  # type: ignore[no-any-return]
+            return this._owner._send(  # type: ignore[no-any-return, union-attr, misc]
                 endpoint=f"{api_name}.{wrapped_function_name}",
-                params=cls._serialize_params(args=args, kwargs=kwargs),
+                params=this._serialize_params(args=args, kwargs=kwargs),
                 expected_type=get_type_hints(wrapped_function)["return"],
             ).result
 
@@ -114,9 +132,9 @@ class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
         @wraps(wrapped_function)
         async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             return (  # type: ignore[no-any-return]
-                await this._owner._async_send(
+                await this._owner._async_send(  # type: ignore[misc]
                     endpoint=f"{api_name}.{wrapped_function_name}",
-                    params=cls._serialize_params(args=args, kwargs=kwargs),
+                    params=this._serialize_params(args=args, kwargs=kwargs),
                     expected_type=get_type_hints(wrapped_function)["return"],
                 )
             ).result

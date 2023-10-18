@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import json
 from typing import Any, ClassVar, Literal, TypeAlias
 
+from helpy._handles.abc.api import AbstractApi
 from helpy._handles.hived.api.database_api.common import DatabaseApiCommons
 
 
@@ -14,4 +14,4 @@ class CondenserApiCommons:
 
     @classmethod
     def _legacy_serialization(cls, args: list[Any]) -> str:
-        return json.dumps(args)
+        return AbstractApi.json_dumps()(args)
