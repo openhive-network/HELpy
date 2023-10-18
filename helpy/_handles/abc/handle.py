@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Protocol
 
 from loguru import logger
 from typing_extensions import Self
@@ -107,7 +106,7 @@ class AbstractHandle:
         parsed_response = json.loads(response)
 
         if "error" in parsed_response:
-            raise RequestError(send=params, error=parsed_response["error"])
+            raise RequestError(send=params, error=str(parsed_response["error"]))
 
         if "result" not in parsed_response:
             raise MissingResultError
@@ -131,9 +130,58 @@ class AbstractHandle:
         return logger.bind(**self._logger_extras())
 
 
+class _SyncCall(Protocol):
+    def __call__(
+        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+    ) -> JSONRPCResult[ExpectResultT]:
+        ...
+
+
+class _AsyncCall(Protocol):
+    async def __call__(
+        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+    ) -> JSONRPCResult[ExpectResultT]:
+        ...
+
+
+def _retry_on_unable_to_acquire_database_lock(
+    async_version: bool,
+) -> Callable[[_SyncCall | _AsyncCall], Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]]]:
+    # inspired by: https://gitlab.syncad.com/hive/test-tools/-/blob/a8290d47ec3638fb31573182a3311137542a6637/package/test_tools/__private/communication.py#L33
+    def __workaround_communication_problem_with_node(
+        send_request: _SyncCall | _AsyncCall,
+    ) -> Callable[..., JSONRPCResult[Any]]:
+        def __handle_exception(exception: RequestError) -> None:
+            message = exception.error
+            if isinstance(message, dict):
+                message = message["message"]
+            if "Unable to acquire database lock" in message:
+                logger.debug("Ignored 'Unable to acquire database lock'")
+            raise exception
+
+        def sync_impl(*args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+            while True:
+                try:
+                    return send_request(*args, **kwargs)  # type: ignore[return-value]
+                except RequestError as exception:
+                    __handle_exception(exception)
+
+        async def async_impl(*args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+            while True:
+                try:
+                    return await send_request(*args, **kwargs)  # type: ignore[no-any-return, misc]
+                except RequestError as exception:
+                    __handle_exception(exception)
+
+        return async_impl if async_version else sync_impl  # type: ignore[return-value]
+
+    return __workaround_communication_problem_with_node
+
+
 class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses asynchronous communication."""
 
+    @_retry_on_unable_to_acquire_database_lock(async_version=True)  # type: ignore[arg-type]
     async def _async_send(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
@@ -157,6 +205,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses synchronous communication."""
 
+    @_retry_on_unable_to_acquire_database_lock(async_version=False)  # type: ignore[arg-type]
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = self._build_json_rpc_call(method=endpoint, params=params)
