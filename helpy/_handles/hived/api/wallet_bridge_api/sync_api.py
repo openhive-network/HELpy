@@ -13,9 +13,8 @@ from schemas.transaction import Transaction  # noqa: TCH001
 class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
     api = AbstractSyncApi._endpoint
 
-    @classmethod
-    def _serialize_params(cls, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG003
-        return cls._legacy_serialization(args=args)
+    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
+        return self._legacy_serialization(args=args)
 
     @api
     def get_version(self) -> wallet_bridge_api.GetVersion:
@@ -26,7 +25,7 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_chain_properties(self) -> wallet_bridge_api.GetChainProperties[Hf26Asset.Hive]:
+    def get_chain_properties(self) -> wallet_bridge_api.GetChainProperties[Hf26Asset.HiveT]:
         raise NotImplementedError
 
     @api

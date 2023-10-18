@@ -8,6 +8,7 @@ from helpy._interfaces.asset.decimal_converter import (
     DecimalConverter,
 )
 from helpy.exceptions import HelpyError
+from pydantic import StrRegexError
 from schemas.fields.assets import (
     AssetHbdHF26,
     AssetHbdLegacy,
@@ -16,6 +17,8 @@ from schemas.fields.assets import (
     AssetVestsHF26,
     AssetVestsLegacy,
 )
+from schemas.fields.assets.hbd import AssetTbdHF26
+from schemas.fields.assets.hive import AssetTestHF26
 
 AssetAmountT = int | float | str
 
@@ -36,16 +39,16 @@ class AssetAmountInvalidFormatError(HelpyError):
 
 
 class Asset:
-    Hive: TypeAlias = AssetHiveHF26
-    Test: TypeAlias = Hive
-    Hbd: TypeAlias = AssetHbdHF26
-    Tbd: TypeAlias = Hbd
-    Vests: TypeAlias = AssetVestsHF26
-    AnyT: TypeAlias = Hive | Hbd | Vests
-    AssetPredicateT = TypeVar("AssetPredicateT", bound=Hive | Hbd | Vests)
+    HiveT: TypeAlias = AssetHiveHF26
+    TestT: TypeAlias = AssetTestHF26
+    HbdT: TypeAlias = AssetHbdHF26
+    TbdT: TypeAlias = AssetTbdHF26
+    VestsT: TypeAlias = AssetVestsHF26
+    AnyT: TypeAlias = HiveT | HbdT | VestsT
+    AssetPredicateT = TypeVar("AssetPredicateT", bound=HiveT | HbdT | VestsT)
 
     @classmethod
-    def hive(cls, amount: AssetAmountT) -> Asset.Hive:
+    def Hive(cls, amount: AssetAmountT) -> Asset.HiveT:
         """
         Create Hive asset.
 
@@ -57,10 +60,10 @@ class Asset:
         ------
         AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
-        return cls.__create(Asset.Hive, amount)
+        return cls.__create(Asset.HiveT, amount)
 
     @classmethod
-    def test(cls, amount: AssetAmountT) -> Asset.Test:
+    def Test(cls, amount: AssetAmountT) -> Asset.TestT:
         """
         Create testnet Hive asset.
 
@@ -72,10 +75,10 @@ class Asset:
         ------
         AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
-        return cls.__create(Asset.Test, amount)
+        return cls.__create(Asset.TestT, amount)
 
     @classmethod
-    def hbd(cls, amount: AssetAmountT) -> Asset.Hbd:
+    def Hbd(cls, amount: AssetAmountT) -> Asset.HbdT:
         """
         Create Hbd asset.
 
@@ -87,10 +90,10 @@ class Asset:
         ------
         AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
-        return cls.__create(Asset.Hbd, amount)
+        return cls.__create(Asset.HbdT, amount)
 
     @classmethod
-    def tbd(cls, amount: AssetAmountT) -> Asset.Tbd:
+    def Tbd(cls, amount: AssetAmountT) -> Asset.TbdT:
         """
         Create testnet Hbd asset.
 
@@ -102,10 +105,10 @@ class Asset:
         ------
         AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
-        return cls.__create(Asset.Tbd, amount)
+        return cls.__create(Asset.TbdT, amount)
 
     @classmethod
-    def vests(cls, amount: AssetAmountT) -> Asset.Vests:
+    def Vest(cls, amount: AssetAmountT) -> Asset.VestsT:
         """
         Create Vests asset.
 
@@ -117,7 +120,7 @@ class Asset:
         ------
         AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
-        return cls.__create(Asset.Vests, amount)
+        return cls.__create(Asset.VestsT, amount)
 
     @classmethod
     def __create(cls, asset: type[AssetPredicateT] | type[AnyT], amount: AssetAmountT) -> AssetPredicateT:
@@ -142,22 +145,26 @@ class Asset:
     @classmethod
     def resolve_symbol(cls, symbol: str) -> type[Asset.AnyT]:
         upper_symbol = symbol.upper()
-        if upper_symbol in Asset.Hive.get_asset_information().symbol:
-            return Asset.Hive
-        if upper_symbol in Asset.Hbd.get_asset_information().symbol:
-            return Asset.Hbd
-        if upper_symbol in Asset.Vests.get_asset_information().symbol:
-            return Asset.Vests
+        if upper_symbol in Asset.HiveT.get_asset_information().symbol:
+            return Asset.HiveT
+        if upper_symbol in Asset.HbdT.get_asset_information().symbol:
+            return Asset.HbdT
+        if upper_symbol in Asset.VestsT.get_asset_information().symbol:
+            return Asset.VestsT
         raise ValueError(f"Unknown asset type: '{symbol}'")
 
     @classmethod
     def from_legacy(cls, value: str) -> Asset.AnyT:
-        with contextlib.suppress(TypeError):
-            return cls.Hive.from_legacy(value)
-        with contextlib.suppress(TypeError):
-            return cls.Hbd.from_legacy(value)
-        with contextlib.suppress(TypeError):
-            return cls.Vests.from_legacy(value)
+        with contextlib.suppress(TypeError, StrRegexError):
+            return cls.HiveT.from_legacy(value)
+        with contextlib.suppress(TypeError, StrRegexError):
+            return cls.TestT.from_legacy(value)
+        with contextlib.suppress(TypeError, StrRegexError):
+            return cls.HbdT.from_legacy(value)
+        with contextlib.suppress(TypeError, StrRegexError):
+            return cls.TbdT.from_legacy(value)
+        with contextlib.suppress(TypeError, StrRegexError):
+            return cls.VestsT.from_legacy(value)
         raise AssetLegacyInvalidFormatError(value)
 
     @classmethod

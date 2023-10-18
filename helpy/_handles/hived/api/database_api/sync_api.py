@@ -122,7 +122,7 @@ class DatabaseApi(AbstractSyncApi, DatabaseApiCommons):
         raise NotImplementedError
 
     @api
-    def get_order_book(self, *, limit: int, base: Hf26Asset.Hive, quote: Hf26Asset.Hbd) -> database_api.GetOrderBook:
+    def get_order_book(self, *, limit: int, base: Hf26Asset.HiveT, quote: Hf26Asset.HbdT) -> database_api.GetOrderBook:
         raise NotImplementedError
 
     @api
@@ -202,7 +202,7 @@ class DatabaseApi(AbstractSyncApi, DatabaseApiCommons):
 
     @api
     def list_limit_orders(
-        self, *, start: tuple[str, int] | tuple[dict[Literal["base", "quote"], Hf26Asset.Hive | Hf26Asset.Hbd], int]
+        self, *, start: tuple[str, int] | tuple[dict[Literal["base", "quote"], Hf26Asset.HiveT | Hf26Asset.HbdT], int]
     ) -> database_api.ListLimitOrders:
         raise NotImplementedError
 
