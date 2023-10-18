@@ -3,12 +3,13 @@ from __future__ import annotations
 import contextlib
 from typing import Any, TypeAlias, TypeVar
 
+from pydantic import StrRegexError
+
 from helpy._interfaces.asset.decimal_converter import (
     DecimalConversionNotANumberError,
     DecimalConverter,
 )
 from helpy.exceptions import HelpyError
-from pydantic import StrRegexError
 from schemas.fields.assets import (
     AssetHbdHF26,
     AssetHbdLegacy,
@@ -48,7 +49,7 @@ class Asset:
     AssetPredicateT = TypeVar("AssetPredicateT", bound=HiveT | HbdT | VestsT)
 
     @classmethod
-    def Hive(cls, amount: AssetAmountT) -> Asset.HiveT:
+    def Hive(cls, amount: AssetAmountT) -> Asset.HiveT:  # noqa: N802
         """
         Create Hive asset.
 
@@ -63,7 +64,7 @@ class Asset:
         return cls.__create(Asset.HiveT, amount)
 
     @classmethod
-    def Test(cls, amount: AssetAmountT) -> Asset.TestT:
+    def Test(cls, amount: AssetAmountT) -> Asset.TestT:  # noqa: N802
         """
         Create testnet Hive asset.
 
@@ -78,7 +79,7 @@ class Asset:
         return cls.__create(Asset.TestT, amount)
 
     @classmethod
-    def Hbd(cls, amount: AssetAmountT) -> Asset.HbdT:
+    def Hbd(cls, amount: AssetAmountT) -> Asset.HbdT:  # noqa: N802
         """
         Create Hbd asset.
 
@@ -93,7 +94,7 @@ class Asset:
         return cls.__create(Asset.HbdT, amount)
 
     @classmethod
-    def Tbd(cls, amount: AssetAmountT) -> Asset.TbdT:
+    def Tbd(cls, amount: AssetAmountT) -> Asset.TbdT:  # noqa: N802
         """
         Create testnet Hbd asset.
 
@@ -108,7 +109,7 @@ class Asset:
         return cls.__create(Asset.TbdT, amount)
 
     @classmethod
-    def Vest(cls, amount: AssetAmountT) -> Asset.VestsT:
+    def Vest(cls, amount: AssetAmountT) -> Asset.VestsT:  # noqa: N802
         """
         Create Vests asset.
 
@@ -123,7 +124,7 @@ class Asset:
         return cls.__create(Asset.VestsT, amount)
 
     @classmethod
-    def __create(cls, asset: type[AssetPredicateT] | type[AnyT], amount: AssetAmountT) -> AssetPredicateT:
+    def __create(cls, asset: type[AssetPredicateT | AnyT], amount: AssetAmountT) -> AssetPredicateT:
         """
         Create asset.
 
@@ -226,7 +227,7 @@ class Asset:
             lower_limit: Asset.AnyT,
             upper_limit: Asset.AnyT | None = None,
             *,
-            tolerance: int | float | None = None,
+            tolerance: float | None = None,
         ) -> None:
             if not upper_limit and not tolerance:
                 raise TypeError("Range has to be specified with either `upper_limit` or `tolerance`")

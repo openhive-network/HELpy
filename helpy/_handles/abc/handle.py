@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from loguru import logger
 from typing_extensions import Self
@@ -13,6 +13,8 @@ from helpy.exceptions import HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
     from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
@@ -144,7 +146,7 @@ class _AsyncCall(Protocol):
         ...
 
 
-def _retry_on_unable_to_acquire_database_lock(
+def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     async_version: bool,
 ) -> Callable[[_SyncCall | _AsyncCall], Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]]]:
     # inspired by: https://gitlab.syncad.com/hive/test-tools/-/blob/a8290d47ec3638fb31573182a3311137542a6637/package/test_tools/__private/communication.py#L33

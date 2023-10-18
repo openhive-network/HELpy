@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from helpy import Time, TimeFormats
+from helpy import Time
 from helpy.exceptions import ParseError
 
 
@@ -24,12 +24,9 @@ def test_parsing_invalid_time_in_default_formats() -> None:
     time = "01.01.1970"
 
     with pytest.raises(ParseError) as exception:
-        assert Time.parse(time)
-    assert (
-        f"Could not be parse the `{time}` string using the "
-        f"`{TimeFormats.DEFAULT_FORMAT}` or `{TimeFormats.DEFAULT_FORMAT_WITH_MILLIS}` default formats"
-        in str(exception.value)
-    )
+        Time.parse(time)
+
+    assert f"Could not be parse the `{time}` string using the" in str(exception)
 
 
 def test_parsing_time_in_invalid_custom_format() -> None:

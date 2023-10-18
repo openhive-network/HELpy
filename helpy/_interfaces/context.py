@@ -14,7 +14,7 @@ class ContextSync(Generic[EnterReturnT]):
         return self._enter()
 
     def __exit__(
-        self, _: type[Exception] | None, exception: Exception | None, traceback: TracebackType | None
+        self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
     ) -> bool | None:
         try:
             if exception is not None:
@@ -31,7 +31,7 @@ class ContextSync(Generic[EnterReturnT]):
     def _finally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    def _handle_exception(self, exception: Exception, traceback: TracebackType | None) -> bool | None:
+    def _handle_exception(self, exception: BaseException, traceback: TracebackType | None) -> bool | None:
         """Called when exception occurred."""
 
 
@@ -40,7 +40,7 @@ class ContextAsync(Generic[EnterReturnT]):
         return await self._enter()
 
     async def __aexit__(
-        self, _: type[Exception] | None, exception: Exception | None, traceback: TracebackType | None
+        self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
     ) -> bool | None:
         try:
             if exception is not None:
@@ -57,5 +57,5 @@ class ContextAsync(Generic[EnterReturnT]):
     async def _finally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    async def _handle_exception(self, exception: Exception, traceback: TracebackType | None) -> bool | None:
+    async def _handle_exception(self, exception: BaseException, traceback: TracebackType | None) -> bool | None:
         """Called when exception occurred."""
