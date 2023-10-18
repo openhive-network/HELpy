@@ -62,7 +62,8 @@ class UniversalNotificationServer(ContextSync[int]):
         return self.__http_server.port
 
     def close(self) -> None:
-        assert self.__server_thread is not None
+        if self.__server_thread is None:
+            return
 
         self.__http_server.close()
         self.__server_thread.join()
