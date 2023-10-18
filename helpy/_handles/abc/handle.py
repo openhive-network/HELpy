@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy._interfaces.context import ContextAsync, ContextSync
-from helpy.exceptions import HelpyError
+from helpy.exceptions import HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
@@ -21,14 +21,6 @@ if TYPE_CHECKING:
         AbstractApiCollection,
     )
     from helpy._interfaces.url import HttpUrl
-
-
-@dataclass
-class RequestError(HelpyError):
-    """Raised if error field is in the response."""
-
-    send: str
-    error: str
 
 
 class MissingResultError(HelpyError):

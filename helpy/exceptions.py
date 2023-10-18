@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 
 class HelpyError(Exception):
     """Base class for all helpy Errors."""
+
+    def __str__(self) -> str:
+        return str(self.__dict__)
 
 
 class ParseError(HelpyError):
@@ -25,3 +30,11 @@ class BlockWaitTimeoutError(HelpyError):
             " irreversible.\n"
             f"Last irreversible block number is `{last_irreversible_block_number}`."
         )
+
+
+@dataclass
+class RequestError(HelpyError):
+    """Raised if error field is in the response."""
+
+    send: str
+    error: str
