@@ -18,7 +18,8 @@ if TYPE_CHECKING:
 class TimeFormats(Enum):
     DEFAULT_FORMAT = "%Y-%m-%dT%H:%M:%S"
     DEFAULT_FORMAT_WITH_MILLIS = "%Y-%m-%dT%H:%M:%S.%f"
-    TIME_OFFSET_FORMAT = "@%Y-%m-%d %H:%M:%S.%f"
+    TIME_OFFSET_FORMAT = "@%Y-%m-%d %H:%M:%S"
+    TIME_OFFSET_FORMAT_WITH_MILLIS = "@%Y-%m-%d %H:%M:%S.%f"
 
 
 class Time:
