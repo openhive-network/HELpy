@@ -1,22 +1,19 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from datetime import datetime  # noqa: TCH003
+from typing import Any
 
 from helpy._handles.abc.api import AbstractAsyncApi
 from helpy._handles.hived.api.condenser_api.common import CondenserApiCommons
 from schemas.apis import condenser_api  # noqa: TCH001
 from schemas.transaction import TransactionLegacy  # noqa: TCH001
 
-if TYPE_CHECKING:
-    from datetime import datetime
-
 
 class CondenserApi(AbstractAsyncApi, CondenserApiCommons):
     api = AbstractAsyncApi._endpoint
 
-    @classmethod
-    def _serialize_params(cls, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG003
-        return cls._legacy_serialization(args=args)
+    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
+        return self._legacy_serialization(args=args)
 
     @api
     async def get_version(self) -> condenser_api.GetVersion:

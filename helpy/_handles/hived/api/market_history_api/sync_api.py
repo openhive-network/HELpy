@@ -11,17 +11,17 @@ class MarketHistoryApi(AbstractSyncApi):
     api = AbstractSyncApi._endpoint
 
     @api
-    def get_ticker(self) -> market_history_api.GetTicker[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    def get_ticker(self) -> market_history_api.GetTicker[Hf26Asset.HiveT, Hf26Asset.HbdT]:
         raise NotImplementedError
 
     @api
-    def get_volume(self) -> market_history_api.GetVolume[Hf26Asset.Hive, Hf26Asset.Hbd]:
+    def get_volume(self) -> market_history_api.GetVolume[Hf26Asset.HiveT, Hf26Asset.HbdT]:
         raise NotImplementedError
 
     @api
     def get_order_book(
         self, *, limit: int = 500
-    ) -> market_history_api.GetOrderBook[Hf26Asset.Hive, Hf26Asset.Hbd, Hf26Asset.Vests]:
+    ) -> market_history_api.GetOrderBook[Hf26Asset.HiveT, Hf26Asset.HbdT, Hf26Asset.VestsT]:
         raise NotImplementedError
 
     @api

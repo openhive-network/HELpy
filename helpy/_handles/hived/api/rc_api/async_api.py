@@ -11,7 +11,7 @@ class RcApi(AbstractAsyncApi):
     @api
     async def find_rc_accounts(
         self, *, accounts: list[str], refresh_mana: bool = False
-    ) -> rc_api.FindRcAccounts[Hf26Asset.Vests]:
+    ) -> rc_api.FindRcAccounts[Hf26Asset.VestsT]:
         raise NotImplementedError
 
     @api
@@ -25,7 +25,7 @@ class RcApi(AbstractAsyncApi):
     @api
     async def list_rc_accounts(
         self, *, accounts: list[str], refresh_mana: bool = False
-    ) -> rc_api.ListRcAccounts[Hf26Asset.Vests]:
+    ) -> rc_api.ListRcAccounts[Hf26Asset.VestsT]:
         raise NotImplementedError
 
     @api
