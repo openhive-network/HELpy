@@ -159,6 +159,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
                 message = message["message"]
             if "Unable to acquire database lock" in message:
                 logger.debug("Ignored 'Unable to acquire database lock'")
+                return
             raise exception
 
         def sync_impl(*args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
