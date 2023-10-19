@@ -38,6 +38,7 @@ class AccountHistoryApi(AbstractSyncApi):
     ) -> account_history_api.EnumVirtualOps:
         raise NotImplementedError
 
+    @api
     def get_ops_in_block(
         self, *, block_num: int, only_virtual: bool = False, include_reversible: bool = True
     ) -> account_history_api.GetOpsInBlock:
