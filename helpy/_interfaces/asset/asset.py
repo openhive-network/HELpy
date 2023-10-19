@@ -45,6 +45,7 @@ class Asset:
     HbdT: TypeAlias = AssetHbdHF26
     TbdT: TypeAlias = AssetTbdHF26
     VestsT: TypeAlias = AssetVestsHF26
+    VestT: TypeAlias = VestsT
     AnyT: TypeAlias = HiveT | HbdT | VestsT
     AssetPredicateT = TypeVar("AssetPredicateT", bound=HiveT | HbdT | VestsT)
 
