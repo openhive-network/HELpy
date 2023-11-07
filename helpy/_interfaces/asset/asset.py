@@ -145,6 +145,12 @@ class Asset:
             raise AssetAmountInvalidFormatError(str(amount)) from error
 
     @classmethod
+    def is_same(cls, first: AnyT, second: AnyT) -> bool:
+        return first.get_asset_information() == second.get_asset_information() and int(first.amount) == int(
+            second.amount
+        )
+
+    @classmethod
     def resolve_symbol(cls, symbol: str) -> type[Asset.AnyT]:
         upper_symbol = symbol.upper()
         if upper_symbol in Asset.HiveT.get_asset_information().symbol:
