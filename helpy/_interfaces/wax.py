@@ -8,7 +8,8 @@ from helpy.exceptions import HelpyError
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
-    from schemas.operations.representations import Hf26OperationRepresentation
+    from schemas.operations.representations import HF26Representation
+    from schemas.operations.representations.representation_value_typevar import RepresentationValueT
     from schemas.transaction import Transaction
 
 
@@ -21,7 +22,7 @@ def __validate_wax_response(response: wax.python_result) -> None:
         raise WaxOperationFailedError(response.exception_message.decode())
 
 
-def __as_binary_json(item: Hf26OperationRepresentation | Transaction) -> bytes:
+def __as_binary_json(item: HF26Representation[RepresentationValueT] | Transaction) -> bytes:
     return item.json(by_alias=True).encode()
 
 
@@ -29,7 +30,7 @@ def validate_transaction(transaction: Transaction) -> None:
     return __validate_wax_response(wax.validate_transaction(__as_binary_json(transaction)))
 
 
-def validate_operation(operation: Hf26OperationRepresentation) -> None:
+def validate_operation(operation: HF26Representation[RepresentationValueT]) -> None:
     return __validate_wax_response(wax.validate_operation(__as_binary_json(operation)))
 
 
