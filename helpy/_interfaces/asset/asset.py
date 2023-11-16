@@ -10,6 +10,7 @@ from helpy._interfaces.asset.decimal_converter import (
     DecimalConverter,
 )
 from helpy.exceptions import HelpyError
+import pydantic
 from schemas.fields.assets import (
     AssetHbdHF26,
     AssetHbdLegacy,
@@ -145,7 +146,17 @@ class Asset:
             raise AssetAmountInvalidFormatError(str(amount)) from error
 
     @classmethod
-    def is_same(cls, first: AnyT, second: AnyT) -> bool:
+    def is_same(cls, first: AnyT | str, second: AnyT | str) -> bool:
+        if isinstance(first, str):
+            first = Asset.from_legacy(first)
+        elif isinstance(first, dict):
+            first = Asset.from_nai(first)
+
+        if isinstance(second, str):
+            second = Asset.from_legacy(second)
+        elif isinstance(second, dict):
+            second = Asset.from_nai(second)
+
         return first.get_asset_information() == second.get_asset_information() and int(first.amount) == int(
             second.amount
         )
@@ -174,6 +185,22 @@ class Asset:
         with contextlib.suppress(TypeError, StrRegexError):
             return cls.VestsT.from_legacy(value)
         raise AssetLegacyInvalidFormatError(value)
+
+    @classmethod
+    def from_nai(cls, value: dict[str, str | int], *, testnet: bool = True) -> Asset.AnyT:
+        if testnet:
+            with contextlib.suppress(pydantic.ValidationError):
+                return cls.TestT.from_nai(value)
+            with contextlib.suppress(pydantic.ValidationError):
+                return cls.TbdT.from_nai(value)
+        else:
+            with contextlib.suppress(pydantic.ValidationError):
+                return cls.HiveT.from_nai(value)
+            with contextlib.suppress(pydantic.ValidationError):
+                return cls.HbdT.from_nai(value)
+        with contextlib.suppress(pydantic.ValidationError):
+            return cls.VestsT.from_nai(value)
+        raise AssetError("given value is not proper nai dictionary", value)
 
     @classmethod
     def to_legacy(cls, asset: Asset.AnyT) -> str:
