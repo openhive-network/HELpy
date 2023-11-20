@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 
 import json
 import re
@@ -20,6 +21,8 @@ from helpy._handles.abc.handle import (
     AbstractSyncHandle,
 )
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
+from schemas.fields.hive_datetime import HiveDateTime
+from schemas.operations.representations.legacy_representation import LegacyRepresentation
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -51,8 +54,12 @@ class AbstractApi(ABC, Generic[HandleT]):
     def json_dumps(cls) -> Callable[[Any], str]:
         class JsonEncoder(json.JSONEncoder):
             def default(self, o: Any) -> Any:
+                if isinstance(o, LegacyRepresentation):
+                    return (o.type, o.value)
                 if isinstance(o, PreconfiguredBaseModel):
                     return o.shallow_dict()
+                if isinstance(o, datetime):
+                    return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # type: ignore[no-untyped-call]
                 return super().default(o)
 
         return partial(json.dumps, cls=JsonEncoder)
