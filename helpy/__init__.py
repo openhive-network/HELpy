@@ -10,6 +10,7 @@ from helpy._handles import (
 )
 from helpy._interfaces import wax
 from helpy._interfaces.asset import Hf26Asset, LegacyAsset
+from helpy._interfaces.stopwatch import Stopwatch
 from helpy._interfaces.time import Time, TimeFormats
 from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 
@@ -24,6 +25,7 @@ __all__ = [
     "HttpUrl",
     "LegacyAsset",
     "P2PUrl",
+    "Stopwatch",
     "Time",
     "TimeFormats",
     "wax",
