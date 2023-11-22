@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 from typing import Any, TypeAlias, TypeVar
 
+import pydantic
 from pydantic import StrRegexError
 
 from helpy._interfaces.asset.decimal_converter import (
@@ -10,7 +11,6 @@ from helpy._interfaces.asset.decimal_converter import (
     DecimalConverter,
 )
 from helpy.exceptions import HelpyError
-import pydantic
 from schemas.fields.assets import (
     AssetHbdHF26,
     AssetHbdLegacy,

@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Protocol
-from helpy._interfaces.stopwatch import Stopwatch
 
 from loguru import logger
 from typing_extensions import Self
 
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy._interfaces.context import ContextAsync, ContextSync
+from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
