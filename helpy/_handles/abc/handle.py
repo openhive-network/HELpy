@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Protocol
+from helpy._interfaces.stopwatch import Stopwatch
 
 from loguru import logger
 from typing_extensions import Self
@@ -191,8 +192,11 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         """Sends data asynchronously to handled service basing on jsonrpc."""
         request = self._build_json_rpc_call(method=endpoint, params=params)
         self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
-        response = await self._communicator.async_send(self.http_endpoint, data=request)
-        self.logger.debug(f"got response from `{self.http_endpoint.as_string()}`: `{response}`")
+        with Stopwatch() as record:
+            response = await self._communicator.async_send(self.http_endpoint, data=request)
+        self.logger.debug(
+            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
+        )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
     async def _enter(self) -> Self:
@@ -213,8 +217,11 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = self._build_json_rpc_call(method=endpoint, params=params)
         self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
-        response = self._communicator.send(self.http_endpoint, data=request)
-        self.logger.debug(f"got response from `{self.http_endpoint.as_string()}`: `{response}`")
+        with Stopwatch() as record:
+            response = self._communicator.send(self.http_endpoint, data=request)
+        self.logger.debug(
+            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
+        )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
     def _enter(self) -> Self:
