@@ -17,7 +17,7 @@ class DecimalConversionNotANumberError(HelpyError):
 
 class DecimalConverter:
     @classmethod
-    def convert(cls, amount: int | float | str, *, precision: int | None = None) -> Decimal:
+    def convert(cls, amount: float | str, *, precision: int | None = None) -> Decimal:
         """
         Convert given amount to Decimal.
 

@@ -1,10 +1,10 @@
 from __future__ import annotations
-from datetime import datetime
 
 import json
 import re
 from abc import ABC
 from collections import defaultdict
+from datetime import datetime
 from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
@@ -21,7 +21,6 @@ from helpy._handles.abc.handle import (
     AbstractSyncHandle,
 )
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
-from schemas.fields.hive_datetime import HiveDateTime
 from schemas.operations.representations.legacy_representation import LegacyRepresentation
 
 if TYPE_CHECKING:
