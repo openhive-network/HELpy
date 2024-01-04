@@ -1,6 +1,8 @@
 stages:
   - static_code_analysis
   - tests
+  - build
+  - deploy
 
 workflow:
   rules:
@@ -70,3 +72,33 @@ run_tests:
       junit: $PATH_TO_REPORT
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| BUILD |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+build_wheel:
+  stage: build
+  extends: .build_wheel_template
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| DEPLOY |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+.deploy_wheel_needs: &deploy_wheel_needs
+  needs:
+    - job: pre_commit_checks
+    - job: run_tests
+    - job: build_wheel
+      artifacts: true
+
+deploy_wheel_to_gitlab:
+  stage: deploy
+  extends: .deploy_wheel_to_gitlab_template
+  <<: *deploy_wheel_needs
+  when: on_success
+
+deploy_wheel_to_pypi:
+  extends: .deploy_wheel_to_pypi_template
+  stage: deploy
+  <<: *deploy_wheel_needs
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| DEPLOY |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
