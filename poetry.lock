@@ -1793,19 +1793,21 @@ files = [
 
 [[package]]
 name = "schemas"
-version = "0.0.0"
+version = "0.0.1.dev283+db2351d"
 description = "Tools for checking if message fits expected format"
 optional = false
-python-versions = "^3.10"
-files = []
-develop = true
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "schemas-0.0.1.dev283+db2351d-py3-none-any.whl", hash = "sha256:371ecc39834be2c8c728d563a798e683b39be17cd5113cb5fc72e728d3dfc1dd"},
+]
 
 [package.dependencies]
 pydantic = "1.10.11"
 
 [package.source]
-type = "directory"
-url = "schemas"
+type = "legacy"
+url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple"
+reference = "gitlab-schemas"
 
 [[package]]
 name = "secretstorage"
@@ -2219,4 +2221,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "352bce65b9728362b38ec44d2e1c1d8c9f571c0c5e13909b89a1e2604942d95a"
+content-hash = "e59e713b40149e693c0e77056caf7755d94f6fcd80ea735fea0cb466be8f334c"
