@@ -17,8 +17,8 @@ variables:
   TXT_BLUE: "\e[1;34m"
   TXT_CLEAR: "\e[0m"
 
-  # uses registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu22.04-5
-  CI_BASE_IMAGE_TAG: "@sha256:eaa6f32730f0f4c45a95a65b6d790bea2b71a59276eb28795c04be7703f003e6"
+  # uses registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu22.04-10
+  CI_BASE_IMAGE_TAG: "@sha256:080b16fd53013aeb9b89b00a8dfc90fecf886173f46448b05f45cee376c43330"
   CI_BASE_IMAGE: "registry.gitlab.syncad.com/hive/hive/ci-base-image${CI_BASE_IMAGE_TAG}"
 
 include:
