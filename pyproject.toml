@@ -31,7 +31,7 @@ loguru = "0.7.2"
 httpx = { extras = ["http2"], version = "0.23.3" }
 requests = "2.27.1"
 aiohttp = "3.9.1"
-wax = "0.0.3a2.dev20+299a3d4"
+wax = "0.0.3a2.dev39+44db07f"
 schemas = { path = "schemas", develop = true }
 
 
