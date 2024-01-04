@@ -23,7 +23,7 @@ variables:
 
 include:
   - project: 'hive/common-ci-configuration'
-    ref: 899a376c9b56d79000372903e75af544c90596ab # develop
+    ref: 44d0cec8cfa8fb87d0daf5cef1485fb57b9e26fd
     file: '/templates/python_projects.gitlab-ci.yml'
 
 image: ${CI_BASE_IMAGE}
