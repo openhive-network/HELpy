@@ -14,6 +14,8 @@ from helpy._interfaces.stopwatch import Stopwatch
 from helpy._interfaces.time import Time, TimeFormats
 from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 
+__version__ = "0.0.0"
+
 __all__ = [
     "AsyncBeekeeper",
     "AsyncHived",
