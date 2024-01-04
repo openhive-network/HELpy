@@ -12,7 +12,9 @@ from helpy import Time, TimeFormats
 )
 def test_from_now_with_parameters(interval: str) -> None:
     # ARRANGE
-    value = random.randint(-1000, 1000)
+    value = 0
+    while value == 0:
+        value = random.randint(-1000, 1000)
     interval_container = {interval: value}
     delta = getattr(Time, interval)(value)
 
