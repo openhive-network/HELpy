@@ -18,6 +18,7 @@ packages = [
 ]
 source = [
     { name = "PyPI", priority = "primary" },
+    { name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental" },
     { name = "gitlab-wax", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental" },
 ]
 
@@ -32,7 +33,7 @@ httpx = { extras = ["http2"], version = "0.23.3" }
 requests = "2.27.1"
 aiohttp = "3.9.1"
 wax = "0.0.3a2.dev39+44db07f"
-schemas = { path = "schemas", develop = true }
+schemas = "0.0.1.dev283+db2351d"
 
 
 [tool.poetry.group.dev.dependencies]
