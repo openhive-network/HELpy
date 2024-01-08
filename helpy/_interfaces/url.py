@@ -31,6 +31,9 @@ class Url(Generic[ProtocolT]):
         else:
             raise TypeError("Unknown type, cannot convert to Url")
 
+    def __str__(self) -> str:
+        return self.as_string()
+
     @property
     def protocol(self) -> ProtocolT:
         """Return protocol of url, e.x: http, https."""
