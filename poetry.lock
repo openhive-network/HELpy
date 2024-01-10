@@ -1050,12 +1050,12 @@ files = [
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev290+6a01cb0"
+version = "0.0.1.dev291+af0fba1"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev290+6a01cb0-py3-none-any.whl", hash = "sha256:af2562ec720b6ebf7939fce7f5979a7f850aaf4d6a71afe3fc5fbb91a4397e8a"},
+    {file = "schemas-0.0.1.dev291+af0fba1-py3-none-any.whl", hash = "sha256:c7e8c70ab9598944f41d13f510c05be912eb8f7c1f8bcf992a96ba1a1ffe613f"},
 ]
 
 [package.dependencies]
@@ -1331,4 +1331,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c45330372353ec84e8bd6440722c1ffc3eadca9de66f36304570cb2d20821fd0"
+content-hash = "e25f46ef1f593594273bd893f486fccdf965bc046060d693f4faab6510601696"
