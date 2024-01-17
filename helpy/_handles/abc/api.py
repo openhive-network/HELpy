@@ -65,7 +65,11 @@ class AbstractApi(ABC, Generic[HandleT]):
 
     def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
         """Return serialized given params. Can be overloaded."""
-        return AbstractApi.json_dumps()(kwargs)
+        prepared_kwargs = {}
+        for key, value in kwargs.items():
+            if value is not None:
+                prepared_kwargs[key.strip("_")] = value
+        return AbstractApi.json_dumps()(prepared_kwargs)
 
     @classmethod
     def _api_name(cls) -> str:
