@@ -43,11 +43,6 @@ class AbstractCommunicator(ABC):
         """Returns is given amount of retries exceeds max_retries."""
         return amount > self.settings.max_retries
 
-    def _assert_is_amount_of_retries_exceeded(self, amount: int) -> None:
-        """Checks is given amount of retries exceeds max_retries and if so raises ExceededAmountOfRetriesError."""
-        if self._is_amount_of_retries_exceeded(amount=amount):
-            raise ExceededAmountOfRetriesError
-
     @classmethod
     def _json_headers(cls) -> dict[str, str]:
         """Returns headers for json communication."""
