@@ -7,8 +7,8 @@ import requests
 
 from helpy._communication.abc.communicator import (
     AbstractCommunicator,
-    CommunicationError,
 )
+from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
     from helpy._interfaces.url import HttpUrl
@@ -35,7 +35,7 @@ class RequestCommunicator(AbstractCommunicator):
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
             except httpx.ConnectError as error:
-                raise CommunicationError(url, data) from error
+                raise CommunicationError(url=url.as_string(), request=data) from error
             except httpx.HTTPError as error:
                 last_exception = error
             self._sleep_for_retry()
