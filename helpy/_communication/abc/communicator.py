@@ -6,18 +6,10 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from helpy._communication.settings import CommunicationSettings
-from helpy.exceptions import HelpyError
+from helpy.exceptions import CommunicationError, ExceededAmountOfRetriesError
 
 if TYPE_CHECKING:
     from helpy._interfaces.url import HttpUrl
-
-
-class CommunicationError(HelpyError):
-    """Base class for all communication related errors."""
-
-
-class ExceededAmountOfRetriesError(CommunicationError):
-    """Raised if exceeded amount of retries."""
 
 
 class AbstractCommunicator(ABC):
