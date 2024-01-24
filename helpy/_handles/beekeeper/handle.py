@@ -17,11 +17,11 @@ class Beekeeper(AbstractSyncHandle):
     def _clone(self) -> Beekeeper:
         return Beekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 
-    def _construct_api(self) -> BeekeeperSyncApiCollection:
+    def _construct_api(self) -> BeekeeperSyncApiCollection:  # type: ignore[override]
         return BeekeeperSyncApiCollection(owner=self)
 
     @property
-    def api(self) -> BeekeeperSyncApiCollection:
+    def api(self) -> BeekeeperSyncApiCollection:  # type: ignore[override]
         return cast(BeekeeperSyncApiCollection, super().api)
 
     def _target_service(self) -> str:
@@ -34,11 +34,11 @@ class AsyncBeekeeper(AbstractAsyncHandle):
     def _clone(self) -> AsyncBeekeeper:
         return AsyncBeekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 
-    def _construct_api(self) -> BeekeeperAsyncApiCollection:
+    def _construct_api(self) -> BeekeeperAsyncApiCollection:  # type: ignore[override]
         return BeekeeperAsyncApiCollection(owner=self)
 
     @property
-    def api(self) -> BeekeeperAsyncApiCollection:
+    def api(self) -> BeekeeperAsyncApiCollection:  # type: ignore[override]
         return cast(BeekeeperAsyncApiCollection, super().api)
 
     def _target_service(self) -> str:
