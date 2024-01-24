@@ -9,6 +9,7 @@ from typing_extensions import Self
 
 from helpy._communication.abc.communicator import CommunicationError
 from helpy._communication.httpx_communicator import HttpxCommunicator
+from helpy._handles.abc.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import HelpyError, RequestError
@@ -119,17 +120,6 @@ class AbstractHandle:
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
-    @classmethod
-    def _build_json_rpc_call(cls, *, method: str, params: str) -> str:
-        """Builds params for jsonrpc call."""
-        return (
-            """{"id": 0, "jsonrpc": "2.0", "method": \""""
-            + method
-            + '"'
-            + (""", "params":""" + params if params else "")
-            + "}"
-        )
-
     def __configure_logger(self) -> Logger:
         return logger.bind(**self._logger_extras())
 
@@ -202,7 +192,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
-        request = self._build_json_rpc_call(method=endpoint, params=params)
+        request = build_json_rpc_call(method=endpoint, params=params)
         self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = await self._communicator.async_send(self.http_endpoint, data=request)
@@ -227,7 +217,7 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
     @_retry_on_unable_to_acquire_database_lock(async_version=False)  # type: ignore[arg-type]
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
-        request = self._build_json_rpc_call(method=endpoint, params=params)
+        request = build_json_rpc_call(method=endpoint, params=params)
         self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = self._communicator.send(self.http_endpoint, data=request)
