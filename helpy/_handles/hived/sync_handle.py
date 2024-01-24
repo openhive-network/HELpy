@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, cast
 
+from helpy._handles.abc.batch_handle import SyncBatchHandle
 from helpy._handles.abc.handle import AbstractSyncHandle
 from helpy._handles.hived.api.api_collection import (
     HivedSyncApiCollection,
@@ -97,3 +98,11 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
 
         if __expected_block_was_reached_but_is_still_not_irreversible():
             raise BlockWaitTimeoutError(last_block_number, block_number, last_irreversible_block_number)
+
+    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[HivedSyncApiCollection]:
+        return SyncBatchHandle(
+            url=self.http_endpoint,
+            communicator=self._communicator,
+            api=lambda o: HivedSyncApiCollection(o),
+            delay_error_on_data_access=delay_error_on_data_access,
+        )

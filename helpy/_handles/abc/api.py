@@ -16,6 +16,7 @@ from typing import (
     get_type_hints,
 )
 
+from helpy._handles.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from helpy._handles.abc.handle import (
     AbstractAsyncHandle,
     AbstractSyncHandle,
@@ -30,7 +31,9 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-HandleT = TypeVar("HandleT", bound=AbstractAsyncHandle | AbstractSyncHandle)
+SyncHandleT = AbstractSyncHandle | SyncBatchHandle
+AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle
+HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
 
@@ -109,10 +112,10 @@ class AbstractApi(ABC, Generic[HandleT]):
         self._owner = owner
 
 
-class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
+class AbstractSyncApi(AbstractApi[SyncHandleT]):
     """Base class for all apis, that provides synchronous endpoints."""
 
-    def __init__(self, owner: AbstractSyncHandle) -> None:
+    def __init__(self, owner: SyncHandleT) -> None:
         super().__init__(owner)
 
     @classmethod
@@ -135,10 +138,10 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
         return impl  # type: ignore[return-value]
 
 
-class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
+class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
     """Base class for all apis, that provides asynchronous endpoints."""
 
-    def __init__(self, owner: AbstractAsyncHandle) -> None:
+    def __init__(self, owner: AsyncHandleT) -> None:
         super().__init__(owner)
 
     @classmethod
