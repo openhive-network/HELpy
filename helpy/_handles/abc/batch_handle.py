@@ -50,7 +50,9 @@ class _DelayedResponseWrapper:
 
     def _set_response(self, **kwargs: Any) -> None:
         expected_type = super().__getattribute__("_expected_type")
-        super().__setattr__("_response", get_response_model(expected_type, **kwargs).result)
+        response = get_response_model(expected_type, **kwargs)
+        assert isinstance(response, JSONRPCResult)
+        super().__setattr__("_response", response.result)
 
     def _set_exception(self, exception: Exception) -> None:
         super().__setattr__("_exception", exception)
@@ -66,15 +68,15 @@ class _PostRequestManager:
     def __init__(self, owner: _BatchHandle, batch_objs: list[_BatchRequestResponseItem]) -> None:
         self.__batch = batch_objs
         self.__owner = owner
-        self.__responses = []
+        self.__responses: list[dict[str, Any]] = []
 
-    def set_responses(self, responses: list[dict[str, Any]]) -> None:
+    def set_responses(self, responses: str) -> None:
         self.__responses = json.loads(responses)
 
     def __enter__(self) -> Self:
         return self
 
-    def _set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str | None = None) -> None:
+    def _set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str = "") -> None:
         if "error" in response:
             # creating a new instance so other responses won't be included in the error
             new_error = CommunicationError(
@@ -94,15 +96,13 @@ class _PostRequestManager:
         if exception is None and len(self.__responses):
             assert len(self.__responses) == len(self.__batch), "Invalid amount of responses"
             for response in self.__responses:
-                self._set_response_or_exception(
-                    request_id=int(response["id"]),
-                    response=response
-                )
+                self._set_response_or_exception(request_id=int(response["id"]), response=response)
             return None
 
-        if not isinstance(exception, CommunicationError):
+        if not isinstance(exception, CommunicationError) and isinstance(exception, BaseException):
             raise exception
 
+        assert exception is not None
         responses_from_error = exception.get_response()
 
         # There is no response available, set this exception on all delayed results.
@@ -112,7 +112,7 @@ class _PostRequestManager:
 
             if not self.__owner._delay_error_on_data_access:
                 raise exception
-            return
+            return None
 
         message = f"Invalid error response format: expected list, got {type(responses_from_error)}"
         assert isinstance(responses_from_error, list), message
@@ -121,17 +121,23 @@ class _PostRequestManager:
         # Some of the responses might be errors, some might be good - set them on delayed results.
         for response in responses_from_error:
             self._set_response_or_exception(
-                request_id=int(response["id"]),
-                response=response,
-                exception_url=exception.url
+                request_id=int(response["id"]), response=response, exception_url=exception.url
             )
 
         if not self.__owner._delay_error_on_data_access:
             raise exception
+        return None
 
 
 class _BatchHandle:
-    def __init__(self, url: HttpUrl, communicator: AbstractCommunicator, *args, delay_error_on_data_access: bool = False, **kwargs) -> None:
+    def __init__(
+        self,
+        url: HttpUrl,
+        communicator: AbstractCommunicator,
+        *args: Any,
+        delay_error_on_data_access: bool = False,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.__url = url
         self.__communicator = communicator
@@ -142,7 +148,8 @@ class _BatchHandle:
     def _impl_handle_request(self, endpoint: str, params: str, *, expect_type: type[ExpectResultT]) -> ExpectResultT:
         @dataclass
         class DummyResponse:
-            result: ExpectResultT
+            result: Any
+
         request = build_json_rpc_call(method=endpoint, params=params, id_=len(self.__batch))
         delayed_result = _DelayedResponseWrapper(url=self.__url, request=request, expected_type=expect_type)
         self.__batch.append(_BatchRequestResponseItem(request=request, delayed_result=delayed_result))
@@ -187,24 +194,47 @@ class _BatchHandle:
 
         self.__sync_evaluate()
 
+
 ApiT = TypeVar("ApiT")
 OwnerT = TypeVar("OwnerT")
-class ApiFactory(Protocol, Generic[OwnerT, ApiT]):
+
+
+class ApiFactory(Protocol, Generic[OwnerT, ApiT]):  # type: ignore[misc]
     def __call__(self, owner: OwnerT) -> ApiT:
         ...
 
+
 class SyncBatchHandle(_BatchHandle, Generic[ApiT]):
-    def __init__(self, url: HttpUrl, communicator: AbstractCommunicator, api: ApiFactory[Self, ApiT], *args, delay_error_on_data_access: bool = False, **kwargs) -> None:
+    def __init__(
+        self,
+        url: HttpUrl,
+        communicator: AbstractCommunicator,
+        api: ApiFactory[Self, ApiT],
+        *args: Any,
+        delay_error_on_data_access: bool = False,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(url, communicator, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.api: ApiT = api(self)
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
+
 
 class AsyncBatchHandle(_BatchHandle, Generic[ApiT]):
-    def __init__(self, url: HttpUrl, communicator: AbstractCommunicator, api: ApiFactory[Self, ApiT], *args, delay_error_on_data_access: bool = False, **kwargs) -> None:
+    def __init__(
+        self,
+        url: HttpUrl,
+        communicator: AbstractCommunicator,
+        api: ApiFactory[Self, ApiT],
+        *args: Any,
+        delay_error_on_data_access: bool = False,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(url, communicator, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.api: ApiT = api(self)
 
-    async def _async_send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)
+    async def _async_send(
+        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+    ) -> JSONRPCResult[ExpectResultT]:
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
