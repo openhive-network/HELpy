@@ -19,6 +19,7 @@ def test_batch_node(sync_node: Hived) -> None:
     assert len(dynamic_properties.dict(by_alias=True)) != 0
     assert len(config.dict(by_alias=True)) != 0
 
+
 async def test_async_batch_node(async_node: AsyncHived) -> None:
     async with async_node.batch() as node:
         dynamic_properties = await node.api.database.get_dynamic_global_properties()
@@ -26,6 +27,7 @@ async def test_async_batch_node(async_node: AsyncHived) -> None:
 
     assert len(dynamic_properties.dict(by_alias=True)) != 0
     assert len(config.dict(by_alias=True)) != 0
+
 
 def test_batch_node_response_not_ready(sync_node: Hived) -> None:
     with sync_node.batch() as node:
@@ -48,6 +50,7 @@ def test_batch_node_error_response_delayed(sync_node: Hived) -> None:
     with pytest.raises(CommunicationError, match="Invalid cast"):
         _ = response.accounts[0].name
 
+
 async def test_async_batch_node_error_response_delayed(async_node: AsyncHived) -> None:
     async with async_node.batch(delay_error_on_data_access=True) as node:
         response = await node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
@@ -55,10 +58,9 @@ async def test_async_batch_node_error_response_delayed(async_node: AsyncHived) -
     with pytest.raises(CommunicationError, match="Invalid cast"):
         _ = response.accounts[0].name
 
+
 @pytest.mark.parametrize("order", ["first_good", "first_bad"])
-def test_batch_node_mixed_request_delayed(
-    sync_node: Hived, order: Literal["first_good", "first_bad"]
-) -> None:
+def test_batch_node_mixed_request_delayed(sync_node: Hived, order: Literal["first_good", "first_bad"]) -> None:
     with sync_node.batch(delay_error_on_data_access=True) as node:
         if order == "first_good":
             good_response = node.api.database.get_dynamic_global_properties()
