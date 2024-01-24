@@ -2,11 +2,7 @@ from __future__ import annotations
 
 from typing import Generic
 
-from helpy._handles.abc.api import HandleT
-from helpy._handles.abc.handle import (
-    AbstractAsyncHandle,
-    AbstractSyncHandle,
-)
+from helpy._handles.abc.api import AsyncHandleT, HandleT, SyncHandleT
 
 
 class AbstractApiCollection(Generic[HandleT]):
@@ -16,15 +12,15 @@ class AbstractApiCollection(Generic[HandleT]):
         self._owner = owner
 
 
-class AbstractAsyncApiCollection(AbstractApiCollection[AbstractAsyncHandle]):
+class AbstractAsyncApiCollection(AbstractApiCollection[AsyncHandleT]):
     """Base class for Async Api Collections."""
 
-    def __init__(self, owner: AbstractAsyncHandle) -> None:
+    def __init__(self, owner: AsyncHandleT) -> None:
         super().__init__(owner)
 
 
-class AbstractSyncApiCollection(AbstractApiCollection[AbstractSyncHandle]):
+class AbstractSyncApiCollection(AbstractApiCollection[SyncHandleT]):
     """Base class for Sync Api Collections."""
 
-    def __init__(self, owner: AbstractSyncHandle) -> None:
+    def __init__(self, owner: SyncHandleT) -> None:
         super().__init__(owner)
