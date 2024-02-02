@@ -206,7 +206,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         """Does nothing."""
 
     def _is_synchronous(self) -> bool:
-        return True
+        return False
 
 
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
@@ -231,4 +231,4 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
         """Does nothing."""
 
     def _is_synchronous(self) -> bool:
-        return False
+        return True
