@@ -19,7 +19,7 @@ class HttpxCommunicator(AbstractCommunicator):
     def __init__(self) -> None:
         super().__init__()
         self.__async_client: httpx.AsyncClient | None = httpx.AsyncClient(
-            timeout=self.timeout.total_seconds(), http2=True
+            timeout=self.settings.timeout.total_seconds(), http2=True
         )
 
     async def close(self) -> None:
