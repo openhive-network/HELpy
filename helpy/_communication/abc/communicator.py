@@ -3,9 +3,9 @@ from __future__ import annotations
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from datetime import timedelta
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any
 
+from helpy._communication.abc.settings import CommunicationSettings
 from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
@@ -23,9 +23,13 @@ class ExceededAmountOfRetriesError(CommunicationError):
 class AbstractCommunicator(ABC):
     """Provides basic interface for communicators, which can implement communications using different way."""
 
-    max_retries: ClassVar[int] = 5
-    period_between_retries: ClassVar[timedelta] = timedelta(seconds=1)
-    timeout: ClassVar[timedelta] = timedelta(seconds=2)
+    def __init__(self, *args: Any, settings: CommunicationSettings | None = None, **kwargs: Any) -> None:
+        self.__settings = settings or CommunicationSettings()
+        super().__init__(*args, **kwargs)
+
+    @property
+    def settings(self) -> CommunicationSettings:
+        return self.__settings
 
     @abstractmethod
     def send(self, url: HttpUrl, data: str) -> str:
@@ -35,25 +39,21 @@ class AbstractCommunicator(ABC):
     async def async_send(self, url: HttpUrl, data: str) -> str:
         """Sends to given url given data asynchronously."""
 
-    @classmethod
-    async def _async_sleep_for_retry(cls) -> None:
+    async def _async_sleep_for_retry(self) -> None:
         """Sleeps using asyncio.sleep (for asynchronous implementations)."""
-        await asyncio.sleep(cls.period_between_retries.total_seconds())
+        await asyncio.sleep(self.settings.period_between_retries.total_seconds())
 
-    @classmethod
-    def _sleep_for_retry(cls) -> None:
+    def _sleep_for_retry(self) -> None:
         """Sleeps using time.sleep (for synchronous implementations)."""
-        time.sleep(cls.period_between_retries.total_seconds())
+        time.sleep(self.settings.period_between_retries.total_seconds())
 
-    @classmethod
-    def _is_amount_of_retries_exceeded(cls, amount: int) -> bool:
+    def _is_amount_of_retries_exceeded(self, amount: int) -> bool:
         """Returns is given amount of retries exceeds max_retries."""
-        return amount > cls.max_retries
+        return amount > self.settings.max_retries
 
-    @classmethod
-    def _assert_is_amount_of_retries_exceeded(cls, amount: int) -> None:
+    def _assert_is_amount_of_retries_exceeded(self, amount: int) -> None:
         """Checks is given amount of retries exceeds max_retries and if so raises ExceededAmountOfRetriesError."""
-        if cls._is_amount_of_retries_exceeded(amount=amount):
+        if self._is_amount_of_retries_exceeded(amount=amount):
             raise ExceededAmountOfRetriesError
 
     @classmethod
