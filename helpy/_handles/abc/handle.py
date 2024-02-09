@@ -192,10 +192,10 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         request = self._build_json_rpc_call(method=endpoint, params=params)
-        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = await self._communicator.async_send(self.http_endpoint, data=request)
-        self.logger.debug(
+        self.logger.trace(
             f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
