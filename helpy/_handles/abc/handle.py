@@ -158,8 +158,9 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
             message = exception.error
             if isinstance(message, dict):
                 message = message["message"]
-            if "Unable to acquire database lock" in message:
-                logger.debug("Ignored 'Unable to acquire database lock'")
+            if "Unable to acquire database lock" in message or "Unable to acquire forkdb lock" in message:
+                logger.debug(f'Ignored "Unable to acquire {"database" if "database" in message else "forkdb"} lock"')
+
                 return
             raise exception
 
