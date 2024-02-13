@@ -20,7 +20,10 @@ def registered_apis() -> RegisteredApisT:
 
 @pytest.fixture()
 def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
-    return helpy.HttpUrl(request.config.getoption("--hived-http-endpoint"), protocol="https")
+    raw_url = request.config.getoption("--hived-http-endpoint")
+    if raw_url is None or raw_url == "":
+        raw_url = "https://api.hive.blog"
+    return helpy.HttpUrl(raw_url)
 
 
 @pytest.fixture()
