@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 from loguru import logger
 from typing_extensions import Self
 
+from helpy._communication.abc.communicator import CommunicationError
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
@@ -151,32 +152,42 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     async_version: bool,
 ) -> Callable[[_SyncCall | _AsyncCall], Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]]]:
     # inspired by: https://gitlab.syncad.com/hive/test-tools/-/blob/a8290d47ec3638fb31573182a3311137542a6637/package/test_tools/__private/communication.py#L33
-    def __workaround_communication_problem_with_node(
+    def __workaround_communication_problem_with_node(  # noqa: C901
         send_request: _SyncCall | _AsyncCall,
     ) -> Callable[..., JSONRPCResult[Any]]:
-        def __handle_exception(exception: RequestError) -> None:
-            message = exception.error
-            if isinstance(message, dict):
-                message = message["message"]
-            if "Unable to acquire database lock" in message or "Unable to acquire forkdb lock" in message:
-                logger.debug(f'Ignored "Unable to acquire {"database" if "database" in message else "forkdb"} lock"')
-
-                return
+        def __handle_exception(this: AbstractHandle, exception: RequestError | CommunicationError, count: int) -> int:
+            ignored_messages = [
+                "Unable to acquire database lock",
+                "Unable to acquire forkdb lock",
+            ]
+            message = str(exception)
+            for imsg in ignored_messages:
+                if imsg in message:
+                    logger.debug(f"Ignored '{imsg}'")
+                    if count <= this._communicator.settings.max_retries:
+                        return count + 1
+                    break
             raise exception
 
-        def sync_impl(*args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+        def sync_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+            i = 0
             while True:
                 try:
-                    return send_request(*args, **kwargs)  # type: ignore[return-value]
+                    return send_request(*[this, *args], **kwargs)  # type: ignore[return-value]
+                except CommunicationError as exception:
+                    i = __handle_exception(this, exception, i)
                 except RequestError as exception:
-                    __handle_exception(exception)
+                    i = __handle_exception(this, exception, i)
 
-        async def async_impl(*args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+        async def async_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+            i = 0
             while True:
                 try:
-                    return await send_request(*args, **kwargs)  # type: ignore[no-any-return, misc]
+                    return await send_request(*[this, *args], **kwargs)  # type: ignore[no-any-return, misc]
+                except CommunicationError as exception:
+                    i = __handle_exception(this, exception, i)
                 except RequestError as exception:
-                    __handle_exception(exception)
+                    i = __handle_exception(this, exception, i)
 
         return async_impl if async_version else sync_impl  # type: ignore[return-value]
 
