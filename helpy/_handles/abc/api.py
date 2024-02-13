@@ -63,13 +63,21 @@ class AbstractApi(ABC, Generic[HandleT]):
 
         return partial(json.dumps, cls=JsonEncoder)
 
-    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
+    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:
         """Return serialized given params. Can be overloaded."""
+        if not self.is_keyword_only():
+            return AbstractApi.json_dumps()([args])
         prepared_kwargs = {}
         for key, value in kwargs.items():
             if value is not None:
                 prepared_kwargs[key.strip("_")] = value
         return AbstractApi.json_dumps()(prepared_kwargs)
+
+    def _verify_positional_keyword_args(self, args: Any, kwargs: dict[str, Any]) -> None:
+        if self.is_keyword_only():
+            assert len(args) == 0, "This api allows only keyword arguments; Ex.: foo(a=1, b=2, c=3)"
+        else:
+            assert len(kwargs) == 0, "This api allows only positional arguments; Ex.: foo(1, 2, 3)"
 
     @classmethod
     def _api_name(cls) -> str:
@@ -94,6 +102,9 @@ class AbstractApi(ABC, Generic[HandleT]):
 
         return pytest_is_running.is_running()
 
+    def is_keyword_only(self) -> bool:
+        return True
+
     def __init__(self, owner: HandleT) -> None:
         self._owner = owner
 
@@ -114,6 +125,7 @@ class AbstractSyncApi(AbstractApi[AbstractSyncHandle]):
 
         @wraps(wrapped_function)
         def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+            this._verify_positional_keyword_args(args, kwargs)
             return this._owner._send(  # type: ignore[no-any-return, union-attr, misc]
                 endpoint=f"{api_name}.{wrapped_function_name}",
                 params=this._serialize_params(args=args, kwargs=kwargs),
@@ -141,6 +153,7 @@ class AbstractAsyncApi(AbstractApi[AbstractAsyncHandle]):
 
         @wraps(wrapped_function)
         async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+            this._verify_positional_keyword_args(args, kwargs)
             return (  # type: ignore[no-any-return]
                 await this._owner._async_send(  # type: ignore[misc]
                     endpoint=f"{api_name}.{wrapped_function_name}",
