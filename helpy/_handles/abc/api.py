@@ -16,11 +16,11 @@ from typing import (
     get_type_hints,
 )
 
-from helpy._handles.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from helpy._handles.abc.handle import (
     AbstractAsyncHandle,
     AbstractSyncHandle,
 )
+from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 from schemas.operations.representations.legacy_representation import LegacyRepresentation
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import cast
 
-from helpy._handles.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from helpy._handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
+from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from helpy._handles.beekeeper.api.api_collection import (
     BeekeeperAsyncApiCollection,
     BeekeeperSyncApiCollection,
