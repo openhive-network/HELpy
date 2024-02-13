@@ -5,7 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from helpy._handles.abc.build_json_rpc_call import build_json_rpc_call
+from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy.exceptions import CommunicationError, NothingToSendError, ResponseNotReadyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 

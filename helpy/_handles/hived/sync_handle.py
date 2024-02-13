@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, cast
 
-from helpy._handles.abc.batch_handle import SyncBatchHandle
 from helpy._handles.abc.handle import AbstractSyncHandle
+from helpy._handles.batch_handle import SyncBatchHandle
 from helpy._handles.hived.api.api_collection import (
     HivedSyncApiCollection,
 )
