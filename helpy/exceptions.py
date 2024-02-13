@@ -105,7 +105,7 @@ class CommunicationError(HelpyError):
 
     def _get_reply(self) -> str:
         if (result := self.get_response()) is not None:
-            return f"{result=}"
+            return f"response={result}"
 
         if self.response is not None:
             return f"response={self.response}"
