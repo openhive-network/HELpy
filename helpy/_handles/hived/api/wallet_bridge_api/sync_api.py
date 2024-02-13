@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
-from typing import Any
 
 from helpy._handles.abc.api import AbstractSyncApi
 from helpy._handles.hived.api.wallet_bridge_api.common import WalletBridgeApiCommons
@@ -13,8 +12,8 @@ from schemas.transaction import Transaction  # noqa: TCH001
 class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
     api = AbstractSyncApi._endpoint
 
-    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
-        return self._legacy_serialization(args=args)
+    def is_keyword_only(self) -> bool:
+        return False
 
     @api
     def get_version(self) -> wallet_bridge_api.GetVersion:
