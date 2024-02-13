@@ -5,7 +5,7 @@ import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from helpy._communication.abc.settings import CommunicationSettings
+from helpy._communication.settings import CommunicationSettings
 from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
