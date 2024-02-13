@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
-from helpy.exceptions import CommunicationError, NothingToSendError, ResponseNotReadyError
+from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ class _DelayedResponseWrapper:
         assert isinstance(response, JSONRPCResult)
         super().__setattr__("_response", response.result)
 
-    def _set_exception(self, exception: Exception) -> None:
+    def _set_exception(self, exception: BaseException) -> None:
         super().__setattr__("_exception", exception)
 
 
@@ -77,7 +77,7 @@ class _PostRequestManager:
     def __enter__(self) -> Self:
         return self
 
-    def _set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str = "") -> None:
+    def __set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str = "") -> None:
         if "error" in response:
             # creating a new instance so other responses won't be included in the error
             new_error = CommunicationError(
@@ -85,49 +85,55 @@ class _PostRequestManager:
                 request=self.__batch[request_id].request,
                 response=response,
             )
+            self.__owner._get_batch_delayed_result(request_id)._set_exception(new_error)
             if not self.__owner._delay_error_on_data_access:
                 raise new_error
-            self.__owner._get_batch_delayed_result(request_id)._set_exception(new_error)
         else:
             self.__owner._get_batch_delayed_result(request_id)._set_response(**response)
+
+    def __handle_no_exception_case(self) -> None:
+        self.__validate_response_count(self.__responses)
+        for response in self.__responses:
+            self.__set_response_or_exception(request_id=int(response["id"]), response=response)
+
+    def __handle_exception_and_no_responses_exists(self, exception: BaseException) -> bool | None:
+        for request_id in range(len(self.__batch)):
+            self.__owner._get_batch_delayed_result(request_id)._set_exception(exception)
+
+        if not self.__owner._delay_error_on_data_access:
+            return False
+        return None
+
+    def __handle_exception_and_responses_exists(self, responses: list[JsonT], url: str) -> bool | None:
+        for response in responses:
+            self.__set_response_or_exception(request_id=int(response["id"]), response=response, exception_url=url)
+        return not self.__owner._delay_error_on_data_access
+
+    def __validate_response_count(self, response: list[JsonT]) -> None:
+        message = "Invalid amount of responses_from_error"
+        assert len(response) == len(self.__batch), message
+
+    def __handle_exception_case(self, exception: BaseException) -> bool | None:
+        if not isinstance(exception, CommunicationError) and isinstance(exception, BaseException):
+            return False
+
+        responses_from_error = exception.get_response()
+        if responses_from_error is None:
+            return self.__handle_exception_and_no_responses_exists(exception)
+
+        message = f"Invalid error response format: expected list, got {type(responses_from_error)}"
+        assert isinstance(responses_from_error, list), message
+        self.__validate_response_count(responses_from_error)
+        return self.__handle_exception_and_responses_exists(responses_from_error, exception.url)
 
     def __exit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
     ) -> bool | None:
         if exception is None and len(self.__responses):
-            assert len(self.__responses) == len(self.__batch), "Invalid amount of responses"
-            for response in self.__responses:
-                self._set_response_or_exception(request_id=int(response["id"]), response=response)
-            return None
-
-        if not isinstance(exception, CommunicationError) and isinstance(exception, BaseException):
-            raise exception
-
+            self.__handle_no_exception_case()
+            return True
         assert exception is not None
-        responses_from_error = exception.get_response()
-
-        # There is no response available, set this exception on all delayed results.
-        if responses_from_error is None:
-            for request_id in range(len(self.__batch)):
-                self.__owner._get_batch_delayed_result(request_id)._set_exception(exception)
-
-            if not self.__owner._delay_error_on_data_access:
-                raise exception
-            return None
-
-        message = f"Invalid error response format: expected list, got {type(responses_from_error)}"
-        assert isinstance(responses_from_error, list), message
-        assert len(responses_from_error) == len(self.__batch), "Invalid amount of responses_from_error"
-
-        # Some of the responses might be errors, some might be good - set them on delayed results.
-        for response in responses_from_error:
-            self._set_response_or_exception(
-                request_id=int(response["id"]), response=response, exception_url=exception.url
-            )
-
-        if not self.__owner._delay_error_on_data_access:
-            raise exception
-        return None
+        return self.__handle_exception_case(exception)
 
 
 class _BatchHandle:
