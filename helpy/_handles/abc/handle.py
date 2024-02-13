@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from helpy._handles.abc.api_collection import (
         AbstractApiCollection,
     )
-    from helpy._handles.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
+    from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
 
 
@@ -212,7 +212,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         return True
 
     @abstractmethod
-    def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle:  # type: ignore[type-arg]
+    def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
         """Returns async batch handle."""
 
 
@@ -241,5 +241,5 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
         return False
 
     @abstractmethod
-    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle:  # type: ignore[type-arg]
+    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:
         """Returns sync batch handle."""
