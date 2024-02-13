@@ -6,10 +6,6 @@ from dataclasses import dataclass
 class HelpyError(Exception):
     """Base class for all helpy Errors."""
 
-    def __str__(self) -> str:
-        """Makes analysis much simpler."""
-        return str(self.__dict__)
-
 
 class ParseError(HelpyError):
     """Raised if cannot parse given str, e.x. url, date, asset."""
