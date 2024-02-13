@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
-from typing import Any
 
 from helpy._handles.abc.api import AbstractSyncApi
 from helpy._handles.hived.api.condenser_api.common import CondenserApiCommons
@@ -12,8 +11,8 @@ from schemas.transaction import TransactionLegacy  # noqa: TCH001
 class CondenserApi(AbstractSyncApi, CondenserApiCommons):
     api = AbstractSyncApi._endpoint
 
-    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:  # noqa: ARG002
-        return self._legacy_serialization(args=args)
+    def is_keyword_only(self) -> bool:
+        return False
 
     @api
     def get_version(self) -> condenser_api.GetVersion:
