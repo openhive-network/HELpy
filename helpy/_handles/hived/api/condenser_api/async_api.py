@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
 
-from helpy._handles.abc.api import AbstractAsyncApi
+from helpy._handles.abc.api import AbstractAsyncApi, ApiArgumentSerialization
 from helpy._handles.hived.api.condenser_api.common import CondenserApiCommons
 from schemas.apis import condenser_api  # noqa: TCH001
 from schemas.transaction import TransactionLegacy  # noqa: TCH001
@@ -11,8 +11,8 @@ from schemas.transaction import TransactionLegacy  # noqa: TCH001
 class CondenserApi(AbstractAsyncApi, CondenserApiCommons):
     api = AbstractAsyncApi._endpoint
 
-    def is_keyword_only(self) -> bool:
-        return False
+    def argument_serialization(self) -> ApiArgumentSerialization:
+        return ApiArgumentSerialization.ARRAY
 
     @api
     async def get_version(self) -> condenser_api.GetVersion:
