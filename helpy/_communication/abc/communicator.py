@@ -4,9 +4,9 @@ import asyncio
 import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
-from helpy._communication.settings import CommunicationSettings
 
-from helpy.exceptions import CommunicationError, ExceededAmountOfRetriesError
+from helpy._communication.settings import CommunicationSettings
+from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
     from helpy._interfaces.url import HttpUrl
