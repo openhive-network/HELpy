@@ -145,39 +145,35 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     def __workaround_communication_problem_with_node(  # noqa: C901
         send_request: _SyncCall | _AsyncCall,
     ) -> Callable[..., JSONRPCResult[Any]]:
-        def __handle_exception(this: AbstractHandle, exception: RequestError | CommunicationError, count: int) -> int:
+        def __handle_exception(this: AbstractHandle, exception: RequestError | CommunicationError) -> None:
             ignored_messages = [
                 "Unable to acquire database lock",
                 "Unable to acquire forkdb lock",
             ]
-            message = f"{exception}" + str(exception)
+            message = exception.error if isinstance(exception, RequestError) else str(exception.args)
             for imsg in ignored_messages:
                 if imsg in message:
-                    logger.debug(f"Ignored '{imsg}'")
-                    if count <= this._communicator.settings.max_retries:
-                        return count + 1
-                    break
+                    logger.debug(f"Ignored for {this.http_endpoint}: '{imsg}'")
+                    return
             raise exception
 
         def sync_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
-            i = 0
             while True:
                 try:
                     return send_request(*[this, *args], **kwargs)  # type: ignore[return-value]
                 except CommunicationError as exception:
-                    i = __handle_exception(this, exception, i)
+                    __handle_exception(this, exception)
                 except RequestError as exception:
-                    i = __handle_exception(this, exception, i)
+                    __handle_exception(this, exception)
 
         async def async_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
-            i = 0
             while True:
                 try:
                     return await send_request(*[this, *args], **kwargs)  # type: ignore[no-any-return, misc]
                 except CommunicationError as exception:
-                    i = __handle_exception(this, exception, i)
+                    __handle_exception(this, exception)
                 except RequestError as exception:
-                    i = __handle_exception(this, exception, i)
+                    __handle_exception(this, exception)
 
         return async_impl if async_version else sync_impl  # type: ignore[return-value]
 

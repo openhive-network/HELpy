@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
 
-from helpy._handles.abc.api import AbstractAsyncApi
+from helpy._handles.abc.api import AbstractAsyncApi, ApiArgumentSerialization
 from helpy._handles.hived.api.wallet_bridge_api.common import WalletBridgeApiCommons
 from helpy._interfaces.asset.asset import Hf26Asset  # noqa: TCH001
 from schemas.apis import wallet_bridge_api  # noqa: TCH001
@@ -12,8 +12,8 @@ from schemas.transaction import Transaction  # noqa: TCH001
 class WalletBridgeApi(AbstractAsyncApi, WalletBridgeApiCommons):
     api = AbstractAsyncApi._endpoint
 
-    def is_keyword_only(self) -> bool:
-        return False
+    def argument_serialization(self) -> ApiArgumentSerialization:
+        return ApiArgumentSerialization.DOUBLE_ARRAY
 
     @api
     async def get_version(self) -> wallet_bridge_api.GetVersion:
