@@ -20,7 +20,7 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_block(self, /, block: int) -> wallet_bridge_api.GetBlock:
+    def get_block(self, block: int, /) -> wallet_bridge_api.GetBlock:
         raise NotImplementedError
 
     @api
@@ -40,7 +40,7 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_ops_in_block(self, /, block: int, only_virtual: bool = False) -> wallet_bridge_api.GetOpsInBlock:
+    def get_ops_in_block(self, block: int, only_virtual: bool = False, /) -> wallet_bridge_api.GetOpsInBlock:
         raise NotImplementedError
 
     @api
@@ -48,21 +48,21 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_active_witnesses(self, /, include_future: bool) -> wallet_bridge_api.GetActiveWitnesses:
+    def get_active_witnesses(self, include_future: bool, /) -> wallet_bridge_api.GetActiveWitnesses:
         raise NotImplementedError
 
     @api
     def get_withdraw_routes(
-        self, /, account: str, destination: WalletBridgeApi.WITHDRAW_ROUTE_TYPES
+        self, account: str, destination: WalletBridgeApi.WITHDRAW_ROUTE_TYPES, /
     ) -> wallet_bridge_api.GetWithdrawRoutes:
         raise NotImplementedError
 
     @api
-    def list_my_accounts(self, /, accounts: list[str]) -> wallet_bridge_api.ListMyAccounts:
+    def list_my_accounts(self, accounts: list[str], /) -> wallet_bridge_api.ListMyAccounts:
         raise NotImplementedError
 
     @api
-    def list_accounts(self, /, start: str, limit: int) -> wallet_bridge_api.ListAccounts:
+    def list_accounts(self, start: str, limit: int, /) -> wallet_bridge_api.ListAccounts:
         raise NotImplementedError
 
     @api
@@ -70,19 +70,19 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_account(self, /, account: str) -> wallet_bridge_api.GetAccount:
+    def get_account(self, account: str, /) -> wallet_bridge_api.GetAccount:
         raise NotImplementedError
 
     @api
-    def get_accounts(self, /, accounts: list[str]) -> wallet_bridge_api.GetAccounts:
+    def get_accounts(self, accounts: list[str], /) -> wallet_bridge_api.GetAccounts:
         raise NotImplementedError
 
     @api
-    def get_transaction(self, /, transaction_id: str) -> wallet_bridge_api.GetTransaction:
+    def get_transaction(self, transaction_id: str, /) -> wallet_bridge_api.GetTransaction:
         raise NotImplementedError
 
     @api
-    def list_witnesses(self, /, start: str, limit: int) -> wallet_bridge_api.ListWitnesses:
+    def list_witnesses(self, start: str, limit: int, /) -> wallet_bridge_api.ListWitnesses:
         raise NotImplementedError
 
     @api
@@ -90,29 +90,29 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_conversion_requests(self, /, account: str) -> wallet_bridge_api.GetConversionRequests:
+    def get_conversion_requests(self, account: str, /) -> wallet_bridge_api.GetConversionRequests:
         raise NotImplementedError
 
     @api
     def get_collateralized_conversion_requests(
-        self, /, account: str
+        self, account: str, /
     ) -> wallet_bridge_api.GetCollateralizedConversionRequests:
         raise NotImplementedError
 
     @api
-    def get_order_book(self, /, limit: int) -> wallet_bridge_api.GetOrderBook:
+    def get_order_book(self, limit: int, /) -> wallet_bridge_api.GetOrderBook:
         raise NotImplementedError
 
     @api
-    def get_open_orders(self, /, account: str) -> wallet_bridge_api.GetOpenOrders:
+    def get_open_orders(self, account: str, /) -> wallet_bridge_api.GetOpenOrders:
         raise NotImplementedError
 
     @api
-    def get_owner_history(self, /, account: str) -> wallet_bridge_api.GetOwnerHistory:
+    def get_owner_history(self, account: str, /) -> wallet_bridge_api.GetOwnerHistory:
         raise NotImplementedError
 
     @api
-    def get_account_history(self, /, account: str, start: int, limit: int) -> wallet_bridge_api.GetAccountHistory:
+    def get_account_history(self, account: str, start: int, limit: int, /) -> wallet_bridge_api.GetAccountHistory:
         raise NotImplementedError
 
     @api
@@ -127,11 +127,11 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def find_proposals(self, /, proposal_ids: list[int]) -> wallet_bridge_api.FindProposals:
+    def find_proposals(self, proposal_ids: list[int], /) -> wallet_bridge_api.FindProposals:
         raise NotImplementedError
 
     @api
-    def is_known_transaction(self, /, transaction_id: str) -> wallet_bridge_api.IsKnownTransaction:
+    def is_known_transaction(self, transaction_id: str, /) -> wallet_bridge_api.IsKnownTransaction:
         raise NotImplementedError
 
     @api
@@ -146,31 +146,31 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_reward_fund(self, /, reward_fund_account: str) -> wallet_bridge_api.GetRewardFund:
+    def get_reward_fund(self, reward_fund_account: str, /) -> wallet_bridge_api.GetRewardFund:
         raise NotImplementedError
 
     @api
     def broadcast_transaction_synchronous(
-        self, /, transaction: Transaction
+        self, transaction: Transaction, /
     ) -> wallet_bridge_api.BroadcastTransactionSynchronous:
         raise NotImplementedError
 
     @api
-    def broadcast_transaction(self, /, transaction: Transaction) -> wallet_bridge_api.BroadcastTransaction:
+    def broadcast_transaction(self, transaction: Transaction, /) -> wallet_bridge_api.BroadcastTransaction:
         raise NotImplementedError
 
     @api
-    def find_recurrent_transfers(self, /, account: str) -> wallet_bridge_api.FindRecurrentTransfers:
+    def find_recurrent_transfers(self, account: str, /) -> wallet_bridge_api.FindRecurrentTransfers:
         raise NotImplementedError
 
     @api
-    def find_rc_accounts(self, /, accounts: list[str]) -> wallet_bridge_api.FindRcAccounts:
+    def find_rc_accounts(self, accounts: list[str], /) -> wallet_bridge_api.FindRcAccounts:
         raise NotImplementedError
 
     @api
-    def list_rc_accounts(self, /, start: str, limit: int) -> wallet_bridge_api.ListRcAccounts:
+    def list_rc_accounts(self, start: str, limit: int, /) -> wallet_bridge_api.ListRcAccounts:
         raise NotImplementedError
 
     @api
-    def list_rc_direct_delegations(self, /, start: datetime, limit: int) -> wallet_bridge_api.ListRcDirectDelegations:
+    def list_rc_direct_delegations(self, start: datetime, limit: int, /) -> wallet_bridge_api.ListRcDirectDelegations:
         raise NotImplementedError
