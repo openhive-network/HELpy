@@ -5,6 +5,7 @@ import re
 from abc import ABC
 from collections import defaultdict
 from datetime import datetime
+from enum import IntEnum
 from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
@@ -38,6 +39,12 @@ HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
 
 
+class ApiArgumentSerialization(IntEnum):
+    OBJECT = 0
+    ARRAY = 1
+    DOUBLE_ARRAY = 2
+
+
 def _convert_pascal_case_to_sneak_case(pascal_case_input: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", pascal_case_input).lower()
 
@@ -68,16 +75,18 @@ class AbstractApi(ABC, Generic[HandleT]):
 
     def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:
         """Return serialized given params. Can be overloaded."""
-        if not self.is_keyword_only():
-            return AbstractApi.json_dumps()([args])
+        json_dumps = AbstractApi.json_dumps()
+        if self.argument_serialization() == ApiArgumentSerialization.ARRAY:
+            return json_dumps(args)
+        if self.argument_serialization() == ApiArgumentSerialization.DOUBLE_ARRAY:
+            return json_dumps([args])
         prepared_kwargs = {}
         for key, value in kwargs.items():
-            if value is not None:
-                prepared_kwargs[key.strip("_")] = value
-        return AbstractApi.json_dumps()(prepared_kwargs)
+            prepared_kwargs[key.strip("_")] = value
+        return json_dumps(prepared_kwargs)
 
     def _verify_positional_keyword_args(self, args: Any, kwargs: dict[str, Any]) -> None:
-        if self.is_keyword_only():
+        if self.argument_serialization() == ApiArgumentSerialization.OBJECT:
             assert len(args) == 0, "This api allows only keyword arguments; Ex.: foo(a=1, b=2, c=3)"
         else:
             assert len(kwargs) == 0, "This api allows only positional arguments; Ex.: foo(1, 2, 3)"
@@ -105,8 +114,8 @@ class AbstractApi(ABC, Generic[HandleT]):
 
         return pytest_is_running.is_running()
 
-    def is_keyword_only(self) -> bool:
-        return True
+    def argument_serialization(self) -> ApiArgumentSerialization:
+        return ApiArgumentSerialization.OBJECT
 
     def __init__(self, owner: HandleT) -> None:
         self._owner = owner
