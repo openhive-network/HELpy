@@ -1,12 +1,26 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from helpy._handles.abc.api import AbstractSyncApi
+from helpy._handles.beekeeper.api.apply_session_token import apply_session_token
+from helpy._handles.beekeeper.api.session_holder import SessionHolder
 from schemas.apis import beekeeper_api  # noqa: TCH001
-from schemas.transaction import Transaction  # noqa: TCH001
+
+if TYPE_CHECKING:
+    from schemas.transaction import Transaction
 
 
 class BeekeeperApi(AbstractSyncApi):
     api = AbstractSyncApi._endpoint
+
+    def _additional_arguments_actions(
+        self, endpoint_name: str, *args: Any, **kwargs: Any
+    ) -> tuple[list[Any], dict[str, Any]]:
+        if "create_session" in endpoint_name:
+            return (list(args), kwargs)
+        assert isinstance(self._owner, SessionHolder)
+        return apply_session_token(self._owner, list(args), kwargs)
 
     @api
     def create(self, *, wallet_name: str, password: str | None = None) -> beekeeper_api.Create:
