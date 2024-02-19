@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, Literal, TypeVar
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -15,13 +15,13 @@ class ContextSync(Generic[EnterReturnT]):
 
     def __exit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
-    ) -> bool | None:
+    ) -> bool:
         try:
             if exception is not None:
                 return self._handle_exception(exception, traceback)
         finally:
             self._finally()
-        return None
+        return True
 
     @abstractmethod
     def _enter(self) -> EnterReturnT:
@@ -31,8 +31,9 @@ class ContextSync(Generic[EnterReturnT]):
     def _finally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    def _handle_exception(self, exception: BaseException, traceback: TracebackType | None) -> bool | None:
+    def _handle_exception(self, _: BaseException, __: TracebackType | None) -> Literal[True]:
         """Called when exception occurred."""
+        return True
 
 
 class ContextAsync(Generic[EnterReturnT]):
@@ -41,13 +42,13 @@ class ContextAsync(Generic[EnterReturnT]):
 
     async def __aexit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
-    ) -> bool | None:
+    ) -> bool:
         try:
             if exception is not None:
                 return await self._handle_exception(exception, traceback)
         finally:
             await self._finally()
-        return None
+        return True
 
     @abstractmethod
     async def _enter(self) -> EnterReturnT:
@@ -57,5 +58,6 @@ class ContextAsync(Generic[EnterReturnT]):
     async def _finally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    async def _handle_exception(self, exception: BaseException, traceback: TracebackType | None) -> bool | None:
+    async def _handle_exception(self, _: BaseException, __: TracebackType | None) -> Literal[True]:
         """Called when exception occurred."""
+        return True
