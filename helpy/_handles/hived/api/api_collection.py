@@ -40,11 +40,11 @@ from helpy._handles.hived.api.wallet_bridge_api import (
 )
 
 if TYPE_CHECKING:
-    from helpy._handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
+    from helpy._handles.abc.api import AsyncHandleT, SyncHandleT
 
 
 class HivedAsyncApiCollection(AbstractAsyncApiCollection):
-    def __init__(self, owner: AbstractAsyncHandle) -> None:
+    def __init__(self, owner: AsyncHandleT) -> None:
         super().__init__(owner)
         self.account_by_key = AsyncAccountByKeyApi(owner=self._owner)
         self.account_history = AsyncAccountHistoryApi(owner=self._owner)
@@ -63,7 +63,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
 
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
-    def __init__(self, owner: AbstractSyncHandle) -> None:
+    def __init__(self, owner: SyncHandleT) -> None:
         super().__init__(owner)
         self.account_by_key = SyncAccountByKeyApi(owner=self._owner)
         self.account_history = SyncAccountHistoryApi(owner=self._owner)
