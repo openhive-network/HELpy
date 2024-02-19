@@ -21,9 +21,7 @@ if TYPE_CHECKING:
     from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._handles.abc.api_collection import (
-        AbstractApiCollection,
-    )
+    from helpy._handles.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
 
@@ -68,7 +66,7 @@ class AbstractHandle:
         self.__http_endpoint = value
 
     @property
-    def api(self) -> AbstractApiCollection[AbstractAsyncHandle] | AbstractApiCollection[AbstractSyncHandle]:
+    def api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
         return self.__api
 
     @property
@@ -81,7 +79,7 @@ class AbstractHandle:
         return self.__logger
 
     @abstractmethod
-    def _construct_api(self) -> AbstractApiCollection[AbstractAsyncHandle] | AbstractApiCollection[AbstractSyncHandle]:
+    def _construct_api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
         """Return api collection."""
 
     @abstractmethod
@@ -123,6 +121,10 @@ class AbstractHandle:
 
     def __configure_logger(self) -> Logger:
         return logger.bind(**self._logger_extras())
+
+    @abstractmethod
+    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any] | AsyncBatchHandle[Any]:
+        """Returns sync batch handle."""
 
 
 class _SyncCall(Protocol):
@@ -211,10 +213,6 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
     def _is_synchronous(self) -> bool:
         return True
 
-    @abstractmethod
-    def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
-        """Returns async batch handle."""
-
 
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses synchronous communication."""
@@ -239,7 +237,3 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
 
     def _is_synchronous(self) -> bool:
         return False
-
-    @abstractmethod
-    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:
-        """Returns sync batch handle."""
