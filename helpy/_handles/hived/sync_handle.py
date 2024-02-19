@@ -22,14 +22,14 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
     def _clone(self) -> Hived:
         return Hived(http_url=self.http_endpoint, communicator=self._communicator)
 
-    def _construct_api(self) -> HivedSyncApiCollection:  # type: ignore[override]
+    def _construct_api(self) -> HivedSyncApiCollection:
         return HivedSyncApiCollection(owner=self)
 
     def _target_service(self) -> str:
         return self._hived_target_service_name()
 
     @property
-    def api(self) -> HivedSyncApiCollection:  # type: ignore[override]
+    def api(self) -> HivedSyncApiCollection:
         return cast(HivedSyncApiCollection, super().api)
 
     def get_dynamic_global_properties(self) -> HiveHandleCommonHelpers.GetDynamicGlobalPropertiesT:

@@ -18,11 +18,11 @@ class Beekeeper(AbstractSyncHandle):
     def _clone(self) -> Beekeeper:
         return Beekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 
-    def _construct_api(self) -> BeekeeperSyncApiCollection:  # type: ignore[override]
+    def _construct_api(self) -> BeekeeperSyncApiCollection:
         return BeekeeperSyncApiCollection(owner=self)
 
     @property
-    def api(self) -> BeekeeperSyncApiCollection:  # type: ignore[override]
+    def api(self) -> BeekeeperSyncApiCollection:
         return cast(BeekeeperSyncApiCollection, super().api)
 
     def _target_service(self) -> str:
@@ -32,7 +32,7 @@ class Beekeeper(AbstractSyncHandle):
         return SyncBatchHandle(
             url=self.http_endpoint,
             communicator=self._communicator,
-            api=lambda o: BeekeeperSyncApiCollection(o),
+            api=lambda o: BeekeeperSyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
         )
 
@@ -43,11 +43,11 @@ class AsyncBeekeeper(AbstractAsyncHandle):
     def _clone(self) -> AsyncBeekeeper:
         return AsyncBeekeeper(http_url=self.http_endpoint, communicator=self._communicator)
 
-    def _construct_api(self) -> BeekeeperAsyncApiCollection:  # type: ignore[override]
+    def _construct_api(self) -> BeekeeperAsyncApiCollection:
         return BeekeeperAsyncApiCollection(owner=self)
 
     @property
-    def api(self) -> BeekeeperAsyncApiCollection:  # type: ignore[override]
+    def api(self) -> BeekeeperAsyncApiCollection:
         return cast(BeekeeperAsyncApiCollection, super().api)
 
     def _target_service(self) -> str:
@@ -57,6 +57,6 @@ class AsyncBeekeeper(AbstractAsyncHandle):
         return AsyncBatchHandle(
             url=self.http_endpoint,
             communicator=self._communicator,
-            api=lambda o: BeekeeperAsyncApiCollection(o),
+            api=lambda o: BeekeeperAsyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
         )
