@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
@@ -96,15 +96,15 @@ class _PostRequestManager:
         for response in self.__responses:
             self.__set_response_or_exception(request_id=int(response["id"]), response=response)
 
-    def __handle_exception_and_no_responses_exists(self, exception: BaseException) -> bool | None:
+    def __handle_exception_and_no_responses_exists(self, exception: BaseException) -> bool:
         for request_id in range(len(self.__batch)):
             self.__owner._get_batch_delayed_result(request_id)._set_exception(exception)
 
         if not self.__owner._delay_error_on_data_access:
             return False
-        return None
+        return True
 
-    def __handle_exception_and_responses_exists(self, responses: list[JsonT], url: str) -> bool | None:
+    def __handle_exception_and_responses_exists(self, responses: list[JsonT], url: str) -> bool:
         for response in responses:
             self.__set_response_or_exception(request_id=int(response["id"]), response=response, exception_url=url)
         return not self.__owner._delay_error_on_data_access
@@ -113,7 +113,7 @@ class _PostRequestManager:
         message = "Invalid amount of responses_from_error"
         assert len(response) == len(self.__batch), message
 
-    def __handle_exception_case(self, exception: BaseException) -> bool | None:
+    def __handle_exception_case(self, exception: BaseException) -> bool:
         if not isinstance(exception, CommunicationError) and isinstance(exception, BaseException):
             return False
 
@@ -128,7 +128,7 @@ class _PostRequestManager:
 
     def __exit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
-    ) -> bool | None:
+    ) -> bool:
         if exception is None and len(self.__responses):
             self.__handle_no_exception_case()
             return True
@@ -195,11 +195,12 @@ class _BatchHandle:
     def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, _: type[Exception] | None, ex: Exception | None, ___: TracebackType | None) -> None:
+    def __exit__(self, _: type[Exception] | None, ex: Exception | None, ___: TracebackType | None) -> Literal[False]:
         if not self.__is_anything_to_send():
             raise NothingToSendError
 
         self.__sync_evaluate()
+        return False
 
 
 ApiT = TypeVar("ApiT")
