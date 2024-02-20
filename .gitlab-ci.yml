@@ -1,7 +1,7 @@
 stages:
   - static_code_analysis
-  - tests
   - build
+  - tests
   - deploy
 
 workflow:
@@ -19,11 +19,18 @@ variables:
   TXT_BLUE: "\e[1;34m"
   TXT_CLEAR: "\e[0m"
 
+  DATA_CACHE_HIVE_PREFIX: "/cache/replay_data_hive"
+  BLOCK_LOG_SOURCE_DIR_5M: /blockchain/block_log_5m
+  BLOCK_LOG_SOURCE_DIR_MIRRORNET_5M: /blockchain/block_log_5m_mirrornet
+
   # uses registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu22.04-10
   CI_BASE_IMAGE_TAG: "@sha256:080b16fd53013aeb9b89b00a8dfc90fecf886173f46448b05f45cee376c43330"
   CI_BASE_IMAGE: "registry.gitlab.syncad.com/hive/hive/ci-base-image${CI_BASE_IMAGE_TAG}"
 
 include:
+  - project: 'hive/hive'
+    ref: a54419d4f6632f0d2a9c89ea690155c766cbbf81
+    file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   - project: 'hive/common-ci-configuration'
     ref: 44d0cec8cfa8fb87d0daf5cef1485fb57b9e26fd
     file: '/templates/python_projects.gitlab-ci.yml'
@@ -54,32 +61,73 @@ type_check_with_mypy:
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| STATIC CODE ANALYSIS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| TESTS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-run_tests:
-  stage: tests
-  extends: .project_develop_configuration_template
-  needs: [ ]  # do not wait for previous stage to finish before starting this one
-  variables:
-    PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
-  script:
-    - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
-    - python3 -m pytest --durations 0 --junitxml=report.xml tests/
-  artifacts:
-    when: always
-    expire_in: 1 week
-    reports:
-      junit: $PATH_TO_REPORT
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| BUILD |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+prepare_hived_image:
+  extends: .prepare_hived_image
+  needs: []
+  stage: build
+  variables:
+    SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
+    REGISTRY_USER: "$HELPY_CI_IMGBUILDER_USER"
+    REGISTRY_PASS: $HELPY_CI_IMGBUILDER_PASSWORD
+    BINARY_CACHE_PATH: "$CI_PROJECT_DIR/hived-binaries"
+    HIVE_NETWORK_TYPE: mainnet
+  tags:
+    - public-runner-docker
+    - hived-for-tests
+
+prepare_hived_data:
+  extends: .prepare_hived_data_5m
+  needs:
+    - job: prepare_hived_image
+      artifacts: true
+  stage: build
+  variables:
+    SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
+    BLOCK_LOG_SOURCE_DIR: $BLOCK_LOG_SOURCE_DIR_5M
+    CONFIG_INI_SOURCE: "$CI_PROJECT_DIR/hive/docker/config_5M.ini"
+  tags:
+    - data-cache-storage
+
 
 build_wheel:
   stage: build
   extends: .build_wheel_template
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| TESTS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+run_tests:
+  stage: tests
+  extends: .project_develop_configuration_template
+  needs:
+    - job: prepare_hived_data
+      artifacts: true
+  services:
+    - name: $HIVED_IMAGE_NAME
+      alias: hived-instance
+      variables:
+        DATA_SOURCE: "${DATA_CACHE_HIVE_PREFIX}_${HIVED_COMMIT}"
+        LOG_FILE: $CI_JOB_NAME.log
+      command: ["--replay-blockchain", "--stop-replay-at-block=5000000"]
+  variables:
+    HIVED_COMMIT: $HIVED_COMMIT
+    HIVED_UID: $HIVED_UID
+    PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
+  script:
+    - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
+    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      junit: $PATH_TO_REPORT
+  tags:
+    - data-cache-storage
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| DEPLOY |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
