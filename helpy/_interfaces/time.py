@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import math
+import re
 import time
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from dateutil.relativedelta import relativedelta
 
@@ -20,6 +22,123 @@ class TimeFormats(Enum):
     DEFAULT_FORMAT_WITH_MILLIS = "%Y-%m-%dT%H:%M:%S.%f"
     TIME_OFFSET_FORMAT = "@%Y-%m-%d %H:%M:%S"
     TIME_OFFSET_FORMAT_WITH_MILLIS = "@%Y-%m-%d %H:%M:%S.%f"
+
+
+@dataclass
+class TimeControl:
+    speed_up_rate: float | int | None = None
+
+    def __post_init__(self) -> None:
+        if (
+            self.speed_up_rate is not None
+            and not isinstance(self.speed_up_rate, float)
+            and not isinstance(self.speed_up_rate, int)
+        ):
+            raise ValueError(f"Incorrect format of 'speed_up_rate' argument, given: `{self.speed_up_rate}`")
+
+    def as_string(self) -> str:
+        if self.speed_up_rate:
+            return f"+0 x{self.speed_up_rate :.1f}"
+        return "+0"
+
+    def apply_head_block_time(self, head_block_time: datetime) -> None:
+        pass
+
+
+@dataclass
+class OffsetTimeControl(TimeControl):
+    r"""
+    Represents a control mechanism for time-related parameters.
+
+    Args:
+        offset (str): The offset value specifying a relative time.
+            Format: '[+-]N[mhdy\s]', where 'N' is any positive floating-point number. The letter at the end denotes
+            the unit of time (y: year d: day, h: hour, m: minute). Default without any letter means second.
+            (e.g. "+10h")
+        speed_up_rate (float): An speed-up rate
+            Format: positive floating-point number.
+            (e.g. "10.0")
+
+    Raises:
+        ValueError:
+        if `offset` has an incorrect format,
+        if `speed_up_rate` has an incorrect format.
+
+    Methods:
+        as_string(): Returns a string representation of the time control parameters.
+    """
+
+    offset: str = "+0"
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.offset is not None and not re.match(r"^[+\-]?\d+([mhdy])?", self.offset):
+            raise ValueError(f"Incorrect format of 'offset' argument, given: `{self.offset}`")
+
+    def as_string(self) -> str:
+        if self.speed_up_rate:
+            return f"{self.offset} x{self.speed_up_rate}"
+        return self.offset
+
+
+@dataclass
+class StartTimeControl(TimeControl):
+    r"""
+    Represents a control mechanism for time-related parameters.
+
+    Args:
+        start_time (Literal["head_block_time"] | str): The starting time specifying an absolute time.
+            Format: "@%Y-%m-%d %H:%M:%S" or "@%Y-%m-%d %H:%M:%S.%f"
+            (e.g. "@1970-01-01 00:00:00")
+        speed_up_rate (float): An speed-up rate
+            Format: positive floating-point number.
+            (e.g. "10.0")
+
+    Raises:
+        ValueError:
+            if `start_time` has an incorrect format,
+            if `speed_up_rate` has an incorrect format.
+
+    Methods:
+        as_string(): Returns a string representation of the time control parameters.
+    """
+
+    start_time: Literal["head_block_time"] | datetime = field(default_factory=datetime.now)
+
+    def apply_head_block_time(self, head_block_time: datetime) -> None:
+        if self.start_time == "head_block_time":
+            self.start_time = head_block_time
+
+    def as_string(self) -> str:
+        if self.start_time == "head_block_time":
+            raise ValueError("You probably forgot to call `apply_head_block_time` to specify time")
+        assert isinstance(self.start_time, datetime)
+        serialized_start_time = Time.serialize(self.start_time, format_=TimeFormats.FAKETIME_FORMAT)
+        if self.speed_up_rate:
+            return f"{serialized_start_time} x{self.speed_up_rate}"
+        return serialized_start_time
+
+    def is_start_time_equal_to(self, value: str) -> bool:
+        return self.start_time == value
+
+
+@dataclass
+class SpeedUpRateTimeControl(TimeControl):
+    r"""
+    Represents a control mechanism for time-related parameters.
+
+    Args:
+        speed_up_rate (float): An speed-up rate
+            Format: positive floating-point number.
+            (e.g. "10.0")
+
+    Raises:
+        ValueError:
+            if `speed_up_rate` has an incorrect format.
+
+    Methods:
+        as_string(): Returns a string representation of the time control parameters.
+    """
 
 
 class Time:
