@@ -7,12 +7,11 @@ from typing import TYPE_CHECKING, Any, Protocol
 from loguru import logger
 from typing_extensions import Self
 
-from helpy._communication.abc.communicator import CommunicationError
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
-from helpy.exceptions import HelpyError, RequestError
+from helpy.exceptions import CommunicationError, HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
