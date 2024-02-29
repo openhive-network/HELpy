@@ -34,8 +34,8 @@ loguru = "0.7.2"
 httpx = { extras = ["http2"], version = "0.23.3" }
 requests = "2.27.1"
 aiohttp = "3.9.1"
-wax = "0.0.3a2.dev39+44db07f"
-schemas = "0.0.1.dev290+6a01cb0"
+wax = "0.0.3a2.dev119+affffd4"
+schemas = "0.0.1.dev289+4b5f474"
 
 
 [tool.poetry.group.dev.dependencies]
