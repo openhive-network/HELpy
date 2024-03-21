@@ -12,8 +12,7 @@ from helpy._handles.beekeeper.api.api_collection import (
 from helpy._handles.beekeeper.api.session_holder import SessionHolder
 
 if TYPE_CHECKING:
-    from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._interfaces.url import HttpUrl
+    from helpy._handles.settings import HandleSettings
 
 _handle_target_service_name = "beekeeper"
 
@@ -34,15 +33,14 @@ class Beekeeper(AbstractSyncHandle, SessionHolder):
     def __init__(
         self,
         *args: Any,
-        http_url: HttpUrl | None = None,
-        communicator: AbstractCommunicator | None = None,
+        settings: HandleSettings | None = None,
         **kwargs: Any,
     ) -> None:
         self._session_token: str | None = None
-        super().__init__(*args, http_url=http_url, communicator=communicator, **kwargs)
+        super().__init__(*args, settings=settings, **kwargs)
 
     def _clone(self) -> Beekeeper:
-        return Beekeeper(http_url=self.http_endpoint, communicator=self._communicator)
+        return Beekeeper(http_url=self.http_endpoint, settings=self.settings)
 
     def _construct_api(self) -> BeekeeperSyncApiCollection:
         return BeekeeperSyncApiCollection(owner=self)
@@ -78,7 +76,7 @@ class AsyncBeekeeper(AbstractAsyncHandle, SessionHolder):
     """Asynchronous handle for beekeeper service communication."""
 
     def _clone(self) -> AsyncBeekeeper:
-        return AsyncBeekeeper(http_url=self.http_endpoint, communicator=self._communicator)
+        return AsyncBeekeeper(http_url=self.http_endpoint, settings=self.settings)
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:
         return BeekeeperAsyncApiCollection(owner=self)

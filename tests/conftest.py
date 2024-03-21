@@ -28,9 +28,9 @@ def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
 
 @pytest.fixture()
 def sync_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.Hived:
-    return helpy.Hived(http_url=hived_http_endpoint)
+    return helpy.Hived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))
 
 
 @pytest.fixture()
 def async_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.AsyncHived:
-    return helpy.AsyncHived(http_url=hived_http_endpoint)
+    return helpy.AsyncHived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))

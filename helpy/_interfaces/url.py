@@ -12,15 +12,16 @@ ProtocolT = TypeVar("ProtocolT", bound=HttpProtocolT | WsProtocolT | P2PProtocol
 class Url(Generic[ProtocolT]):
     """Wrapper for Url, for handy access to all of it members with serialization."""
 
-    def __init__(self, url: str | Url[ProtocolT], *, protocol: ProtocolT = "") -> None:  # type: ignore[assignment]
+    def __init__(self, url: str | Url[ProtocolT], *, protocol: ProtocolT | None = None) -> None:
+        target_protocol: str = protocol or ""
         if isinstance(url, Url):
             self.__protocol: str = url.__protocol
             self.__address: str = url.__address
             self.__port: int | None = url.__port
         elif isinstance(url, str):
-            parsed_url = urlparse(url, scheme=protocol)
+            parsed_url = urlparse(url, scheme=target_protocol)
             if not parsed_url.netloc:
-                parsed_url = urlparse(f"//{url}", scheme=protocol)
+                parsed_url = urlparse(f"//{url}", scheme=target_protocol)
 
             if not parsed_url.hostname:
                 raise ValueError("Address was not specified.")
@@ -52,7 +53,7 @@ class Url(Generic[ProtocolT]):
     def as_string(self, *, with_protocol: bool = True) -> str:
         """Serializes url."""
         protocol_prefix = f"{self.protocol}://" if with_protocol and self.__protocol else ""
-        port_suffix = f":{self.port}" if self.port else ""
+        port_suffix = f":{self.port}" if self.port is not None else ""
 
         return f"{protocol_prefix}{self.address}{port_suffix}"
 
