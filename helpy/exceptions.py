@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 JsonT = dict[str, Any]
@@ -33,12 +32,23 @@ class BlockWaitTimeoutError(HelpyError):
         )
 
 
-@dataclass
 class RequestError(HelpyError):
     """Raised if error field is in the response."""
 
-    send: str
-    error: str
+    def __init__(self, send: str, error: str) -> None:
+        """
+        Initialize a RequestError.
+
+        Parameters:
+        - send (str): The request sent.
+        - error (str): The error received in response.
+
+        Returns:
+        None
+        """
+        self.send = send
+        self.error = error
+        super().__init__(f"{send=} | {error=}")
 
 
 class BatchRequestError(HelpyError):
