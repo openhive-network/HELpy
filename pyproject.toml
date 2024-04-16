@@ -35,7 +35,7 @@ httpx = { extras = ["http2"], version = "0.23.3" }
 requests = "2.27.1"
 aiohttp = "3.9.1"
 wax = "0.0.3a2.dev187+207f9b4"
-schemas = "0.0.1.dev292+bcba095"
+schemas = "0.0.1.dev295+ca539c5"
 
 
 [tool.poetry.group.dev.dependencies]
