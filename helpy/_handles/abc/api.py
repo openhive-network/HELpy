@@ -120,6 +120,11 @@ class AbstractApi(ABC, Generic[HandleT]):
     def __init__(self, owner: HandleT) -> None:
         self._owner = owner
 
+    def _additional_arguments_actions(
+        self, endpoint_name: str, *args: Any, **kwargs: Any  # noqa: ARG002
+    ) -> tuple[list[Any], dict[str, Any]]:
+        return (list(args), kwargs)
+
 
 class AbstractSyncApi(AbstractApi[SyncHandleT]):
     """Base class for all apis, that provides synchronous endpoints."""
@@ -138,9 +143,11 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
         @wraps(wrapped_function)
         def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             this._verify_positional_keyword_args(args, kwargs)
+            endpoint = f"{api_name}.{wrapped_function_name}"
+            largs, dkwargs = this._additional_arguments_actions(endpoint, *args, **kwargs)
             return this._owner._send(  # type: ignore[no-any-return, union-attr, misc]
-                endpoint=f"{api_name}.{wrapped_function_name}",
-                params=this._serialize_params(args=args, kwargs=kwargs),
+                endpoint=endpoint,
+                params=this._serialize_params(args=largs, kwargs=dkwargs),
                 expected_type=get_type_hints(wrapped_function)["return"],
             ).result
 
@@ -166,10 +173,12 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
         @wraps(wrapped_function)
         async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             this._verify_positional_keyword_args(args, kwargs)
+            endpoint = f"{api_name}.{wrapped_function_name}"
+            largs, dkwargs = this._additional_arguments_actions(endpoint, *args, **kwargs)
             return (  # type: ignore[no-any-return]
                 await this._owner._async_send(  # type: ignore[misc]
-                    endpoint=f"{api_name}.{wrapped_function_name}",
-                    params=this._serialize_params(args=args, kwargs=kwargs),
+                    endpoint=endpoint,
+                    params=this._serialize_params(args=largs, kwargs=dkwargs),
                     expected_type=get_type_hints(wrapped_function)["return"],
                 )
             ).result
