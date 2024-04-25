@@ -4,8 +4,8 @@ from typing import Any
 
 from helpy._handles.abc.api import AbstractSyncApi
 from helpy._handles.beekeeper.api.apply_session_token import apply_session_token
-from helpy._handles.beekeeper.api.session_holder import SessionHolder  # noqa: TCH001
-from schemas.apis import beekeeper_api
+from helpy._handles.beekeeper.api.session_holder import SessionHolder
+from schemas.apis import beekeeper_api  # noqa: TCH001
 
 
 class BeekeeperApi(AbstractSyncApi):
@@ -56,17 +56,13 @@ class BeekeeperApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def get_public_keys(self) -> beekeeper_api.GetPublicKeys:
+    def get_public_keys(self, wallet_name: str | None = None) -> beekeeper_api.GetPublicKeys:
         raise NotImplementedError
 
     @api
-    def sign_digest(self, *, sig_digest: str, public_key: str) -> beekeeper_api.SignDigest:
-        raise NotImplementedError
-
-    @api
-    def sign_transaction(
-        self, *, transaction: Transaction, chain_id: str, public_key: str, sig_digest: str
-    ) -> beekeeper_api.SignTransaction:
+    def sign_digest(
+        self, *, sig_digest: str, public_key: str, wallet_name: str | None = None
+    ) -> beekeeper_api.SignDigest:
         raise NotImplementedError
 
     @api
@@ -79,4 +75,12 @@ class BeekeeperApi(AbstractSyncApi):
 
     @api
     def close_session(self) -> beekeeper_api.EmptyResponse:
+        raise NotImplementedError
+
+    @api
+    def close(self, wallet_name: str) -> beekeeper_api.EmptyResponse:
+        raise NotImplementedError
+
+    @api
+    def has_matching_private_key(self, wallet_name: str, public_key: str) -> beekeeper_api.HasMatchingPrivateKey:
         raise NotImplementedError
