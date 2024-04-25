@@ -122,7 +122,7 @@ class AbstractHandle:
         parsed_response = json.loads(response)
 
         if "error" in parsed_response:
-            raise RequestError(send=params, error=str(parsed_response["error"]))
+            raise RequestError(send=params, error=parsed_response["error"])
 
         if "result" not in parsed_response:
             raise MissingResultError
@@ -207,10 +207,11 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = await self._communicator.async_send(self.http_endpoint, data=request)
-        self.logger.trace(
-            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
-        )
-        return self._response_handle(params=params, response=response, expected_type=expected_type)
+            self.logger.trace(
+                f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
+            )
+            return self._response_handle(params=params, response=response, expected_type=expected_type)
+        raise RuntimeError("_async_send: unexpected decision path")
 
     async def _enter(self) -> Self:
         return self._clone()
