@@ -15,8 +15,16 @@ _handle_target_service_name = "beekeeper"
 class Beekeeper(AbstractSyncHandle):
     """Synchronous handle for beekeeper service communication."""
 
+    def __init__(
+        self,
+        *args: Any,
+        settings: HandleSettings | None = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, settings=settings, **kwargs)
+
     def _clone(self) -> Beekeeper:
-        return Beekeeper(http_url=self.http_endpoint, communicator=self._communicator)
+        return Beekeeper(http_url=self.http_endpoint, settings=self.settings)
 
     def _construct_api(self) -> BeekeeperSyncApiCollection:
         return BeekeeperSyncApiCollection(owner=self)
@@ -41,7 +49,7 @@ class AsyncBeekeeper(AbstractAsyncHandle):
     """Asynchronous handle for beekeeper service communication."""
 
     def _clone(self) -> AsyncBeekeeper:
-        return AsyncBeekeeper(http_url=self.http_endpoint, communicator=self._communicator)
+        return AsyncBeekeeper(http_url=self.http_endpoint, settings=self.settings)
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:
         return BeekeeperAsyncApiCollection(owner=self)

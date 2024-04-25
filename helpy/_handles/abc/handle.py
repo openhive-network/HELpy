@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, Protocol
 from loguru import logger
 from typing_extensions import Self
 
-from helpy._communication.httpx_communicator import HttpxCommunicator
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
+from helpy._handles.settings import HandleSettings
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import CommunicationError, HelpyError, RequestError
@@ -35,8 +35,7 @@ class AbstractHandle:
     def __init__(
         self,
         *args: Any,
-        http_url: HttpUrl | None = None,
-        communicator: AbstractCommunicator | None = None,
+        settings: HandleSettings | None = None,
         **kwargs: Any,
     ) -> None:
         """Constructs handle to network service.
@@ -47,22 +46,29 @@ class AbstractHandle:
             communicator -- communicator class to use for communication (default: {HttpxCommunicator})
         """
         super().__init__(*args, **kwargs)
+        if settings is None:
+            settings = HandleSettings()
         self.__logger = self.__configure_logger()
-        self.__http_endpoint = http_url
-        self.__communicator = communicator or HttpxCommunicator()
+        self.__backup_settings = settings
+        self.__settings = settings
+        self.__communicator = (
+            self.__settings.communicator(settings=self.__settings)
+            if isinstance(self.__settings.communicator, type)
+            else self.__settings.communicator
+        )
         self.__api = self._construct_api()
 
     @property
     def http_endpoint(self) -> HttpUrl:
         """Return endpoint where handle is connected to."""
-        assert self.__http_endpoint is not None
-        return self.__http_endpoint
+        assert self.settings.http_endpoint is not None
+        return self.settings.http_endpoint
 
     @http_endpoint.setter
     def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
         self.logger.debug(f"setting http endpoint to: {value.as_string()}")
-        self.__http_endpoint = value
+        self.settings.http_endpoint = value
 
     @property
     def api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
@@ -76,6 +82,10 @@ class AbstractHandle:
     @property
     def logger(self) -> Logger:
         return self.__logger
+
+    @property
+    def settings(self) -> HandleSettings:
+        return self.__settings
 
     @abstractmethod
     def _construct_api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
@@ -92,6 +102,9 @@ class AbstractHandle:
     @abstractmethod
     def _target_service(self) -> str:
         """Returns name of service that following handle is connecting to."""
+
+    def _restore_settings(self) -> None:
+        self.__settings = self.__backup_settings
 
     def _logger_extras(self) -> dict[str, Any]:
         """
