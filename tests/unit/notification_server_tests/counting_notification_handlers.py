@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+import helpy
 from helpy._communication.appbase_notification_handler import AppbaseNotificationHandler
 from helpy._communication.httpx_communicator import HttpxCommunicator
 from schemas.notifications import Notification
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 
 
 async def send_notification(address: HttpUrl, notification: NotificationBase) -> None:
-    communicator = HttpxCommunicator()
+    communicator = HttpxCommunicator(settings=helpy.Settings())
     await communicator.get_async_client().put(
         address.as_string(),
         headers=communicator._json_headers(),

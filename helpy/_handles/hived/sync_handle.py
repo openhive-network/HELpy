@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
     def _clone(self) -> Hived:
-        return Hived(http_url=self.http_endpoint, communicator=self._communicator)
+        return Hived(http_url=self.http_endpoint, settings=self.settings)
 
     def _construct_api(self) -> HivedSyncApiCollection:
         return HivedSyncApiCollection(owner=self)

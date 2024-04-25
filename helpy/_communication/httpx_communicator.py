@@ -10,14 +10,15 @@ from helpy._communication.abc.communicator import (
 from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from helpy._communication.settings import CommunicationSettings
     from helpy._interfaces.url import HttpUrl
 
 
 class HttpxCommunicator(AbstractCommunicator):
     """Provides support for httpx library."""
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, settings: CommunicationSettings) -> None:
+        super().__init__(settings=settings)
         self.__async_client: httpx.AsyncClient | None = httpx.AsyncClient(
             timeout=self.settings.timeout.total_seconds(), http2=True
         )
