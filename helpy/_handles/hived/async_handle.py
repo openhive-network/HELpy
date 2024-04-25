@@ -106,3 +106,7 @@ class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
             api=lambda o: HivedAsyncApiCollection(o),
             delay_error_on_data_access=delay_error_on_data_access,
         )
+
+    @property
+    async def network_type(self) -> str:
+        return self._extract_network_type(await self.api.database.get_version())
