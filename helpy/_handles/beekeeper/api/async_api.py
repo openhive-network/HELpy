@@ -1,11 +1,11 @@
 from __future__ import annotations
+
 from typing import Any
 
 from helpy._handles.abc.api import AbstractAsyncApi
-from schemas.apis import beekeeper_api
-
 from helpy._handles.beekeeper.api.apply_session_token import apply_session_token
-from helpy._handles.beekeeper.api.session_holder import SessionHolder  # noqa: TCH001
+from helpy._handles.beekeeper.api.session_holder import SessionHolder
+from schemas.apis import beekeeper_api  # noqa: TCH001
 
 
 class BeekeeperApi(AbstractAsyncApi):
@@ -139,8 +139,11 @@ class BeekeeperApi(AbstractAsyncApi):
         raise NotImplementedError
 
     @api
-    async def get_public_keys(self) -> beekeeper_api.GetPublicKeys:
+    async def get_public_keys(self, wallet_name: str | None = None) -> beekeeper_api.GetPublicKeys:
         """Lists all public keys from all unlocked wallets.
+
+        Arguments:
+            wallet_name -- if not None, beekeeper will list public keys only from given wallet
 
         Returns:
             List of public keys
@@ -148,29 +151,15 @@ class BeekeeperApi(AbstractAsyncApi):
         raise NotImplementedError
 
     @api
-    async def sign_digest(self, *, sig_digest: str, public_key: str) -> beekeeper_api.SignDigest:
+    async def sign_digest(
+        self, *, sig_digest: str, public_key: str, wallet_name: str | None = None
+    ) -> beekeeper_api.SignDigest:
         """Signs given digest with private key paired with given public key.
 
         Arguments:
             sig_digest -- digest to sign
             public_key -- public key paired with private key to sign with
-
-        Returns:
-            Signature
-        """
-        raise NotImplementedError
-
-    @api
-    async def sign_transaction(
-        self, *, transaction: Transaction, chain_id: str, public_key: str, sig_digest: str
-    ) -> beekeeper_api.SignTransaction:
-        """Signs transaction with given key.
-
-        Arguments:
-            transaction -- transaction to sign
-            chain_id -- chain id under which signature should be created (database_api.get_config -> HIVE_CHAIN_ID)
-            public_key -- public key paired with private key to sign with
-            sig_digest -- sig digest of given transaction to confirm proper transaction will be signed
+            wallet_name -- if not set to None, beekeeper will use keys only from given wallet
 
         Returns:
             Signature
@@ -208,5 +197,30 @@ class BeekeeperApi(AbstractAsyncApi):
 
         Returns:
             Noting.
+        """
+        raise NotImplementedError
+
+    @api
+    async def close(self, wallet_name: str) -> beekeeper_api.EmptyResponse:
+        """Closes opened wallet, which implies locking.
+
+        Arguments:
+            wallet_name -- wallet name to close
+
+        Returns:
+            Nothing
+        """
+        raise NotImplementedError
+
+    @api
+    async def has_matching_private_key(self, wallet_name: str, public_key: str) -> beekeeper_api.HasMatchingPrivateKey:
+        """Checks is beekeeper contain private key associated with given public key.
+
+        Arguments:
+            wallet_name -- wallet to check for corresponding private key
+            public_key -- public key to check
+
+        Returns:
+            True if found, False otherwise
         """
         raise NotImplementedError
