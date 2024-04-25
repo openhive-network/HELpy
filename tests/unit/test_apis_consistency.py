@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from inspect import iscoroutinefunction, signature
 from typing import TYPE_CHECKING
 
 import pytest
@@ -70,3 +71,12 @@ def test_is_api_consistent(
     assert len(sync_api_methods) > 0
     assert len(async_api_methods) > 0
     assert sync_api_methods == async_api_methods
+
+    for api_method in sync_api_methods:
+        sync_method = getattr(sync_api, api_method)
+        assert not iscoroutinefunction(sync_method)
+
+        async_method = getattr(async_api, api_method)
+        assert iscoroutinefunction(async_method)
+
+        assert signature(sync_method) == signature(async_method), f"inconsistency in: {api_method}"
