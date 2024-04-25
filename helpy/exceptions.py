@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
+import json
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from helpy._interfaces.url import Url
 
 JsonT = dict[str, Any]
 CommunicationResponseT = str | JsonT | list[JsonT]
@@ -35,20 +39,29 @@ class BlockWaitTimeoutError(HelpyError):
 class RequestError(HelpyError):
     """Raised if error field is in the response."""
 
-    def __init__(self, send: str, error: str) -> None:
+    def __init__(self, send: str, error: str | JsonT) -> None:
         """
         Initialize a RequestError.
 
         Parameters:
         - send (str): The request sent.
-        - error (str): The error received in response.
+        - error (str | JsonT): The error received in response.
 
         Returns:
         None
         """
         self.send = send
-        self.error = error
-        super().__init__(f"{send=} | {error=}")
+        self.error = self.__try_extract_exception_message(error)
+        super().__init__(f"{send=} | {self.error=}")
+
+    def __try_extract_exception_message(self, error: str | JsonT) -> str | JsonT:
+        try:
+            parsed_error = json.loads(error) if isinstance(error, str) else error
+            if not isinstance(error, dict):
+                return error
+            return parsed_error.get("message", error)  # type: ignore[no-any-return]
+        except json.JSONDecodeError:
+            return error
 
 
 class BatchRequestError(HelpyError):
@@ -77,7 +90,7 @@ class CommunicationError(HelpyError):
     """Base class for all communication related errors."""
 
     def __init__(
-        self, url: str, request: str, response: CommunicationResponseT | None = None, *, message: str = ""
+        self, url: str | Url[Any], request: str, response: CommunicationResponseT | None = None, *, message: str = ""
     ) -> None:
         """Contains required details.
 
@@ -87,7 +100,7 @@ class CommunicationError(HelpyError):
             response (CommunicationResponseT | None, optional): content of response. Defaults to None.
             message (str, optional): additional information about error. Defaults to "".
         """
-        self.url = url
+        self.url = str(url)
         self.request = request
         self.response = response
         message = message or self.__create_message()
@@ -130,3 +143,7 @@ class CommunicationError(HelpyError):
 
 class ExceededAmountOfRetriesError(CommunicationError):
     """Raised if exceeded amount of retries."""
+
+
+class InvalidOptionError(HelpyError):
+    """Raised if invalid expression is given in config."""
