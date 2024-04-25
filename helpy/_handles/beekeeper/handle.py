@@ -90,11 +90,13 @@ class Beekeeper(AbstractSyncHandle, SessionHolder):
         return _handle_target_service_name
 
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[BeekeeperSyncApiCollection]:
-        return SyncBatchHandle(
+        return _SyncSessionBatchHandle(
             url=self.http_endpoint,
             communicator=self._communicator,
             api=lambda o: BeekeeperSyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
+            session_token=self.session_token,
+        )
 
     def _acquire_session_token(self) -> str:
         return self.api.beekeeper.create_session(
@@ -125,11 +127,13 @@ class AsyncBeekeeper(AbstractAsyncHandle, SessionHolder):
         return _handle_target_service_name
 
     def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[BeekeeperAsyncApiCollection]:
-        return AsyncBatchHandle(
+        return _AsyncSessionBatchHandle(
             url=self.http_endpoint,
             communicator=self._communicator,
             api=lambda o: BeekeeperAsyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
+            session_token=self.session_token,
+        )
 
     def _acquire_session_token(self) -> str:
         # FIXME: how to make it work both in async and sync mode
