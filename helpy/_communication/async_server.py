@@ -8,12 +8,14 @@ from aiohttp import web
 from typing_extensions import Self
 
 from helpy._interfaces.context import ContextAsync
+from helpy._interfaces.url import HttpUrl
 from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
     from socket import socket
 
     from helpy._communication.abc.http_server_observer import HttpServerObserver
+    from helpy._handles.settings import HandleSettings
 
 
 class AsyncHttpServerError(HelpyError):
@@ -36,13 +38,14 @@ class ServerSetupError(AsyncHttpServerError):
 
 
 class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
-    __ADDRESS = ("0.0.0.0", 0)
+    __ADDRESS = HttpUrl("0.0.0.0:0")
 
-    def __init__(self, observer: HttpServerObserver) -> None:
+    def __init__(self, observer: HttpServerObserver, settings: HandleSettings) -> None:
         self.__observer = observer
         self.__app = web.Application()
         self.__site: web.TCPSite | None = None
         self.__running: bool = False
+        self.__settings = settings
 
         async def handle_put_method(request: web.Request) -> web.Response:
             await self.__observer.data_received(await request.json())
@@ -76,7 +79,8 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
 
         runner = web.AppRunner(self.__app, access_log=False)
         await runner.setup()
-        self.__site = web.TCPSite(runner, *self.__ADDRESS)
+        address = self.__settings.notification_endpoint or self.__ADDRESS
+        self.__site = web.TCPSite(runner, address.address, address.port)
         await self.__site.start()
         self.__running = True
         try:

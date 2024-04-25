@@ -13,6 +13,7 @@ from helpy._interfaces.context import ContextSync
 from helpy.exceptions import HelpyError
 
 if TYPE_CHECKING:
+    from helpy._handles.settings import HandleSettings
     from schemas.notifications import KnownNotificationT, Notification
 
 
@@ -45,10 +46,12 @@ class UniversalNotificationHandler(NotificationHandler):
 
 
 class UniversalNotificationServer(ContextSync[int]):
-    def __init__(self, event_handler: UniversalNotificationHandler, *, thread_name: str | None = None) -> None:
+    def __init__(
+        self, event_handler: UniversalNotificationHandler, settings: HandleSettings, *, thread_name: str | None = None
+    ) -> None:
         self.__event_handler = event_handler
         self.__event_handler.setup()
-        self.__http_server = AsyncHttpServer(self.__event_handler)
+        self.__http_server = AsyncHttpServer(self.__event_handler, settings=settings)
         self.__server_thread: Thread | None = None
         self.__thread_name = thread_name
 

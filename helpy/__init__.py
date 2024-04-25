@@ -8,6 +8,7 @@ from helpy._handles import (
     Hived,
     HivedNotificationHandler,
 )
+from helpy._handles.settings import HandleSettings as Settings
 from helpy._interfaces import wax
 from helpy._interfaces.asset import Hf26Asset, LegacyAsset
 from helpy._interfaces.stopwatch import Stopwatch
@@ -28,6 +29,7 @@ __all__ = [
     "LegacyAsset",
     "OffsetTimeControl",
     "P2PUrl",
+    "Settings",
     "SpeedUpRateTimeControl",
     "StartTimeControl",
     "Stopwatch",
