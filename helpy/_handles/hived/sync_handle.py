@@ -106,3 +106,7 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
             api=lambda o: HivedSyncApiCollection(o),
             delay_error_on_data_access=delay_error_on_data_access,
         )
+
+    @property
+    def network_type(self) -> str:
+        return self._extract_network_type(self.api.database.get_version())

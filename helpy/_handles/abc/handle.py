@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from helpy._handles.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
+    from schemas.apis.database_api import GetVersion
 
 
 class MissingResultError(HelpyError):
@@ -137,6 +138,9 @@ class AbstractHandle:
     @abstractmethod
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any] | AsyncBatchHandle[Any]:
         """Returns sync batch handle."""
+
+    def _extract_network_type(self, get_version: GetVersion) -> str:
+        return get_version.node_type
 
 
 class _SyncCall(Protocol):
