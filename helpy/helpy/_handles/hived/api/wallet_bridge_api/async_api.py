@@ -86,7 +86,7 @@ class WalletBridgeApi(AbstractAsyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    async def get_witness(self) -> wallet_bridge_api.GetWitness:
+    async def get_witness(self, witness: str, /) -> wallet_bridge_api.GetWitness:
         raise NotImplementedError
 
     @api
