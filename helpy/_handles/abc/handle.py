@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, Protocol
 from loguru import logger
 from typing_extensions import Self
 
+from helpy._communication.aiohttp_communicator import AioHttpCommunicator
+from helpy._communication.request_communicator import RequestCommunicator
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
@@ -50,11 +52,7 @@ class AbstractHandle:
         self.__logger = self.__configure_logger()
         self.__backup_settings = settings
         self.__settings = settings
-        self.__communicator = (
-            self.__settings.communicator(settings=self.__settings)
-            if isinstance(self.__settings.communicator, type)
-            else self.__settings.communicator
-        )
+        self.__communicator = self.__settings.try_get_communicator_instance() or self._get_recommended_communicator()
         self.__api = self._construct_api()
 
     @property
@@ -85,6 +83,10 @@ class AbstractHandle:
     @property
     def settings(self) -> HandleSettings:
         return self.__settings
+
+    @abstractmethod
+    def _get_recommended_communicator(self) -> AbstractCommunicator:
+        """Return api collection."""
 
     @abstractmethod
     def _construct_api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
@@ -224,6 +226,9 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
     def _is_synchronous(self) -> bool:
         return True
 
+    def _get_recommended_communicator(self) -> AbstractCommunicator:
+        return AioHttpCommunicator(settings=self.settings)
+
 
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
     """Base class for service handlers that uses synchronous communication."""
@@ -248,3 +253,6 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
 
     def _is_synchronous(self) -> bool:
         return False
+
+    def _get_recommended_communicator(self) -> AbstractCommunicator:
+        return RequestCommunicator(settings=self.settings)
