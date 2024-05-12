@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy import HttpUrl, Settings
+from helpy import HttpUrl
 from helpy._communication.universal_notification_server import UniversalNotificationServer
 from tests.unit.notification_server_tests.counting_notification_handlers import CountingAppbaseNotificationHandler
 
@@ -21,7 +21,7 @@ def counting_appbase_notification_handler() -> CountingAppbaseNotificationHandle
 def counting_appbase_notification_server(
     counting_appbase_notification_handler: CountingAppbaseNotificationHandler,
 ) -> Iterator[UniversalNotificationServer]:
-    server = UniversalNotificationServer(counting_appbase_notification_handler, settings=Settings())
+    server = UniversalNotificationServer(counting_appbase_notification_handler)
     server.run()
     yield server
     server.close()

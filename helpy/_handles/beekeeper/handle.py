@@ -68,14 +68,6 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], Se
 class Beekeeper(AbstractSyncHandle, SessionHolder):
     """Synchronous handle for beekeeper service communication."""
 
-    def __init__(
-        self,
-        *args: Any,
-        settings: HandleSettings | None = None,
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(*args, settings=settings, **kwargs)
-
     def _clone(self) -> Beekeeper:
         return Beekeeper(http_url=self.http_endpoint, settings=self.settings)
 
