@@ -1,20 +1,30 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import TYPE_CHECKING, cast
+from os import environ
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel, Field
 
 from helpy._interfaces.url import Url
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from typing_extensions import Self
 
 
+def _default_factory(env_name: str, default_factory: Callable[[str | None], Any]) -> Any:
+    env_value = environ.get(env_name)
+    return Field(default_factory=lambda: default_factory(env_value))
+
+
 class CommunicationSettings(BaseModel):
-    max_retries: int = 5
-    timeout: timedelta = Field(default_factory=lambda: timedelta(seconds=5))
-    period_between_retries: timedelta = Field(default_factory=lambda: timedelta(seconds=1))
+    max_retries: int = _default_factory("HELPY_COMMUNICATION_MAX_RETRIES", lambda x: int(x or 5))
+    timeout: timedelta = _default_factory("HELPY_COMMUNICATION_TIMEOUT", lambda x: timedelta(seconds=int(x or 5)))
+    period_between_retries: timedelta = _default_factory(
+        "HELPY_COMMUNICATION_PERIOD_BETWEEN_RETRIES", lambda x: timedelta(seconds=int(x or 1))
+    )
 
     class Config:
         arbitrary_types_allowed = True
