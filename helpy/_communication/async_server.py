@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from socket import socket
 
     from helpy._communication.abc.http_server_observer import HttpServerObserver
-    from helpy._handles.settings import HandleSettings
 
 
 class AsyncHttpServerError(HelpyError):
@@ -40,12 +39,12 @@ class ServerSetupError(AsyncHttpServerError):
 class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
     __ADDRESS = HttpUrl("0.0.0.0:0")
 
-    def __init__(self, observer: HttpServerObserver, settings: HandleSettings) -> None:
+    def __init__(self, observer: HttpServerObserver, notification_endpoint: HttpUrl | None) -> None:
         self.__observer = observer
         self.__app = web.Application()
         self.__site: web.TCPSite | None = None
         self.__running: bool = False
-        self.__settings = settings
+        self.__notification_endpoint = notification_endpoint
 
         async def handle_put_method(request: web.Request) -> web.Response:
             await self.__observer.data_received(await request.json())
@@ -79,7 +78,7 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
 
         runner = web.AppRunner(self.__app, access_log=False)
         await runner.setup()
-        address = self.__settings.notification_endpoint or self.__ADDRESS
+        address = self.__notification_endpoint or self.__ADDRESS
         self.__site = web.TCPSite(runner, address.address, address.port)
         await self.__site.start()
         self.__running = True

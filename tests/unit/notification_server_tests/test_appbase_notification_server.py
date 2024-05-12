@@ -13,10 +13,10 @@ from tests.unit.notification_server_tests.counting_notification_handlers import 
 
 if TYPE_CHECKING:
     from helpy._interfaces.url import HttpUrl
-    from schemas.notifications.abc import NotificationBase
+    from schemas.notifications import KnownNotificationT
 
 CounterGetterT = Callable[[CountingAppbaseNotificationHandler], int]
-smoke_test_cases: list[tuple[CounterGetterT, NotificationBase]] = [
+smoke_test_cases: list[tuple[CounterGetterT, KnownNotificationT]] = [  # type: ignore[valid-type]
     (lambda h: h.on_ws_webserver_bind_count, WebserverListening(type_="WS", address="127.0.0.1", port=9090)),
     (lambda h: h.on_http_webserver_bind_count, WebserverListening(type_="HTTP", address="127.0.0.1", port=9090)),
     (lambda h: h.on_error_count, Error(message="some error message")),
@@ -29,7 +29,7 @@ async def test_smoke(
     counting_appbase_notification_handler: CountingAppbaseNotificationHandler,
     counting_appbase_notification_server_address: HttpUrl,
     counter_getter: CounterGetterT,
-    notification: NotificationBase,
+    notification: KnownNotificationT,
 ) -> None:
     assert counter_getter(counting_appbase_notification_handler) == 0
     await send_notification(counting_appbase_notification_server_address, notification)

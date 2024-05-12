@@ -8,7 +8,6 @@ from loguru import logger
 from typing_extensions import Self
 
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
-from helpy._handles.settings import HandleSettings
 from helpy._interfaces.context import ContextAsync, ContextSync
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import CommunicationError, HelpyError, RequestError
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
     from helpy._communication.abc.communicator import AbstractCommunicator
     from helpy._handles.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
+    from helpy._handles.settings import HandleSettings
     from helpy._interfaces.url import HttpUrl
     from schemas.apis.database_api import GetVersion
 
@@ -36,7 +36,7 @@ class AbstractHandle:
     def __init__(
         self,
         *args: Any,
-        settings: HandleSettings | None = None,
+        settings: HandleSettings,
         **kwargs: Any,
     ) -> None:
         """Constructs handle to network service.
@@ -47,8 +47,6 @@ class AbstractHandle:
             communicator -- communicator class to use for communication (default: {HttpxCommunicator})
         """
         super().__init__(*args, **kwargs)
-        if settings is None:
-            settings = HandleSettings()
         self.__logger = self.__configure_logger()
         self.__backup_settings = settings
         self.__settings = settings
