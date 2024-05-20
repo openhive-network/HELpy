@@ -172,5 +172,7 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def list_rc_direct_delegations(self, start: datetime, limit: int, /) -> wallet_bridge_api.ListRcDirectDelegations:
+    def list_rc_direct_delegations(
+        self, start: tuple[str, str], limit: int, /
+    ) -> wallet_bridge_api.ListRcDirectDelegations:
         raise NotImplementedError
