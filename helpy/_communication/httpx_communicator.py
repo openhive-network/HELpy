@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
 import httpx
 
@@ -13,24 +13,38 @@ if TYPE_CHECKING:
     from helpy._communication.settings import CommunicationSettings
     from helpy._interfaces.url import HttpUrl
 
+ClientTypes = httpx.AsyncClient | httpx.Client
+
 
 class HttpxCommunicator(AbstractCommunicator):
     """Provides support for httpx library."""
 
-    def __init__(self, settings: CommunicationSettings) -> None:
-        super().__init__(settings=settings)
-        self.__async_client: httpx.AsyncClient | None = httpx.AsyncClient(
-            timeout=self.settings.timeout.total_seconds(), http2=True
-        )
+    def __init__(self, *args: Any, settings: CommunicationSettings, **kwargs: Any) -> None:
+        super().__init__(*args, settings=settings, **kwargs)
+        self.__async_client: httpx.AsyncClient | None = None
+        self.__sync_client: httpx.Client | None = None
 
     async def close(self) -> None:
         if self.__async_client is not None:
             await self.__async_client.aclose()
             self.__async_client = None
 
+        if self.__sync_client is not None:
+            self.__sync_client.close()
+            self.__sync_client = None
+
+    def __create_client(self, client_type: type[ClientTypes]) -> ClientTypes:
+        return client_type(timeout=self.settings.timeout.total_seconds(), http2=True)
+
     def get_async_client(self) -> httpx.AsyncClient:
-        assert self.__async_client is not None, "Session is closed."
+        if self.__async_client is None:
+            self.__async_client = cast(httpx.AsyncClient, self.__create_client(httpx.AsyncClient))
         return self.__async_client
+
+    def get_sync_client(self) -> httpx.Client:
+        if self.__sync_client is None:
+            self.__sync_client = cast(httpx.Client, self.__create_client(httpx.Client))
+        return self.__sync_client
 
     async def async_send(self, url: HttpUrl, data: str) -> str:
         last_exception: BaseException | None = None
@@ -60,7 +74,9 @@ class HttpxCommunicator(AbstractCommunicator):
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
-                response: httpx.Response = httpx.post(url.as_string(), content=data, headers=self._json_headers())
+                response: httpx.Response = self.get_sync_client().post(
+                    url.as_string(), content=data, headers=self._json_headers()
+                )
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
