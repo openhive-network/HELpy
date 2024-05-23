@@ -21,10 +21,15 @@ def _default_factory(env_name: str, default_factory: Callable[[str | None], Any]
 
 class CommunicationSettings(BaseModel):
     max_retries: int = _default_factory("HELPY_COMMUNICATION_MAX_RETRIES", lambda x: int(x or 5))
-    timeout: timedelta = _default_factory("HELPY_COMMUNICATION_TIMEOUT", lambda x: timedelta(seconds=int(x or 5)))
+    """Amount of retries when sending request to service."""
+
+    timeout: timedelta = _default_factory("HELPY_COMMUNICATION_TIMEOUT_SECS", lambda x: timedelta(seconds=int(x or 5)))
+    """Maximum time for request to finish."""
+
     period_between_retries: timedelta = _default_factory(
-        "HELPY_COMMUNICATION_PERIOD_BETWEEN_RETRIES", lambda x: timedelta(seconds=int(x or 1))
+        "HELPY_COMMUNICATION_PERIOD_BETWEEN_RETRIES_SECS", lambda x: timedelta(seconds=int(x or 1))
     )
+    """Period between failed request and next retry."""
 
     class Config:
         arbitrary_types_allowed = True

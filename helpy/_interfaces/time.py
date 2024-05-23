@@ -51,7 +51,7 @@ class OffsetTimeControl(TimeControl):
     Represents a control mechanism for time-related parameters.
 
     Args:
-        offset (str): The offset value specifying a relative time.
+        offset: The offset value specifying a relative time.
             Format: '[+-]N[mhdy\s]', where 'N' is any positive floating-point number. The letter at the end denotes
             the unit of time (y: year d: day, h: hour, m: minute). Default without any letter means second.
             (e.g. "+10h")
@@ -87,10 +87,10 @@ class StartTimeControl(TimeControl):
     Represents a control mechanism for time-related parameters.
 
     Args:
-        start_time (Literal["head_block_time"] | str): The starting time specifying an absolute time.
+        start_time: The starting time specifying an absolute time.
             Format: "@%Y-%m-%d %H:%M:%S" or "@%Y-%m-%d %H:%M:%S.%f"
             (e.g. "@1970-01-01 00:00:00")
-        speed_up_rate (float): An speed-up rate
+        speed_up_rate: An speed-up rate
             Format: positive floating-point number.
             (e.g. "10.0")
 
@@ -112,7 +112,7 @@ class StartTimeControl(TimeControl):
     def as_string(self) -> str:
         if self.start_time == "head_block_time":
             raise ValueError("You probably forgot to call `apply_head_block_time` to specify time")
-        assert isinstance(self.start_time, datetime)
+        assert isinstance(self.start_time, datetime), "start_time have to be datetime type"
         serialized_start_time = Time.serialize(self.start_time, format_=TimeFormats.FAKETIME_FORMAT)
         if self.speed_up_rate:
             return f"{serialized_start_time} x{self.speed_up_rate}"
@@ -128,13 +128,12 @@ class SpeedUpRateTimeControl(TimeControl):
     Represents a control mechanism for time-related parameters.
 
     Args:
-        speed_up_rate (float): An speed-up rate
+        speed_up_rate: An speed-up rate
             Format: positive floating-point number.
             (e.g. "10.0")
 
     Raises:
-        ValueError:
-            if `speed_up_rate` has an incorrect format.
+        ValueError: if `speed_up_rate` has an incorrect format.
 
     Methods:
         as_string(): Returns a string representation of the time control parameters.
@@ -159,12 +158,10 @@ class Time:
             By default, when `format_` parameter is specified as None - the ISO format (Time.DEFAULT_FORMAT)
             and ISO format including milliseconds (Time.DEFAULT_FORMAT_WITH_MILLIS) could be parsed.
 
-        Arguments:
-            time -- time string to parse
-
-        Keyword Arguments:
-            format_ -- format of given time string (default: {Time.DEFAULT_FORMAT})
-            time_zone -- timezone to set after parsing (default: {timezone.utc})
+        Args:
+            time: time string to parse
+            format_: format of given time string
+            time_zone: timezone to set after parsing
 
         Raises:
             ParseError: if parsing is not possible
@@ -277,18 +274,18 @@ class Time:
     ) -> str | datetime:
         """Adds to current time given time periods.
 
-        Keyword Arguments:
-            milliseconds -- milliseconds to add (default: {0})
-            seconds -- seconds to add (default: {0})
-            minutes -- minutes to add (default: {0})
-            hours -- hours to add (default: {0})
-            days -- days to add (default: {0})
-            weeks -- weeks to add (default: {0})
-            months -- months to add (default: {0})
-            years -- years to add (default: {0})
-            time_zone -- time zone to set (default: {timezone.utc})
-            serialize -- return serialized time or as datetime (default: {True})
-            serialize_format -- if serialize, this determines format (default: {DEFAULT_FORMAT})
+        Args:
+            milliseconds: milliseconds to add.
+            seconds: seconds to add.
+            minutes: minutes to add.
+            hours: hours to add.
+            days: days to add.
+            weeks: weeks to add.
+            months: months to add.
+            years: years to add.
+            time_zone: time zone to set.
+            serialize: return serialized time or as datetime.
+            serialize_format: if serialize, this determines format.
 
         Raises:
             ValueError: no periods has been given
@@ -329,13 +326,11 @@ class Time:
     ) -> float:
         """Waits synchronously for the predicate to return True.
 
-        Arguments:
-            predicate -- Callable that returns boolean value.
-
-        Keyword Arguments:
-            timeout -- Timeout in seconds or preferably timedelta (default: {math.inf})
-            timeout_error_message -- Message that will be displayed if timeout is reached. (default: {None})
-            poll_time -- Time between predicate calls. (default: {1.0})
+        Args:
+            predicate: Callable that returns boolean value.
+            timeout: Timeout in seconds or preferably timedelta.
+            timeout_error_message: Message that will be displayed if timeout is reached.
+            poll_time: Time between predicate calls.
 
         Raises:
             TimeoutError: if given timeout exceeds
@@ -366,13 +361,11 @@ class Time:
     ) -> float:
         """Waits asynchronously for the predicate to return True.
 
-        Arguments:
-            predicate -- Callable that returns boolean value.
-
-        Keyword Arguments:
-            timeout -- Timeout in seconds or preferably timedelta (default: {math.inf})
-            timeout_error_message -- Message that will be displayed if timeout is reached. (default: {None})
-            poll_time -- Time between predicate calls. (default: {1.0})
+        Args:
+            predicate: Callable that returns boolean value.
+            timeout: Timeout in seconds or preferably timedelta.
+            timeout_error_message: Message that will be displayed if timeout is reached.
+            poll_time: Time between predicate calls.
 
         Raises:
             TimeoutError: if given timeout exceeds
@@ -424,11 +417,14 @@ class Time:
         """
         Waits for the predicate to return True in the given timeout and raises TimeoutError if it was exceeded.
 
-        :param predicate: Callable that returns boolean value.
-        :param timeout: Timeout in seconds or preferably timedelta (e.g. tt.Time.minutes(1)).
-        :param timeout_error_message: Message that will be displayed if timeout is reached.
-        :param poll_time: Time between predicate calls.
-        :return: Time in seconds that was spent on waiting.
+        Args:
+            predicate: Callable that returns boolean value.
+            timeout: Timeout in seconds or preferably timedelta (e.g. tt.Time.minutes(1)).
+            timeout_error_message: Message that will be displayed if timeout is reached.
+            poll_time: Time between predicate calls.
+
+        Returns:
+            Time in seconds that was spent on waiting.
         """
         timeout_secs: float = timeout.total_seconds() if isinstance(timeout, timedelta) else timeout
         assert timeout_secs >= 0, "The `timeout` argument must be non-negative value."

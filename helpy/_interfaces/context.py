@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -32,9 +32,21 @@ class ContextSync(Generic[EnterReturnT]):
     def _finally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    def _handle_exception(self, _: BaseException, __: TracebackType | None) -> Literal[False]:
-        """Called when exception occurred."""
+    def _handle_exception(self, _: BaseException, __: TracebackType | None) -> bool:
+        """Called when exception occurred.
+
+        Note:
+            * Returning False will reraise error (if occurred)
+            * Returning True will suppress all errors
+        """
         return False
+
+    def _handle_no_exception(self) -> None:
+        """Called when no exception occurred.
+
+        Returns:
+            Noting.
+        """
 
 
 class ContextAsync(Generic[EnterReturnT]):
@@ -60,6 +72,18 @@ class ContextAsync(Generic[EnterReturnT]):
     async def _afinally(self) -> None:
         """Called _always_ in __exit__ method."""
 
-    async def _handle_exception(self, _: BaseException, __: TracebackType | None) -> Literal[False]:
-        """Called when exception occurred."""
+    async def _ahandle_exception(self, _: BaseException, __: TracebackType | None) -> bool:
+        """Called when exception occurred.
+
+        Note:
+            * Returning False will reraise error (if occurred)
+            * Returning True will suppress all errors
+        """
         return False
+
+    async def _ahandle_no_exception(self) -> None:
+        """Called when no exception occurred.
+
+        Returns:
+            Noting.
+        """
