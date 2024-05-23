@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from typing import TypeAlias
 
+    from schemas.apis.database_api import GetVersion
     from schemas.fields.basic import AccountName
 
 
@@ -28,3 +29,9 @@ class HiveHandleCommonHelpers:
 
     def _hived_target_service_name(self) -> str:
         return "hived"
+
+    def _extract_network_type(self, get_version: GetVersion) -> str:
+        return get_version.node_type
+
+    def _assert_non_negative_amount_of_blocks(self, amount_of_blocks: int) -> None:
+        assert amount_of_blocks > 0, "Can't wait for negative or zero amount of blocks"
