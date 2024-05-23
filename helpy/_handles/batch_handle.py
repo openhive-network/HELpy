@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
+from helpy._interfaces.context import ContextAsync, ContextSync, EnterReturnT
 from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
@@ -65,8 +67,8 @@ class _BatchRequestResponseItem:
     delayed_result: _DelayedResponseWrapper
 
 
-class _PostRequestManager:
-    def __init__(self, owner: _BatchHandle, batch_objs: list[_BatchRequestResponseItem]) -> None:
+class _PostRequestManager(ContextSync["_PostRequestManager"]):
+    def __init__(self, owner: _BatchHandle[Any], batch_objs: list[_BatchRequestResponseItem]) -> None:
         self.__batch = batch_objs
         self.__owner = owner
         self.__responses: list[dict[str, Any]] = []
@@ -74,7 +76,7 @@ class _PostRequestManager:
     def set_responses(self, responses: str) -> None:
         self.__responses = json.loads(responses)
 
-    def __enter__(self) -> Self:
+    def _enter(self) -> _PostRequestManager:
         return self
 
     def __set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str = "") -> None:
@@ -126,17 +128,17 @@ class _PostRequestManager:
         self.__validate_response_count(responses_from_error)
         return self.__handle_exception_and_responses_exists(responses_from_error, exception.url)
 
-    def __exit__(
-        self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
-    ) -> bool:
-        if exception is None and len(self.__responses):
-            self.__handle_no_exception_case()
-            return True
-        assert exception is not None
+    def _handle_exception(self, exception: BaseException, __: TracebackType | None) -> bool:
         return self.__handle_exception_case(exception)
 
+    def _handle_no_exception(self) -> None:
+        self.__handle_no_exception_case()
 
-class _BatchHandle:
+    def _finally(self) -> None:
+        return None
+
+
+class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generic[EnterReturnT], ABC):
     def __init__(
         self,
         url: HttpUrl,
@@ -183,24 +185,29 @@ class _BatchHandle:
     def __is_anything_to_send(self) -> bool:
         return bool(self.__batch)
 
-    async def __aenter__(self) -> Self:
-        return self
+    async def _aenter(self) -> EnterReturnT:
+        return self  # type: ignore[return-value]
 
-    async def __aexit__(self, _: type[Exception] | None, ex: Exception | None, ___: TracebackType | None) -> None:
+    def _enter(self) -> EnterReturnT:
+        return self  # type: ignore[return-value]
+
+    async def _ahandle_no_exception(self) -> None:
         if not self.__is_anything_to_send():
             raise NothingToSendError
 
         await self.__async_evaluate()
 
-    def __enter__(self) -> Self:
-        return self
-
-    def __exit__(self, _: type[Exception] | None, ex: Exception | None, ___: TracebackType | None) -> Literal[False]:
+    def _handle_no_exception(self) -> None:
         if not self.__is_anything_to_send():
             raise NothingToSendError
 
         self.__sync_evaluate()
-        return False
+
+    async def _afinally(self) -> None:
+        return None
+
+    def _finally(self) -> None:
+        return None
 
 
 ApiT = TypeVar("ApiT")
@@ -210,7 +217,7 @@ OwnerT = TypeVar("OwnerT")
 ApiFactory = Callable[[OwnerT], ApiT]
 
 
-class SyncBatchHandle(_BatchHandle, Generic[ApiT]):
+class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
     def __init__(
         self,
         url: HttpUrl,
@@ -227,7 +234,7 @@ class SyncBatchHandle(_BatchHandle, Generic[ApiT]):
         return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
 
 
-class AsyncBatchHandle(_BatchHandle, Generic[ApiT]):
+class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
     def __init__(
         self,
         url: HttpUrl,
