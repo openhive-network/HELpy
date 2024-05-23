@@ -19,9 +19,6 @@ if TYPE_CHECKING:
 
 
 class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
-    def _clone(self) -> Hived:
-        return Hived(http_url=self.http_endpoint, settings=self.settings)
-
     def _construct_api(self) -> HivedSyncApiCollection:
         return HivedSyncApiCollection(owner=self)
 
@@ -48,7 +45,7 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
         return self._get_current_witness(self.get_dynamic_global_properties())
 
     def wait_number_of_blocks(self, blocks_to_wait: int, *, timeout: float = math.inf) -> None:
-        assert blocks_to_wait > 0
+        self._assert_non_negative_amount_of_blocks(blocks_to_wait)
         self.wait_for_block_with_number(self.get_last_block_number() + blocks_to_wait, timeout=timeout)
 
     def wait_for_block_with_number(self, block_number: int, *, timeout: float | timedelta = math.inf) -> None:
