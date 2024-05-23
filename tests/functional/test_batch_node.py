@@ -21,7 +21,7 @@ def test_batch_node(sync_node: Hived) -> None:
 
 
 async def test_async_batch_node(async_node: AsyncHived) -> None:
-    async with async_node.batch() as node:
+    async with await async_node.batch() as node:
         dynamic_properties = await node.api.database.get_dynamic_global_properties()
         config = await node.api.database.get_config()
 
@@ -40,20 +40,20 @@ def test_batch_node_response_not_ready(sync_node: Hived) -> None:
 def test_batch_node_error_response(sync_node: Hived) -> None:
     with pytest.raises(CommunicationError, match="Invalid cast"):  # noqa: PT012, SIM117
         with sync_node.batch() as node:
-            node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
+            node.api.database.find_accounts(accounts=123)
 
 
 def test_batch_node_error_response_delayed(sync_node: Hived) -> None:
     with sync_node.batch(delay_error_on_data_access=True) as node:
-        response = node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
+        response = node.api.database.find_accounts(accounts=123)
 
     with pytest.raises(CommunicationError, match="Invalid cast"):
         _ = response.accounts[0].name
 
 
 async def test_async_batch_node_error_response_delayed(async_node: AsyncHived) -> None:
-    async with async_node.batch(delay_error_on_data_access=True) as node:
-        response = await node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
+    async with await async_node.batch(delay_error_on_data_access=True) as node:
+        response = await node.api.database.find_accounts(accounts=123)
 
     with pytest.raises(CommunicationError, match="Invalid cast"):
         _ = response.accounts[0].name
@@ -64,9 +64,9 @@ def test_batch_node_mixed_request_delayed(sync_node: Hived, order: Literal["firs
     with sync_node.batch(delay_error_on_data_access=True) as node:
         if order == "first_good":
             good_response = node.api.database.get_dynamic_global_properties()
-            bad_response = node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
+            bad_response = node.api.database.find_accounts(accounts=123)
         else:
-            bad_response = node.api.database.find_accounts(accounts=123)  # type: ignore[arg-type]
+            bad_response = node.api.database.find_accounts(accounts=123)
             good_response = node.api.database.get_dynamic_global_properties()
 
     assert good_response.head_block_number > 0
