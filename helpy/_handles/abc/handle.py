@@ -118,13 +118,6 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
     def __configure_logger(self) -> Logger:
         return logger.bind(**self._logger_extras())
 
-    @abstractmethod
-    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any] | AsyncBatchHandle[Any]:
-        """Returns sync batch handle."""
-
-    def _extract_network_type(self, get_version: GetVersion) -> str:
-        return get_version.node_type
-
 
 class _SyncCall(Protocol):
     def __call__(
@@ -153,9 +146,9 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
                 "Unable to acquire forkdb lock",
             ]
             message = exception.error if isinstance(exception, RequestError) else str(exception.args)
-            for imsg in ignored_messages:
-                if imsg in message:
-                    logger.debug(f"Ignored for {this.http_endpoint}: '{imsg}'")
+            for ignored_msg in ignored_messages:
+                if ignored_msg in message:
+                    logger.debug(f"Ignored for {this.http_endpoint}: '{ignored_msg}'")
                     return
             raise exception
 
@@ -182,7 +175,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     return __workaround_communication_problem_with_node
 
 
-class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ignore[misc]
+class AbstractAsyncHandle(AbstractHandle, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     @_retry_on_unable_to_acquire_database_lock(async_version=True)  # type: ignore[arg-type]
@@ -194,17 +187,10 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = await self._communicator.async_send(self.http_endpoint, data=request)
-            self.logger.trace(
-                f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
-            )
-            return self._response_handle(params=params, response=response, expected_type=expected_type)
-        raise RuntimeError("_async_send: unexpected decision path")
-
-    async def _enter(self) -> Self:
-        return self._clone()
-
-    async def _finally(self) -> None:
-        """Does nothing."""
+        self.logger.trace(
+            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
+        )
+        return self._response_handle(params=params, response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
         return True
@@ -212,8 +198,12 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
     def _get_recommended_communicator(self) -> AbstractCommunicator:
         return AioHttpCommunicator(settings=self.settings)
 
+    @abstractmethod
+    async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
+        """Returns async batch handle."""
 
-class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
+
+class AbstractSyncHandle(AbstractHandle, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
     @_retry_on_unable_to_acquire_database_lock(async_version=False)  # type: ignore[arg-type]
@@ -228,14 +218,12 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
-    def _enter(self) -> Self:
-        return self._clone()
-
-    def _finally(self) -> None:
-        """Does nothing."""
-
     def _is_synchronous(self) -> bool:
         return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
         return RequestCommunicator(settings=self.settings)
+
+    @abstractmethod
+    def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:
+        """Returns sync batch handle."""
