@@ -19,9 +19,6 @@ if TYPE_CHECKING:
 
 
 class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
-    def _clone(self) -> AsyncHived:
-        return AsyncHived(http_url=self.http_endpoint, settings=self.settings)
-
     def _construct_api(self) -> HivedAsyncApiCollection:
         return HivedAsyncApiCollection(owner=self)
 
@@ -48,7 +45,7 @@ class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
         return self._get_current_witness(await self.get_dynamic_global_properties())
 
     async def wait_number_of_blocks(self, blocks_to_wait: int, *, timeout: float = math.inf) -> None:
-        assert blocks_to_wait > 0
+        self._assert_non_negative_amount_of_blocks(blocks_to_wait)
         await self.wait_for_block_with_number(await self.get_last_block_number() + blocks_to_wait, timeout=timeout)
 
     async def wait_for_block_with_number(self, block_number: int, *, timeout: float | timedelta = math.inf) -> None:
@@ -99,7 +96,7 @@ class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
         if __expected_block_was_reached_but_is_still_not_irreversible():
             raise BlockWaitTimeoutError(last_block_number, block_number, last_irreversible_block_number)
 
-    def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[HivedAsyncApiCollection]:
+    async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[HivedAsyncApiCollection]:
         return AsyncBatchHandle(
             url=self.http_endpoint,
             communicator=self._communicator,
