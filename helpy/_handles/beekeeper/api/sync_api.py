@@ -1,23 +1,35 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, cast
 
-from helpy._handles.abc.api import AbstractSyncApi
-from helpy._handles.beekeeper.api.apply_session_token import apply_session_token
-from helpy._handles.beekeeper.api.session_holder import SessionHolder
-from schemas.apis import beekeeper_api  # noqa: TCH001
+from helpy._handles.abc.api import AbstractSyncApi, ApiArgumentsToSerialize, SyncHandleT
+from helpy._handles.beekeeper.api.apply_session_token import sync_apply_session_token
+from helpy._handles.beekeeper.api.beekeeper_api_commons import BeekeeperApiCommons
+from helpy._handles.beekeeper.api.session_holder import SyncSessionHolder
+
+if TYPE_CHECKING:
+    from helpy._handles.beekeeper.handle import Beekeeper, _SyncSessionBatchHandle
+    from schemas.apis import beekeeper_api
 
 
-class BeekeeperApi(AbstractSyncApi):
+class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
     api = AbstractSyncApi._endpoint
 
+    _owner: Beekeeper | _SyncSessionBatchHandle
+
+    def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
+        self._verify_is_owner_can_hold_session_token(owner=owner)
+        super().__init__(owner=owner)
+
     def _additional_arguments_actions(
-        self, endpoint_name: str, *args: Any, **kwargs: Any
-    ) -> tuple[list[Any], dict[str, Any]]:
-        if "create_session" in endpoint_name:
-            return (list(args), kwargs)
-        assert isinstance(self._owner, SessionHolder), f"owner `{self._owner}` is not able to handle this request"
-        return apply_session_token(self._owner, list(args), kwargs)
+        self, endpoint_name: str, arguments: ApiArgumentsToSerialize
+    ) -> ApiArgumentsToSerialize:
+        if self._token_required(endpoint_name):
+            return super()._additional_arguments_actions(endpoint_name, arguments)
+        return sync_apply_session_token(cast(SyncSessionHolder, self._owner), arguments)
+
+    def _get_requires_session_holder_type(self) -> type[SyncSessionHolder]:
+        return SyncSessionHolder
 
     @api
     def create(self, *, wallet_name: str, password: str | None = None) -> beekeeper_api.Create:
@@ -56,6 +68,10 @@ class BeekeeperApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
+    def list_created_wallets(self) -> beekeeper_api.ListWallets:
+        raise NotImplementedError
+
+    @api
     def get_public_keys(self, wallet_name: str | None = None) -> beekeeper_api.GetPublicKeys:
         raise NotImplementedError
 
@@ -70,7 +86,7 @@ class BeekeeperApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def create_session(self, *, notifications_endpoint: str, salt: str) -> beekeeper_api.CreateSession:
+    def create_session(self, *, notifications_endpoint: str = "", salt: str = "") -> beekeeper_api.CreateSession:
         raise NotImplementedError
 
     @api

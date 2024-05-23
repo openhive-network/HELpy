@@ -9,13 +9,20 @@ from helpy._handles.abc.api_collection import (
 from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
 
 if TYPE_CHECKING:
-    from helpy._handles.abc.api import AsyncHandleT, SyncHandleT
+    from helpy._handles.beekeeper.handle import (
+        AsyncBeekeeper,
+        Beekeeper,
+        _AsyncSessionBatchHandle,
+        _SyncSessionBatchHandle,
+    )
 
 
 class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
     """Beekeepers collection of available apis in async version."""
 
-    def __init__(self, owner: AsyncHandleT) -> None:
+    _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
+
+    def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = AsyncBeekeeperApi(owner=self._owner)
 
@@ -23,6 +30,8 @@ class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
 class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
     """Beekeepers collection of available apis in async version."""
 
-    def __init__(self, owner: SyncHandleT) -> None:
+    _owner: Beekeeper | _SyncSessionBatchHandle
+
+    def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = SyncBeekeeperApi(owner=self._owner)
