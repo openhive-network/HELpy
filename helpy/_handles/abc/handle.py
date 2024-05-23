@@ -43,10 +43,9 @@ class AbstractHandle:
     ) -> None:
         """Constructs handle to network service.
 
-        Keyword Arguments:
-            http_url -- http url where, service is available.
-
-            communicator -- communicator class to use for communication (default: {HttpxCommunicator})
+        Args:
+            http_url: http url where, service is available.
+            communicator: communicator class to use for communication
         """
         super().__init__(*args, **kwargs)
         self.__logger = self.__configure_logger()

@@ -17,5 +17,5 @@ class NotificationHandler(HttpServerObserver, ABC):
         """Method called after properly serializing notification.
 
         Args:
-            notification (Notification[T]): received notification object
+            notification: received notification object
         """

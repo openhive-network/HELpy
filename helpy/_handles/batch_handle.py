@@ -52,7 +52,7 @@ class _DelayedResponseWrapper:
     def _set_response(self, **kwargs: Any) -> None:
         expected_type = super().__getattribute__("_expected_type")
         response = get_response_model(expected_type, **kwargs)
-        assert isinstance(response, JSONRPCResult)
+        assert isinstance(response, JSONRPCResult), "Expected JSONRPCResult, model cannot be found."
         super().__setattr__("_response", response.result)
 
     def _set_exception(self, exception: BaseException) -> None:

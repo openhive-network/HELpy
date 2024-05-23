@@ -32,7 +32,7 @@ class Config(BaseModel):
     @classmethod
     def load(cls, source: Path) -> Self:
         source = source / Config.DEFAULT_FILE_NAME if source.is_dir() else source
-        assert source.exists()
+        assert source.exists(), "Given file does not exists."
         fields = cls.__fields__
         values_to_write = {}
         with source.open("rt", encoding="utf-8") as in_file:

@@ -24,10 +24,10 @@ class BlockWaitTimeoutError(HelpyError):
     def __init__(self, last_block_number: int, block_number: int, last_irreversible_block_number: int) -> None:
         """Creates exception.
 
-        Arguments:
-            last_block_number -- last fetched block number
-            block_number -- block that was expected to be irreversible
-            last_irreversible_block_number -- last fetched irreversible block number
+        Args:
+            last_block_number: last fetched block number
+            block_number: block that was expected to be irreversible
+            last_irreversible_block_number: last fetched irreversible block number
         """
         super().__init__(
             f"Block with number `{last_block_number}` was just reached but expected `{block_number}` is still not"
@@ -95,10 +95,10 @@ class CommunicationError(HelpyError):
         """Contains required details.
 
         Args:
-            url (str): where request has been send
-            request (str): content of request
-            response (CommunicationResponseT | None, optional): content of response. Defaults to None.
-            message (str, optional): additional information about error. Defaults to "".
+            url: where request has been send
+            request: content of request
+            response: content of response. Defaults to None.
+            message: additional information about error. Defaults to "".
         """
         self.url = str(url)
         self.request = request
