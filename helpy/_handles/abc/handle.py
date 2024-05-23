@@ -5,12 +5,12 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Protocol
 
 from loguru import logger
-from typing_extensions import Self
 
 from helpy._communication.aiohttp_communicator import AioHttpCommunicator
 from helpy._communication.request_communicator import RequestCommunicator
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
-from helpy._interfaces.context import ContextAsync, ContextSync
+from helpy._handles.settings import Settings
+from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import CommunicationError, HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
@@ -23,22 +23,20 @@ if TYPE_CHECKING:
     from helpy._communication.abc.communicator import AbstractCommunicator
     from helpy._handles.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
-    from helpy._handles.settings import HandleSettings
     from helpy._interfaces.url import HttpUrl
-    from schemas.apis.database_api import GetVersion
 
 
 class MissingResultError(HelpyError):
     """Raised if response does not have any response."""
 
 
-class AbstractHandle:
+class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
     """Provides basic interface for all network handles."""
 
     def __init__(
         self,
         *args: Any,
-        settings: HandleSettings,
+        settings: Settings,
         **kwargs: Any,
     ) -> None:
         """Constructs handle to network service.
@@ -47,17 +45,14 @@ class AbstractHandle:
             http_url: http url where, service is available.
             communicator: communicator class to use for communication
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, settings=settings, **kwargs)
         self.__logger = self.__configure_logger()
-        self.__backup_settings = settings
-        self.__settings = settings
-        self.__communicator = self.__settings.try_get_communicator_instance() or self._get_recommended_communicator()
+        self.__communicator = self.settings.try_get_communicator_instance() or self._get_recommended_communicator()
         self.__api = self._construct_api()
 
     @property
     def http_endpoint(self) -> HttpUrl:
         """Return endpoint where handle is connected to."""
-        assert self.settings.http_endpoint is not None
         return self.settings.http_endpoint
 
     @http_endpoint.setter
@@ -79,10 +74,6 @@ class AbstractHandle:
     def logger(self) -> Logger:
         return self.__logger
 
-    @property
-    def settings(self) -> HandleSettings:
-        return self.__settings
-
     @abstractmethod
     def _get_recommended_communicator(self) -> AbstractCommunicator:
         """Return api collection."""
@@ -92,19 +83,12 @@ class AbstractHandle:
         """Return api collection."""
 
     @abstractmethod
-    def _clone(self) -> Self:
-        """Return clone of itself."""
-
-    @abstractmethod
     def _is_synchronous(self) -> bool:
         """Returns is handle is asynchronous."""
 
     @abstractmethod
     def _target_service(self) -> str:
         """Returns name of service that following handle is connecting to."""
-
-    def _restore_settings(self) -> None:
-        self.__settings = self.__backup_settings
 
     def _logger_extras(self) -> dict[str, Any]:
         """
@@ -226,7 +210,7 @@ class AbstractAsyncHandle(ABC, AbstractHandle, ContextAsync[Self]):  # type: ign
         return True
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return AioHttpCommunicator(settings=self.settings)
+        return AioHttpCommunicator(settings=self._settings)
 
 
 class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignore[misc]
@@ -254,4 +238,4 @@ class AbstractSyncHandle(ABC, AbstractHandle, ContextSync[Self]):  # type: ignor
         return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return RequestCommunicator(settings=self.settings)
+        return RequestCommunicator(settings=self._settings)
