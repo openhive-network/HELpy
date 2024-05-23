@@ -37,6 +37,7 @@ AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle
 HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
+ApiArgumentsToSerialize = tuple[tuple[Any, ...], dict[str, Any]]
 
 
 class ApiArgumentSerialization(IntEnum):
@@ -99,20 +100,15 @@ class AbstractApi(ABC, Generic[HandleT]):
     @classmethod
     def _register_method(cls, *, api: str, endpoint: str, sync: bool) -> None:
         """For tests purposes only; Registers apis in global collection."""
-        if cls.__is_pytest_running():
-            cls.__registered_apis[sync][api].add(endpoint)
+        cls.__registered_apis[sync][api].add(endpoint)
 
     @classmethod
     def _get_registered_methods(cls) -> RegisteredApisT:
-        """For tests purposes only; Return __registered_apis."""
-        assert cls.__is_pytest_running(), "only available if pytest is running!"
-        return cls.__registered_apis
+        """Returns registered endpoints."""
+        return cls.__registered_apis.copy()
 
-    @classmethod
-    def __is_pytest_running(cls) -> bool:
-        import pytest_is_running
-
-        return pytest_is_running.is_running()
+    def _prepare_arguments_for_serialization(self, arguments: ApiArgumentsToSerialize) -> ApiArgumentsToSerialize:
+        return arguments
 
     def argument_serialization(self) -> ApiArgumentSerialization:
         return ApiArgumentSerialization.OBJECT
