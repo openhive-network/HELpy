@@ -56,12 +56,10 @@ class Asset:
         Create Hive asset.
 
         Args:
-        ----
-        amount: Amount of Hive.
+            amount: Amount of Hive.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         return cls.__create(Asset.HiveT, amount)
 
@@ -71,12 +69,10 @@ class Asset:
         Create testnet Hive asset.
 
         Args:
-        ----
-        amount: Amount of Tests.
+            amount: Amount of Tests.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         return cls.__create(Asset.TestT, amount)
 
@@ -86,12 +82,10 @@ class Asset:
         Create Hbd asset.
 
         Args:
-        ----
-        amount: Amount of Hbd.
+            amount: Amount of Hbd.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         return cls.__create(Asset.HbdT, amount)
 
@@ -101,12 +95,10 @@ class Asset:
         Create testnet Hbd asset.
 
         Args:
-        ----
-        amount: Amount of TBD.
+            amount: Amount of TBD.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         return cls.__create(Asset.TbdT, amount)
 
@@ -116,12 +108,10 @@ class Asset:
         Create Vests asset.
 
         Args:
-        ----
-        amount: Amount of Vests.
+            amount: Amount of Vests.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         return cls.__create(Asset.VestsT, amount)
 
@@ -131,13 +121,11 @@ class Asset:
         Create asset.
 
         Args:
-        ----
-        asset: Asset type.
-        amount: Amount of asset.
+            asset: Asset type.
+            amount: Amount of asset.
 
         Raises:
-        ------
-        AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
+            AssetAmountInvalidFormatError: Raised when given amount is in invalid format.
         """
         try:
             amount = cls.__convert_amount_to_internal_representation(amount, asset)  # type: ignore[arg-type]
@@ -216,8 +204,7 @@ class Asset:
         Convert given amount to internal representation of integer value.
 
         Raises
-        ------
-        DecimalConversionNotANumberError: If given amount is not a valid number.
+            DecimalConversionNotANumberError: If given amount is not a valid number.
         """
         precision = precision if isinstance(precision, int) else precision.get_asset_information().precision
         amount_decimal = DecimalConverter.convert(amount, precision=precision)
@@ -247,11 +234,14 @@ class Asset:
         Usage:
             Asset.Range(lower_limit=Asset.hive(100), upper_limit=Asset.hive(110))
 
-        :param lower_limit is required. When tolerance is given it acts as the value to which we refer when specifying
-        the percentage range.
-        :param tolerance: is defined as a positive number, which is a percentage of the upper and lower deviations e.g:
-            asset = Asset.hive(100)
-            Asset.Range(asset, tolerance=10) -> the range of this asset is from Asset.hive(90) to inclusive (100)
+        Args:
+            lower_limit: When tolerance is given it acts as the value to which we refer when specifying the percentage range.
+            tolerance: is defined as a positive number, which is a percentage of the upper and lower deviations e.g:
+
+        ```
+        asset = Asset.hive(100)
+        Asset.Range(asset, tolerance=10) -> the range of this asset is from Asset.hive(90) to inclusive (100)
+        ```
 
         Upper limit and tolerance should be used interchangeably.
         """

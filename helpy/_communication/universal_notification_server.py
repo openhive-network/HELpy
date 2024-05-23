@@ -61,7 +61,7 @@ class UniversalNotificationServer(ContextSync[int]):
 
     def run(self) -> int:
         time_to_launch_notification_server: Final[float] = 0.5
-        assert self.__server_thread is None
+        assert self.__server_thread is None, "Server thread is not None; Is server still running?"
 
         self.__server_thread = Thread(target=asyncio.run, args=(self.__http_server.run(),), name=self.__thread_name)
         self.__server_thread.start()

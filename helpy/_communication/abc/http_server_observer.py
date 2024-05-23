@@ -9,8 +9,8 @@ class HttpServerObserver(ABC):
     async def data_received(self, data: dict[str, Any]) -> None:
         """Called when any data is received via PUT method.
 
-        Arguments:
-            data -- data received as body
+        Args:
+            data: data received as body
 
         Returns:
             Nothing.

@@ -24,7 +24,7 @@ class Transaction(SchemasTransaction):
             This digest is used as data to sign with private key and such signature should be appended to signatures member
 
         Args:
-            chain_id (str): chain id of chain for which signature is calculated
+            chain_id: chain id of chain for which signature is calculated
 
         Returns:
             str: signature digest
@@ -49,7 +49,7 @@ class Transaction(SchemasTransaction):
             ```
 
         Args:
-            block_id (str): Block id used for tapos calculation
+            block_id: Block id used for tapos calculation
         """
         tapos = calculate_tapos_data(block_id=block_id)
         self.ref_block_num = HiveInt(tapos.ref_block_num)
@@ -66,8 +66,8 @@ class Transaction(SchemasTransaction):
             ```
 
         Args:
-            block_time (datetime): time of block for reference (but can be any time).
-            extra_time (timedelta, optional): length of expiration. Current default is maximum expiration time measuring from current head block number. Defaults to timedelta(minutes=30).
+            block_time: time of block for reference (but can be any time).
+            extra_time: length of expiration. Current default is maximum expiration time measuring from current head block number. Defaults to timedelta(minutes=30).
         """
         self.expiration = cast(HiveDateTime, block_time + extra_time)
 
@@ -79,7 +79,7 @@ class Transaction(SchemasTransaction):
             operation = transaction.operations[0].value
 
         Args:
-            operation (AnyOperation): operation to add to operations member with proper wrapper.
+            operation: operation to add to operations member with proper wrapper.
         """
         self.operations.append(HF26Representation(type=operation.get_name_with_suffix(), value=operation))
 
@@ -89,7 +89,7 @@ class Transaction(SchemasTransaction):
         Creates empty transaction object with default values.
 
         Args:
-            block_id (str | None, optional): If given, tapos is automatically calculated. Defaults to None.
+            block_id: If given, tapos is automatically calculated. Defaults to None.
 
         Returns:
             TransactionHelper: Empty transaction.
