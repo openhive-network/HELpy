@@ -1,25 +1,36 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
-from helpy._handles.abc.api import AbstractAsyncApi
-from helpy._handles.beekeeper.api.apply_session_token import apply_session_token
-from helpy._handles.beekeeper.api.session_holder import SessionHolder
-from schemas.apis import beekeeper_api  # noqa: TCH001
+from helpy._handles.abc.api import AbstractAsyncApi, ApiArgumentsToSerialize, AsyncHandleT
+from helpy._handles.beekeeper.api.apply_session_token import async_apply_session_token
+from helpy._handles.beekeeper.api.beekeeper_api_commons import BeekeeperApiCommons
+from helpy._handles.beekeeper.api.session_holder import AsyncSessionHolder
+
+if TYPE_CHECKING:
+    from helpy._handles.beekeeper.handle import AsyncBeekeeper, _AsyncSessionBatchHandle
+    from schemas.apis import beekeeper_api
 
 
-class BeekeeperApi(AbstractAsyncApi):
+class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
     """Set of endpoints, that allows asynchronous communication with beekeeper service."""
 
     api = AbstractAsyncApi._endpoint
+    _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
 
-    def _additional_arguments_actions(
-        self, endpoint_name: str, *args: Any, **kwargs: Any
-    ) -> tuple[list[Any], dict[str, Any]]:
-        if "create_session" in endpoint_name:
-            return super()._additional_arguments_actions(endpoint_name, *args, **kwargs)
-        assert isinstance(self._owner, SessionHolder), f"owner `{self._owner}` is not able to handle this request"
-        return apply_session_token(self._owner, list(args), kwargs)
+    def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
+        self._verify_is_owner_can_hold_session_token(owner=owner)
+        super().__init__(owner=owner)
+
+    async def _additional_arguments_actions(
+        self, endpoint_name: str, arguments: ApiArgumentsToSerialize
+    ) -> ApiArgumentsToSerialize:
+        if self._token_required(endpoint_name):
+            return await super()._additional_arguments_actions(endpoint_name, arguments)
+        return await async_apply_session_token(self._owner, arguments)
+
+    def _get_requires_session_holder_type(self) -> type[AsyncSessionHolder]:
+        return AsyncSessionHolder
 
     @api
     async def create(self, *, wallet_name: str, password: str | None = None) -> beekeeper_api.Create:
