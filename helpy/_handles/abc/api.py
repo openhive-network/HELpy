@@ -74,15 +74,15 @@ class AbstractApi(ABC, Generic[HandleT]):
 
         return partial(json.dumps, cls=JsonEncoder)
 
-    def _serialize_params(self, args: Any, kwargs: dict[str, Any]) -> str:
+    def _serialize_params(self, arguments: ApiArgumentsToSerialize) -> str:
         """Return serialized given params. Can be overloaded."""
         json_dumps = AbstractApi.json_dumps()
         if self.argument_serialization() == ApiArgumentSerialization.ARRAY:
-            return json_dumps(args)
+            return json_dumps(arguments[0])
         if self.argument_serialization() == ApiArgumentSerialization.DOUBLE_ARRAY:
-            return json_dumps([args])
+            return json_dumps([arguments[0]])
         prepared_kwargs = {}
-        for key, value in kwargs.items():
+        for key, value in arguments[1].items():
             prepared_kwargs[key.strip("_")] = value
         return json_dumps(prepared_kwargs)
 
@@ -116,17 +116,14 @@ class AbstractApi(ABC, Generic[HandleT]):
     def __init__(self, owner: HandleT) -> None:
         self._owner = owner
 
-    def _additional_arguments_actions(
-        self, endpoint_name: str, *args: Any, **kwargs: Any  # noqa: ARG002
-    ) -> tuple[list[Any], dict[str, Any]]:
-        return (list(args), kwargs)
-
 
 class AbstractSyncApi(AbstractApi[SyncHandleT]):
     """Base class for all apis, that provides synchronous endpoints."""
 
-    def __init__(self, owner: SyncHandleT) -> None:
-        super().__init__(owner)
+    def _additional_arguments_actions(
+        self, endpoint_name: str, arguments: ApiArgumentsToSerialize  # noqa: ARG002
+    ) -> ApiArgumentsToSerialize:
+        return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
     def _endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
@@ -140,10 +137,10 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
         def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
-            largs, dkwargs = this._additional_arguments_actions(endpoint, *args, **kwargs)
+            args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
             return this._owner._send(  # type: ignore[no-any-return, union-attr, misc]
                 endpoint=endpoint,
-                params=this._serialize_params(args=largs, kwargs=dkwargs),
+                params=this._serialize_params((args_, kwargs_)),
                 expected_type=get_type_hints(wrapped_function)["return"],
             ).result
 
@@ -153,8 +150,10 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
 class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
     """Base class for all apis, that provides asynchronous endpoints."""
 
-    def __init__(self, owner: AsyncHandleT) -> None:
-        super().__init__(owner)
+    async def _additional_arguments_actions(
+        self, endpoint_name: str, arguments: ApiArgumentsToSerialize  # noqa: ARG002
+    ) -> ApiArgumentsToSerialize:
+        return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
     def _endpoint(
@@ -170,11 +169,11 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
         async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
-            largs, dkwargs = this._additional_arguments_actions(endpoint, *args, **kwargs)
+            args_, kwargs_ = await this._additional_arguments_actions(endpoint, (args, kwargs))
             return (  # type: ignore[no-any-return]
                 await this._owner._async_send(  # type: ignore[misc]
                     endpoint=endpoint,
-                    params=this._serialize_params(args=largs, kwargs=dkwargs),
+                    params=this._serialize_params((args_, kwargs_)),
                     expected_type=get_type_hints(wrapped_function)["return"],
                 )
             ).result
