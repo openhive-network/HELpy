@@ -94,9 +94,9 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
             raise ServerNotRunningError
         self.__running = False
 
-    async def _enter(self) -> Self:
+    async def _aenter(self) -> Self:
         await self.run()
         return self
 
-    async def _finally(self) -> None:
+    async def _afinally(self) -> None:
         self.close()
