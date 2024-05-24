@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
 
 from helpy._communication.settings import CommunicationSettings
 
@@ -11,12 +11,29 @@ if TYPE_CHECKING:
 
 __all__ = ["SettingsT", "UniqueSettingsHolder", "SharedSettingsHolder"]
 
+
+class _SettingsTransportObjectInterface(ABC):  # noqa: B024
+    """Only for internal use."""
+
+
 SettingsT = TypeVar("SettingsT", bound=CommunicationSettings)
 
 
+class _SettingsTransportObject(_SettingsTransportObjectInterface, Generic[SettingsT]):
+    """Only for internal use."""
+
+    def __init__(self, settings: SettingsT) -> None:
+        self.__settings = settings
+
+    def _get_settings(self) -> SettingsT:
+        """Only for internal use."""
+        return self.__settings
+
+
 class _SettingsHolderBase(ABC, Generic[SettingsT]):
-    def __init__(self, *args: Any, settings: SettingsT, **kwargs: Any) -> None:
-        self.__settings = self._get_settings_for_storage(settings)
+
+    def __init__(self, *args: Any, settings: SettingsT | _SettingsTransportObjectInterface, **kwargs: Any) -> None:
+        self.__settings = self._get_settings_for_storage(self.__get_settings_from_init_input(settings))
         self.__is_in_modify_settings_state: bool = False
         super().__init__(*args, **kwargs)
 
@@ -24,6 +41,20 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
     def settings(self) -> SettingsT:
         """Obtain currently used settings."""
         return self.__settings if self.__is_in_modify_settings_state else self._get_copy_of_settings()
+
+    def __get_settings_from_init_input(
+        self, incoming_value: SettingsT | _SettingsTransportObjectInterface
+    ) -> SettingsT:
+        if isinstance(incoming_value, _SettingsTransportObjectInterface):
+            assert isinstance(
+                incoming_value, _SettingsTransportObject
+            ), "This object has to be type of _SettingsTransportObject"
+            incoming_value = cast(_SettingsTransportObject[SettingsT], incoming_value)
+            return incoming_value._get_settings()
+        return incoming_value
+
+    def _get_settings_for_other_holder(self) -> _SettingsTransportObjectInterface:
+        return _SettingsTransportObject(self.__settings)
 
     def _get_copy_of_settings(self) -> SettingsT:
         return self.__settings.copy()
@@ -38,8 +69,7 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
         """
 
     @abstractmethod
-    def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT:
-        ...
+    def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...
 
     @contextmanager
     def _modify_settings_state(self) -> Iterator[None]:

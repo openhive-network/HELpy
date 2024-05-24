@@ -59,7 +59,8 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
     def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
         self.logger.debug(f"setting http endpoint to: {value.as_string()}")
-        self.settings.http_endpoint = value
+        with self.update_settings() as settings:
+            settings.http_endpoint = value
 
     @property
     def api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
@@ -196,7 +197,7 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
         return True
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return AioHttpCommunicator(settings=self.settings)
+        return AioHttpCommunicator(settings=self._get_settings_for_other_holder())
 
     @abstractmethod
     async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
@@ -222,7 +223,7 @@ class AbstractSyncHandle(AbstractHandle, ABC):
         return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return RequestCommunicator(settings=self.settings)
+        return RequestCommunicator(settings=self._get_settings_for_other_holder())
 
     @abstractmethod
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:
