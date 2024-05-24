@@ -113,6 +113,10 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
             raise MissingResultError
 
         serialized_data = get_response_model(expected_type, **parsed_response)
+        if isinstance(serialized_data, JSONRPCResult):
+            assert not isinstance(
+                serialized_data.result, dict
+            ), f"%%%%% {expected_type=} | {type(expected_type)=} | {type(serialized_data)=}"
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 

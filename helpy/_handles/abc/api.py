@@ -138,12 +138,22 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
+            type_hints = get_type_hints(wrapped_function)
+            type_hints_return = type_hints["return"]
             result = this._owner._send(  # type: ignore[union-attr, misc]
                 endpoint=endpoint,
                 params=this._serialize_params((args_, kwargs_)),
-                expected_type=get_type_hints(wrapped_function)["return"],
+                expected_type=type_hints_return,
             ).result
-            assert not isinstance(result, dict), f"##########{result}"
+            assert not isinstance(
+                result, dict
+            ), f"""##########
+{result=}
+
+{type_hints=}
+
+{type_hints_return=}
+"""
             return result  # type: ignore[no-any-return]
 
         return impl  # type: ignore[return-value]
