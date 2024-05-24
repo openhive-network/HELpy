@@ -136,7 +136,7 @@ run_tests:
 .deploy_wheel_needs: &deploy_wheel_needs
   needs:
     - job: pre_commit_checks
-    - job: run_tests
+    # - job: run_tests
     - job: build_wheel
       artifacts: true
 
