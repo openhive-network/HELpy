@@ -19,7 +19,7 @@ class BeekeeperApiCommons(Generic[HandleT]):
         super().__init__(*args, **kwargs)
 
     def _token_required(self, endpoint_name: str) -> bool:
-        return endpoint_name != "create_session"
+        return endpoint_name != "beekeeper_api.create_session"
 
     def _verify_is_owner_can_hold_session_token(self, owner: HandleT) -> None:
         assert isinstance(

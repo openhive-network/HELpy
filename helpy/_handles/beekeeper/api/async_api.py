@@ -6,10 +6,10 @@ from helpy._handles.abc.api import AbstractAsyncApi, ApiArgumentsToSerialize, As
 from helpy._handles.beekeeper.api.apply_session_token import async_apply_session_token
 from helpy._handles.beekeeper.api.beekeeper_api_commons import BeekeeperApiCommons
 from helpy._handles.beekeeper.api.session_holder import AsyncSessionHolder
+from schemas.apis import beekeeper_api  # noqa: TCH001
 
 if TYPE_CHECKING:
     from helpy._handles.beekeeper.handle import AsyncBeekeeper, _AsyncSessionBatchHandle
-    from schemas.apis import beekeeper_api
 
 
 class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
@@ -25,7 +25,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
     async def _additional_arguments_actions(
         self, endpoint_name: str, arguments: ApiArgumentsToSerialize
     ) -> ApiArgumentsToSerialize:
-        if self._token_required(endpoint_name):
+        if not self._token_required(endpoint_name):
             return await super()._additional_arguments_actions(endpoint_name, arguments)
         return await async_apply_session_token(self._owner, arguments)
 
