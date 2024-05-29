@@ -100,3 +100,15 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
     @api
     def has_matching_private_key(self, wallet_name: str, public_key: str) -> beekeeper_api.HasMatchingPrivateKey:
         raise NotImplementedError
+
+    @api
+    def encrypt_data(
+        self, *, wallet_name: str, from_public_key: str, to_public_key: str, content: str, nonce: int | None = None
+    ) -> beekeeper_api.EncryptData:
+        raise NotImplementedError
+
+    @api
+    def decrypt_data(
+        self, *, wallet_name: str, from_public_key: str, to_public_key: str, encrypted_content: str
+    ) -> beekeeper_api.DecryptData:
+        raise NotImplementedError

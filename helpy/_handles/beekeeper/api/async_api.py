@@ -241,3 +241,36 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
             True if found, False otherwise
         """
         raise NotImplementedError
+
+    @api
+    async def encrypt_data(
+        self, *, wallet_name: str, from_public_key: str, to_public_key: str, content: str, nonce: int | None = None
+    ) -> beekeeper_api.EncryptData:
+        """Encrypts given buffer.
+
+        Args:
+            from_public_key: used to match private key for encryption.
+            to_public_key: used to encrypt for receiver.
+            content: buffer to encrypt.
+            nonce: used as seed, to have deterministic encryption. Defaults to None.
+
+        Returns:
+            Encrypted memo
+        """
+        raise NotImplementedError
+
+    @api
+    async def decrypt_data(
+        self, *, wallet_name: str, from_public_key: str, to_public_key: str, encrypted_content: str
+    ) -> beekeeper_api.DecryptData:
+        """Decrypts given buffer.
+
+        Args:
+            from_public_key: used to match private key for decryption.
+            to_public_key: used to decrypt from sender.
+            encrypted_content: buffer to decrypt.
+
+        Returns:
+            Decrypted memo
+        """
+        raise NotImplementedError
