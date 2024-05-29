@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 from pydantic import ValidationError
 
@@ -238,4 +238,49 @@ def get_transaction_required_authorities(transaction: Transaction) -> RequiredAu
         owner=to_python_set_str(result.owner_accounts),
         active=to_python_set_str(result.active_accounts),
         posting=to_python_set_str(result.posting_accounts),
+    )
+
+
+class SecondStepEncryptionCallback(Protocol):
+    """
+    Protocol that defines a callable for performing the second step of encryption or decryption in the memo process.
+
+    This callable is expected to handle the transformation (encryption or decryption)
+    of the memo content, given two public keys and the content to be processed. Optionally,
+    a nonce can be provided to add an extra layer of security.
+
+    Parameters:
+        from_key (PublicKey): The public key of the sender (used in encryption/decryption).
+        to_key (PublicKey): The public key of the recipient (used in encryption/decryption).
+        content (str): The memo content to be encrypted or decrypted.
+        nonce (int, optional): A nonce value to ensure uniqueness in encryption (default is 0).
+
+    Returns:
+        str: The encrypted or decrypted memo content.
+    """
+
+    def __call__(self, from_key: PublicKey | str, to_key: PublicKey | str, content: str, nonce: int = 0) -> str: ...
+
+
+def encrypt_memo(
+    content: str,
+    main_encryption_key: PublicKey,
+    other_encryption_key: PublicKey,
+    second_step_callback: SecondStepEncryptionCallback,
+) -> str:
+    encrypted_memo = second_step_callback(from_key=main_encryption_key, to_key=other_encryption_key, content=content)
+    encoded_encrypted_memo: bytes = wax.encode_encrypted_memo(
+        encrypted_content=__python_to_cpp_string(encrypted_memo),
+        main_encryption_key=__python_to_cpp_string(main_encryption_key),
+        other_encryption_key=__python_to_cpp_string(other_encryption_key),
+    )
+    return __cpp_to_python_string(encoded_encrypted_memo)
+
+
+def decrypt_memo(content: str, second_step_callback: SecondStepEncryptionCallback) -> str:
+    encrypted_memo = wax.decode_encrypted_memo(encoded_memo=__python_to_cpp_string(content))
+    return second_step_callback(
+        from_key=__cpp_to_python_string(encrypted_memo.main_encryption_key),
+        to_key=__cpp_to_python_string(encrypted_memo.other_encryption_key),
+        content=__cpp_to_python_string(encrypted_memo.encrypted_content),
     )

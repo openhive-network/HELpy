@@ -104,3 +104,28 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
         self, wallet_name: str, public_key: str, token: str | None = None
     ) -> beekeeper_api.HasMatchingPrivateKey:
         raise NotImplementedError
+
+    @api
+    def encrypt_data(
+        self,
+        *,
+        wallet_name: str,
+        from_public_key: str,
+        to_public_key: str,
+        content: str,
+        nonce: int | None = None,
+        token: str | None = None,
+    ) -> beekeeper_api.EncryptData:
+        raise NotImplementedError
+
+    @api
+    def decrypt_data(
+        self,
+        *,
+        wallet_name: str,
+        from_public_key: str,
+        to_public_key: str,
+        encrypted_content: str,
+        token: str | None = None,
+    ) -> beekeeper_api.DecryptData:
+        raise NotImplementedError
