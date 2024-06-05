@@ -1211,12 +1211,12 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 
 [[package]]
 name = "wax"
-version = "0.0.3a2.dev255+edfd911"
+version = "0.0.3a2.dev300+4b5789e"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "wax-0.0.3a2.dev255+edfd911-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:b9bddc10a690e8523cfc4d87ec78f74872f2b4ce231a736356742c65ad25568e"},
+    {file = "wax-0.0.3a2.dev300+4b5789e-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:d816954e3bb6cb68d88d2a266e419531a76d20d9e3133549189ea136bcca1883"},
 ]
 
 [package.dependencies]
@@ -1331,4 +1331,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1c3eb164f24075de6805afbbe5964195dd1f627eaada7af95e8a0c249f9388e0"
+content-hash = "1504f56f5bc16f5505593d75c8e1f854b1b0e894c3ee0297f9f44fe72c4054c8"
