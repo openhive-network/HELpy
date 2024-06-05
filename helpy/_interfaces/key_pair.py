@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
-
-if TYPE_CHECKING:
-    from schemas.fields.basic import PrivateKey, PublicKey
+from schemas.fields.basic import PrivateKey, PublicKey  # noqa: TCH001
 
 
 class KeyPair(PreconfiguredBaseModel):
