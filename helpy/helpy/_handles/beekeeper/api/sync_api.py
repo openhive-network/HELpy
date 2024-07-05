@@ -62,6 +62,12 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
         raise NotImplementedError
 
     @api
+    def import_keys(
+        self, *, wallet_name: str, wif_keys: list[str], token: str | None = None
+    ) -> beekeeper_api.ImportKeys:
+        raise NotImplementedError
+
+    @api
     def remove_key(self, *, wallet_name: str, public_key: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         raise NotImplementedError
 
