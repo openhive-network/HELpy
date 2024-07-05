@@ -111,8 +111,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         """Imports key to given wallet.
 
         Warning:
-            After importing this key to beekeeper, it's impossible to access it via api; Access to private keys is only
-            possible with binary.
+            To read private key you need access to wallet file and beekeeper binary
 
         Args:
             wallet_name: wallet to import given key
@@ -120,6 +119,24 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
 
         Returns:
             Public key calculated from imported private key.
+        """
+        raise NotImplementedError
+
+    @api
+    async def import_keys(
+        self, *, wallet_name: str, wif_keys: list[str], token: str | None = None
+    ) -> beekeeper_api.ImportKeys:
+        """Imports multiple keys to a given wallet at once.
+
+        Warning:
+            To read private keys you need access to wallet file and beekeeper binary.
+
+        Args:
+            wallet_name: Wallet to import the given key.
+            wif_keys: List of private keys to import.
+
+        Returns:
+            Public keys calculated from the imported private keys.
         """
         raise NotImplementedError
 
