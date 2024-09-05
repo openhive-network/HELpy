@@ -33,7 +33,9 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         return AsyncSessionHolder
 
     @api
-    async def create(self, *, wallet_name: str, password: str | None = None) -> beekeeper_api.Create:
+    async def create(
+        self, *, wallet_name: str, password: str | None = None, token: str | None = None
+    ) -> beekeeper_api.Create:
         """
         Creates wallet with given name.
 
@@ -47,7 +49,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def open(self, *, wallet_name: str) -> beekeeper_api.EmptyResponse:  # noqa: A003
+    async def open(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:  # noqa: A003
         """Opens wallet, which makes it unaccessible for other sessions.
 
         Args:
@@ -59,7 +61,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def set_timeout(self, *, seconds: int) -> beekeeper_api.EmptyResponse:
+    async def set_timeout(self, *, seconds: int, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Sets timeout after all wallets opened in current session will be closed.
 
         Args:
@@ -71,7 +73,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def lock_all(self) -> beekeeper_api.EmptyResponse:
+    async def lock_all(self, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Locks all wallet in current session.
 
         Returns:
@@ -80,7 +82,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def lock(self, *, wallet_name: str) -> beekeeper_api.EmptyResponse:
+    async def lock(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Locks specific wallet.
 
         Args:
@@ -92,7 +94,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def unlock(self, *, wallet_name: str, password: str) -> beekeeper_api.EmptyResponse:
+    async def unlock(self, *, wallet_name: str, password: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Unlocks specific wallet (and opens it implicitly).
 
         Args:
@@ -105,7 +107,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def import_key(self, *, wallet_name: str, wif_key: str) -> beekeeper_api.ImportKey:
+    async def import_key(self, *, wallet_name: str, wif_key: str, token: str | None = None) -> beekeeper_api.ImportKey:
         """Imports key to given wallet.
 
         Warning:
@@ -121,7 +123,9 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def remove_key(self, *, wallet_name: str, password: str, public_key: str) -> beekeeper_api.EmptyResponse:
+    async def remove_key(
+        self, *, wallet_name: str, password: str, public_key: str, token: str | None = None
+    ) -> beekeeper_api.EmptyResponse:
         """Removes imported key from given wallet.
 
         Args:
@@ -135,7 +139,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def list_wallets(self) -> beekeeper_api.ListWallets:
+    async def list_wallets(self, token: str | None = None) -> beekeeper_api.ListWallets:
         """Lists all opened wallets in current session.
 
         Note:
@@ -147,7 +151,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def list_created_wallets(self) -> beekeeper_api.ListWallets:
+    async def list_created_wallets(self, token: str | None = None) -> beekeeper_api.ListWallets:
         """Lists all wallets existing in beekeeper.
 
         Returns:
@@ -156,7 +160,9 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def get_public_keys(self, wallet_name: str | None = None) -> beekeeper_api.GetPublicKeys:
+    async def get_public_keys(
+        self, wallet_name: str | None = None, token: str | None = None
+    ) -> beekeeper_api.GetPublicKeys:
         """Lists all public keys from all unlocked wallets.
 
         Args:
@@ -169,7 +175,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
 
     @api
     async def sign_digest(
-        self, *, sig_digest: str, public_key: str, wallet_name: str | None = None
+        self, *, sig_digest: str, public_key: str, wallet_name: str | None = None, token: str | None = None
     ) -> beekeeper_api.SignDigest:
         """Signs given digest with private key paired with given public key.
 
@@ -184,7 +190,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def get_info(self) -> beekeeper_api.GetInfo:
+    async def get_info(self, token: str | None = None) -> beekeeper_api.GetInfo:
         """Gets status of current session.
 
         Returns:
@@ -209,7 +215,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def close_session(self) -> beekeeper_api.EmptyResponse:
+    async def close_session(self, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Closes session.
 
         Returns:
@@ -218,7 +224,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def close(self, wallet_name: str) -> beekeeper_api.EmptyResponse:
+    async def close(self, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Closes opened wallet, which implies locking.
 
         Args:
@@ -230,7 +236,9 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def has_matching_private_key(self, wallet_name: str, public_key: str) -> beekeeper_api.HasMatchingPrivateKey:
+    async def has_matching_private_key(
+        self, wallet_name: str, public_key: str, token: str | None = None
+    ) -> beekeeper_api.HasMatchingPrivateKey:
         """Checks is beekeeper contain private key associated with given public key.
 
         Args:
