@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import httpx
 import requests
 
 from helpy._communication.abc.communicator import (
@@ -34,9 +33,9 @@ class RequestCommunicator(AbstractCommunicator):
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
-            except httpx.ConnectError as error:
+            except requests.exceptions.ConnectionError as error:
                 raise CommunicationError(url=url.as_string(), request=data) from error
-            except httpx.HTTPError as error:
+            except requests.exceptions.RequestException as error:
                 last_exception = error
             self._sleep_for_retry()
 
