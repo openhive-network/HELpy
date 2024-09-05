@@ -8,12 +8,12 @@ if TYPE_CHECKING:
 
 
 def sync_apply_session_token(owner: SyncSessionHolder, arguments: ApiArgumentsToSerialize) -> ApiArgumentsToSerialize:
-    arguments[1]["token"] = owner.session_token
+    arguments[1]["token"] = arguments[1].get("token") or owner.session.token
     return arguments
 
 
 async def async_apply_session_token(
     owner: AsyncSessionHolder, arguments: ApiArgumentsToSerialize
 ) -> ApiArgumentsToSerialize:
-    arguments[1]["token"] = await owner.session_token
+    arguments[1]["token"] = arguments[1].get("token") or (await owner.session).token
     return arguments
