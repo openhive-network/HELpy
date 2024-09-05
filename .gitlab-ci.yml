@@ -30,11 +30,11 @@ variables:
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
-    ref: b09d1eb5f6858b6e2ba0f4b77d4d7ce47e76e31f
+    ref: 8039e32fb584fbf06f4bd0bf5eae3a7b360dae1b
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   - project: 'hive/common-ci-configuration'
     # This should be the same version of Common CI defined in /hive/scripts/ci-helpers/prepare_data_image_job.yml
-    ref: d4e29410ea168096e1a822f77c7ce741d9cfb57a
+    ref: 132e915dbe0a03df0f14e4b741d50476509ab045
     file: '/templates/python_projects.gitlab-ci.yml'
 
 image: ${CI_BASE_IMAGE}
@@ -113,7 +113,7 @@ run_tests:
       variables:
         DATA_SOURCE: "${DATA_CACHE_HIVE_PREFIX}_${HIVED_COMMIT}"
         LOG_FILE: $CI_JOB_NAME.log
-      command: ["--replay-blockchain", "--stop-replay-at-block=5000000"]
+      command: ["--replay-blockchain", "--stop-at-block=5000000"]
   variables:
     HIVED_COMMIT: $HIVED_COMMIT
     HIVED_UID: $HIVED_UID
