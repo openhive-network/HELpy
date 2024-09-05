@@ -124,13 +124,12 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
 
     @api
     async def remove_key(
-        self, *, wallet_name: str, password: str, public_key: str, token: str | None = None
+        self, *, wallet_name: str, public_key: str, token: str | None = None
     ) -> beekeeper_api.EmptyResponse:
         """Removes imported key from given wallet.
 
         Args:
             wallet_name: wallet from key will be removed.
-            password: to confirm action.
             public_key: public key, which is paired with private key to remove.
 
         Returns:
