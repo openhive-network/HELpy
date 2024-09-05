@@ -70,6 +70,15 @@ def __as_binary_json(item: HF26Representation[RepresentationValueT] | Transactio
     return __python_to_cpp_string(item.json(by_alias=True))
 
 
+def assure_asset_type(
+    value: Hf26Asset.AnyT, expected_type: type[Hf26Asset.AssetPredicateT]
+) -> Hf26Asset.AssetPredicateT:
+    assert isinstance(
+        value, expected_type
+    ), f"invalid asset type, expected: {expected_type.__name__}, but got: {type(value).__name__}"
+    return value
+
+
 def validate_transaction(transaction: Transaction) -> None:
     return __validate_wax_response(wax.validate_transaction(__as_binary_json(transaction)))
 
@@ -152,13 +161,13 @@ def calculate_inflation_rate_for_block(block_num: int) -> str:
 
 def calculate_vests_to_hp(
     vests: Hf26Asset.VestT, total_vesting_fund_hive: Hf26Asset.HiveT, total_vesting_shares: Hf26Asset.VestT
-) -> Hf26Asset.AnyT:
+) -> Hf26Asset.HiveT:
     result = wax.calculate_vests_to_hp(
         vests=__schema_asset_to_wax(vests),
         total_vesting_fund_hive=__schema_asset_to_wax(total_vesting_fund_hive),
         total_vesting_shares=__schema_asset_to_wax(total_vesting_shares),
     )
-    return __wax_asset_to_schema(result)
+    return assure_asset_type(__wax_asset_to_schema(result), Hf26Asset.HiveT)
 
 
 def calculate_hbd_to_hive(hbd: Hf26Asset.HbdT, base: Hf26Asset.AnyT, quote: Hf26Asset.AnyT) -> Hf26Asset.HiveT:
@@ -167,9 +176,7 @@ def calculate_hbd_to_hive(hbd: Hf26Asset.HbdT, base: Hf26Asset.AnyT, quote: Hf26
         base=__schema_asset_to_wax(base),
         quote=__schema_asset_to_wax(quote),
     )
-    asset_result = __wax_asset_to_schema(result)
-    assert isinstance(asset_result, Hf26Asset.HiveT), "invalid asset type as result"
-    return asset_result
+    return assure_asset_type(__wax_asset_to_schema(result), Hf26Asset.HiveT)
 
 
 def serialize_transaction(transaction: Transaction) -> bytes:
