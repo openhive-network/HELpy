@@ -62,9 +62,7 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
         raise NotImplementedError
 
     @api
-    def remove_key(
-        self, *, wallet_name: str, password: str, public_key: str, token: str | None = None
-    ) -> beekeeper_api.EmptyResponse:
+    def remove_key(self, *, wallet_name: str, public_key: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         raise NotImplementedError
 
     @api
