@@ -1,0 +1,68 @@
+[build-system]
+requires = [
+    "poetry-core>=1.7.0",
+    "poetry-dynamic-versioning>=1.0.0,<2.0.0",
+]
+build-backend = "poetry_dynamic_versioning.backend"
+
+
+[tool.poetry]
+name = "helpy"
+version = "0.0.0"
+description = "Easily interact with the Hive blockchain using Python."
+repository = "https://gitlab.syncad.com/hive/helpy"
+authors = [
+    "Mateusz Żebrak <mzebrak@syncad.com>",
+    "Krzysztof Mochocki <kmochocki@syncad.com>"
+]
+packages = [
+    { include = "helpy" },
+]
+source = [
+    { name = "PyPI", priority = "primary" },
+    { name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental" },
+    { name = "gitlab-wax", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental" },
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest-is-running = "1.5.0"
+python-dateutil = "2.8.2"
+loguru = "0.7.2"
+httpx = { extras = ["http2"], version = "0.23.3" }
+requests = "2.27.1"
+aiohttp = "3.9.1"
+wax = "0.3.10.dev25+8044195"
+schemas = "0.0.1.dev307+6f4cbb8"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "23.3.0"
+mypy = "1.4.1"
+pre-commit = "2.21.0"
+pytest = "7.2.0"
+pytest-asyncio = "0.21.0"
+pytest-xdist = "3.1.0"
+ruff = "0.0.277"
+types-pyyaml = "6.0.12.4"
+types-requests = "2.31.0.2"
+types-python-dateutil = "2.8.19.14"
+
+
+[tool.poetry-dynamic-versioning]
+enable = true
+format-jinja = """
+    {%- if distance == 0 and not dirty -%}
+        {{ serialize_pep440(base, stage, revision) }}
+    {%- elif revision is not none -%}
+        {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}{{ dirty_postfix }}
+    {%- else -%}
+        {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}{{ dirty_postfix }}
+    {%- endif -%}
+"""
+
+[tool.poetry-dynamic-versioning.substitution]
+files = [
+    "helpy/__init__.py",
+]
