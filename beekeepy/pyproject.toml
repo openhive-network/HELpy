@@ -27,15 +27,13 @@ version = "0.0.0"
 [tool.poetry.dependencies]
 helpy = {path = "../helpy"}
 python = "^3.10"
-
 [tool.poetry.group.dev.dependencies]
-black = "23.3.0"
-mypy = "1.4.1"
+mypy = "1.10.0"
 pre-commit = "2.21.0"
 pytest = "7.2.0"
 pytest-asyncio = "0.21.0"
 pytest-xdist = "3.1.0"
-ruff = "0.0.277"
+ruff = "0.4.9"
 types-python-dateutil = "2.8.19.14"
 types-pyyaml = "6.0.12.4"
 types-requests = "2.31.0.2"
