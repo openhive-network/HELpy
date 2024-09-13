@@ -10,8 +10,7 @@ if TYPE_CHECKING:
 
 
 class CreateSessionActionProtocol(Protocol):
-    def __call__(self, endpoint_name: str, *args: Any, **kwargs: Any) -> tuple[list[Any], dict[str, Any]]:
-        ...
+    def __call__(self, endpoint_name: str, *args: Any, **kwargs: Any) -> tuple[list[Any], dict[str, Any]]: ...
 
 
 class BeekeeperApiCommons(Generic[HandleT]):
@@ -27,5 +26,4 @@ class BeekeeperApiCommons(Generic[HandleT]):
         ), f"owner `{owner}` is not able to handle this request"
 
     @abstractmethod
-    def _get_requires_session_holder_type(self) -> type[SyncSessionHolder] | type[AsyncSessionHolder]:
-        ...
+    def _get_requires_session_holder_type(self) -> type[SyncSessionHolder | AsyncSessionHolder]: ...

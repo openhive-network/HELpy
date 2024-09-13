@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-SyncHandleT = AbstractSyncHandle | SyncBatchHandle
-AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle
+SyncHandleT = AbstractSyncHandle | SyncBatchHandle[Any]
+AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle[Any]
 HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
@@ -121,7 +121,9 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
     """Base class for all apis, that provides synchronous endpoints."""
 
     def _additional_arguments_actions(
-        self, endpoint_name: str, arguments: ApiArgumentsToSerialize  # noqa: ARG002
+        self,
+        endpoint_name: str,  # noqa: ARG002
+        arguments: ApiArgumentsToSerialize,
     ) -> ApiArgumentsToSerialize:
         return self._prepare_arguments_for_serialization(arguments)
 
@@ -138,7 +140,7 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
-            return this._owner._send(  # type: ignore[no-any-return, union-attr, misc]
+            return this._owner._send(  # type: ignore[no-any-return, union-attr]
                 endpoint=endpoint,
                 params=this._serialize_params((args_, kwargs_)),
                 expected_type=get_type_hints(wrapped_function)["return"],
@@ -151,7 +153,9 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
     """Base class for all apis, that provides asynchronous endpoints."""
 
     async def _additional_arguments_actions(
-        self, endpoint_name: str, arguments: ApiArgumentsToSerialize  # noqa: ARG002
+        self,
+        endpoint_name: str,  # noqa: ARG002
+        arguments: ApiArgumentsToSerialize,
     ) -> ApiArgumentsToSerialize:
         return self._prepare_arguments_for_serialization(arguments)
 

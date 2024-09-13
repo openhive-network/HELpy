@@ -123,7 +123,7 @@ class CommunicationError(HelpyError):
                 messages.append(str(message))
         return messages
 
-    def get_response(self) -> JsonT | list[JsonT] | None:  # noqa: D102
+    def get_response(self) -> JsonT | list[JsonT] | None:
         return self.response if isinstance(self.response, dict | list) else None
 
     def _get_reply(self) -> str:

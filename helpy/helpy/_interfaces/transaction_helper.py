@@ -28,7 +28,7 @@ class Transaction(SchemasTransaction):
 
         Returns:
             str: signature digest
-        """
+        """  # noqa: E501
         return calculate_sig_digest(transaction=self, chain_id=chain_id)
 
     def recalculate_tapos(self, block_id: str) -> None:
@@ -67,7 +67,8 @@ class Transaction(SchemasTransaction):
 
         Args:
             block_time: time of block for reference (but can be any time).
-            extra_time: length of expiration. Current default is maximum expiration time measuring from current head block number. Defaults to timedelta(minutes=30).
+            extra_time: length of expiration. Current default is maximum expiration time measuring from current
+                        head block number. Defaults to timedelta(minutes=30).
         """
         self.expiration = cast(HiveDateTime, block_time + extra_time)
 

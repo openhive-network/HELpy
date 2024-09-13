@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
+from pytz import utc
+
 from helpy._interfaces.context import ContextSync
 
 
@@ -23,11 +25,14 @@ class StopwatchResult:
 
 class Stopwatch(ContextSync[StopwatchResult]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.__result = StopwatchResult(started_at=datetime.now(), stopped_at=datetime.now())
+        self.__result = StopwatchResult(started_at=self.__now(), stopped_at=self.__now())
         super().__init__(*args, **kwargs)
 
     def _enter(self) -> StopwatchResult:
         return self.__result
 
     def _finally(self) -> None:
-        self.__result.stopped_at = datetime.now()
+        self.__result.stopped_at = self.__now()
+
+    def __now(self) -> datetime:
+        return datetime.now(tz=utc)

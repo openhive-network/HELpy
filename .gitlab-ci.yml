@@ -34,7 +34,7 @@ include:
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   - project: 'hive/common-ci-configuration'
     # This should be the same version of Common CI defined in /hive/scripts/ci-helpers/prepare_data_image_job.yml
-    ref: 132e915dbe0a03df0f14e4b741d50476509ab045
+    ref: c044f6f635867b07658520fd726d62999af48400
     file: '/templates/python_projects.gitlab-ci.yml'
 
 image: ${CI_BASE_IMAGE}

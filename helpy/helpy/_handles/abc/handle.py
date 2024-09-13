@@ -21,7 +21,10 @@ if TYPE_CHECKING:
     from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._handles.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
+    from helpy._handles.abc.api_collection import (
+        AbstractAsyncApiCollection,
+        AbstractSyncApiCollection,
+    )
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
 
@@ -58,7 +61,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
     @http_endpoint.setter
     def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
-        self.logger.debug(f"setting http endpoint to: {value.as_string()}")
+        self.logger.debug("setting http endpoint to: {value}", value=value.as_string())
         with self.update_settings() as settings:
             settings.http_endpoint = value
 
@@ -97,7 +100,10 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
 
         Learn more: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.bind
         """
-        return {"asynchronous": self._is_synchronous(), "handle_target": self._target_service()}
+        return {
+            "asynchronous": self._is_synchronous(),
+            "handle_target": self._target_service(),
+        }
 
     @classmethod
     def _response_handle(
@@ -123,20 +129,22 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
 class _SyncCall(Protocol):
     def __call__(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
-    ) -> JSONRPCResult[ExpectResultT]:
-        ...
+    ) -> JSONRPCResult[ExpectResultT]: ...
 
 
 class _AsyncCall(Protocol):
     async def __call__(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
-    ) -> JSONRPCResult[ExpectResultT]:
-        ...
+    ) -> JSONRPCResult[ExpectResultT]: ...
 
 
 def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
+    *,
     async_version: bool,
-) -> Callable[[_SyncCall | _AsyncCall], Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]]]:
+) -> Callable[
+    [_SyncCall | _AsyncCall],
+    Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]],
+]:
     # inspired by: https://gitlab.syncad.com/hive/test-tools/-/blob/a8290d47ec3638fb31573182a3311137542a6637/package/test_tools/__private/communication.py#L33
     def __workaround_communication_problem_with_node(  # noqa: C901
         send_request: _SyncCall | _AsyncCall,
@@ -157,7 +165,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
             while True:
                 try:
                     return send_request(*[this, *args], **kwargs)  # type: ignore[return-value]
-                except CommunicationError as exception:
+                except CommunicationError as exception:  # noqa: PERF203
                     __handle_exception(this, exception)
                 except RequestError as exception:
                     __handle_exception(this, exception)
@@ -166,7 +174,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
             while True:
                 try:
                     return await send_request(*[this, *args], **kwargs)  # type: ignore[no-any-return, misc]
-                except CommunicationError as exception:
+                except CommunicationError as exception:  # noqa: PERF203
                     __handle_exception(this, exception)
                 except RequestError as exception:
                     __handle_exception(this, exception)
@@ -211,11 +219,18 @@ class AbstractSyncHandle(AbstractHandle, ABC):
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = build_json_rpc_call(method=endpoint, params=params)
-        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        self.logger.debug(
+            "sending to `{address}`: `{request}`",
+            address=self.http_endpoint.as_string(),
+            request=request,
+        )
         with Stopwatch() as record:
             response = self._communicator.send(self.http_endpoint, data=request)
         self.logger.debug(
-            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
+            "got response in {record:.5f}s from `{address}`: `{response}`",
+            record=record.seconds_delta,
+            address=self.http_endpoint.as_string(),
+            response=response,
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
