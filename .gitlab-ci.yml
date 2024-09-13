@@ -120,7 +120,7 @@ run_tests:
     PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
   script:
     - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
-    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/
+    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/helpy_test
   artifacts:
     when: always
     expire_in: 1 week

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from schemas.notifications import Error, Status, WebserverListening
-from tests.unit.notification_server_tests.counting_notification_handlers import (
+from tests.helpy_test.unit.notification_server_tests.counting_notification_handlers import (
     CountingAppbaseNotificationHandler,
     send_notification,
 )
