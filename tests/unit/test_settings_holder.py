@@ -59,7 +59,6 @@ def test_restore_settings(holder: AnySettingsHolder) -> None:
 
 
 def test_shared_settings() -> None:
-    pass
     # ARRANGE
     parent = get_shared_settings()
     child = SharedSettingsHolder(settings=parent._settings)
@@ -74,7 +73,6 @@ def test_shared_settings() -> None:
 
 
 def test_unique_settings() -> None:
-    pass
     # ARRANGE
     parent = get_unique_settings()
     child = UniqueSettingsHolder(settings=parent._settings)
@@ -91,7 +89,6 @@ def test_unique_settings() -> None:
 
 
 def test_is_shared_has_same_addresses() -> None:
-    pass
     # ARRANGE
     parent = get_shared_settings()
 
@@ -103,7 +100,6 @@ def test_is_shared_has_same_addresses() -> None:
 
 
 def test_is_unique_has_different_addresses() -> None:
-    pass
     # ARRANGE
     parent = get_unique_settings()
 

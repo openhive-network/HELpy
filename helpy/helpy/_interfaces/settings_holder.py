@@ -35,7 +35,7 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
 
         Warning:
             Not intended for public usage.
-        """
+        """  # noqa: E501
         return self.__settings
 
     def _get_copy_of_settings(self) -> SettingsT:
@@ -51,8 +51,7 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
         """
 
     @abstractmethod
-    def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT:
-        ...
+    def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...
 
     @contextmanager
     def _modify_settings_state(self) -> Iterator[None]:

@@ -38,7 +38,7 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
         raise NotImplementedError
 
     @api
-    def open(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:  # noqa: A003
+    def open(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         raise NotImplementedError
 
     @api

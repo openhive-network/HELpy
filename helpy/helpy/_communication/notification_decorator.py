@@ -30,7 +30,7 @@ def notification(
     _NotificationHandlerWrapper[KnownNotificationT],
 ]:
     def wrapper(
-        callback: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]]
+        callback: Callable[[Any, Notification[KnownNotificationT]], Awaitable[None]],
     ) -> _NotificationHandlerWrapper[KnownNotificationT]:
         result_cls = _NotificationHandlerWrapper[type_]  # type: ignore[valid-type]
         result_cls.update_forward_refs(**locals())

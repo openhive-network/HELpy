@@ -28,7 +28,7 @@ class Settings(CommunicationSettings):
 
         Returns:
             Child of AbstractCommunicator instance if communicator is not None, otherwise None
-        """
+        """  # noqa: E501
         if self.communicator is None:
             return None
 
