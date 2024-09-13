@@ -6,7 +6,9 @@ import pytest
 
 from helpy import HttpUrl
 from helpy._communication.universal_notification_server import UniversalNotificationServer
-from tests.unit.notification_server_tests.counting_notification_handlers import CountingAppbaseNotificationHandler
+from tests.helpy_test.unit.notification_server_tests.counting_notification_handlers import (
+    CountingAppbaseNotificationHandler,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
