@@ -23,6 +23,7 @@ from helpy._handles.abc.handle import (
 )
 from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
+from schemas.fields.serializable import Serializable
 from schemas.operations.representations.legacy_representation import LegacyRepresentation
 
 if TYPE_CHECKING:
@@ -66,6 +67,8 @@ class AbstractApi(ABC, Generic[HandleT]):
             def default(self, o: Any) -> Any:
                 if isinstance(o, LegacyRepresentation):
                     return (o.type, o.value)
+                if isinstance(o, Serializable):
+                    return o.serialize()
                 if isinstance(o, PreconfiguredBaseModel):
                     return o.shallow_dict()
                 if isinstance(o, datetime):
