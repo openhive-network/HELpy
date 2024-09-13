@@ -49,7 +49,7 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def open(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:  # noqa: A003
+    async def open(self, *, wallet_name: str, token: str | None = None) -> beekeeper_api.EmptyResponse:
         """Opens wallet, which makes it unaccessible for other sessions.
 
         Args:
@@ -111,7 +111,8 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         """Imports key to given wallet.
 
         Warning:
-            After importing this key to beekeeper, it's impossible to access it via api; Access to private keys is only possible with binary.
+            After importing this key to beekeeper, it's impossible to access it via api; Access to private keys is only
+            possible with binary.
 
         Args:
             wallet_name: wallet to import given key

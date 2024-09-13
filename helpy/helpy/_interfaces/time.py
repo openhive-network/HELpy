@@ -141,7 +141,7 @@ class SpeedUpRateTimeControl(TimeControl):
 
 
 class Time:
-    def __new__(cls, *_: Any, **__: Any) -> Time:
+    def __new__(cls, *_: Any, **__: Any) -> Time:  # noqa: PYI034  # it's creation prevention
         raise TypeError(f"Creation object of {Time.__name__} class is forbidden.")
 
     @classmethod
@@ -176,7 +176,7 @@ class Time:
             if isinstance(_format, str):
                 _format = TimeFormats(_format)
             try:
-                parsed = datetime.strptime(time, _format.value)
+                parsed = datetime.strptime(time, _format.value)  # noqa: DTZ007 # in hive project %z is unused because all timestamps are utc
                 return parsed.replace(tzinfo=time_zone) if time_zone else parsed
             except ValueError as exception:
                 format_info = (
@@ -257,7 +257,7 @@ class Time:
         return cls.serialize(time, format_=serialize_format) if serialize else time
 
     @classmethod
-    def from_now(
+    def from_now(  # noqa: PLR0913 # it is mirroring timedelta interface
         cls,
         *,
         milliseconds: int = 0,

@@ -38,7 +38,7 @@ def test_batch_node_response_not_ready(sync_node: Hived) -> None:
 
 
 def test_batch_node_error_response(sync_node: Hived) -> None:
-    with pytest.raises(CommunicationError, match="Invalid cast"):  # noqa: PT012, SIM117
+    with pytest.raises(CommunicationError, match="Invalid cast"):  # noqa: SIM117
         with sync_node.batch() as node:
             node.api.database.find_accounts(accounts=123)
 

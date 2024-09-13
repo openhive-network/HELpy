@@ -31,5 +31,6 @@ def test_serialization(url: HttpUrl, with_protocol: bool, expected: str) -> None
 )
 def test_url_serializing_without_port_given(input_url: str, expected_protocol: int, url_type: URL_TYPES) -> None:
     assert (
-        url_type(input_url, protocol=expected_protocol).as_string(with_protocol=True) == f"{expected_protocol}://127.0.0.1"  # type: ignore[arg-type]
+        url_type(input_url, protocol=expected_protocol).as_string(with_protocol=True)  # type: ignore[arg-type]
+        == f"{expected_protocol}://127.0.0.1"
     )

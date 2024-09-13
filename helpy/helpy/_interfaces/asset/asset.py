@@ -235,7 +235,7 @@ class Asset:
             Asset.Range(lower_limit=Asset.hive(100), upper_limit=Asset.hive(110))
 
         Args:
-            lower_limit: When tolerance is given it acts as the value to which we refer when specifying the percentage range.
+            lower_limit: If tolerance is given it acts as the value to which we refer specifying the percentage range.
             tolerance: is defined as a positive number, which is a percentage of the upper and lower deviations e.g:
 
         ```
@@ -287,8 +287,8 @@ class LegacyAsset(Asset):
     AnyT: TypeAlias = Hive | Hbd | Vests
 
 
-def convert_hf26_to_legacy(asset: type[Hf26Asset.AssetPredicateT]) -> Hf26Asset.AssetPredicateT:
-    return Hf26Asset.to_legacy(asset)  # type: ignore
+def convert_hf26_to_legacy(asset: Hf26Asset.AssetPredicateT) -> Hf26Asset.AssetPredicateT:
+    return Hf26Asset.to_legacy(asset)  # type: ignore[return-value]
 
 
 def convert_legacy_to_hf26(asset: LegacyAsset.AnyT) -> Hf26Asset.AnyT:

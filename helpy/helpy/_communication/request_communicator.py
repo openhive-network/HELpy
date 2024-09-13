@@ -29,6 +29,7 @@ class RequestCommunicator(AbstractCommunicator):
                     url.as_string(),
                     data=data,
                     headers=self._json_headers(),
+                    timeout=self.settings.timeout.total_seconds(),
                 )
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
