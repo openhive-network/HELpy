@@ -14,7 +14,7 @@ def test_from_now_with_parameters(interval: str) -> None:
     # ARRANGE
     value = 0
     while value == 0:
-        value = random.randint(-1000, 1000)
+        value = random.randint(-1000, 1000)  # noqa: S311  # that's tests, not implementation of cryptographic lib
     interval_container = {interval: value}
     delta = getattr(Time, interval)(value)
 

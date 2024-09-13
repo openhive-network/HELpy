@@ -39,8 +39,7 @@ class SessionHolder:
 
 class SyncSessionHolder(SessionHolder):
     @abstractmethod
-    def _acquire_session_token(self) -> str:
-        ...
+    def _acquire_session_token(self) -> str: ...
 
     @property
     def session(self) -> Session:
@@ -51,8 +50,7 @@ class SyncSessionHolder(SessionHolder):
 
 class AsyncSessionHolder(SessionHolder):
     @abstractmethod
-    async def _acquire_session_token(self) -> str:
-        ...
+    async def _acquire_session_token(self) -> str: ...
 
     @property
     async def session(self) -> Session:

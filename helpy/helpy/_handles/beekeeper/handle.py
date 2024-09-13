@@ -30,7 +30,7 @@ def _raise_acquire_not_possible() -> NoReturn:
 
 
 class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncSessionHolder):
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
         communicator: AbstractCommunicator,
@@ -48,7 +48,7 @@ class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncS
 
 
 class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], AsyncSessionHolder):
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
         communicator: AbstractCommunicator,

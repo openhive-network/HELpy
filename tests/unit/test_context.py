@@ -56,12 +56,12 @@ async def test_finally_context_async() -> None:
 
 
 def test_exception_rethrow_sync() -> None:
-    with pytest.raises(MyCustomError):  # noqa: PT012, SIM117
+    with pytest.raises(MyCustomError):  # noqa: SIM117
         with SyncTestContext():
             raise MyCustomError
 
 
 async def test_exception_rethrow_async() -> None:
-    with pytest.raises(MyCustomError):  # noqa: PT012
+    with pytest.raises(MyCustomError):
         async with AsyncTestContext():
             raise MyCustomError
