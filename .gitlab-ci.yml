@@ -2,7 +2,8 @@ stages:
   - static_code_analysis
   - build
   - tests
-  - deploy
+  - helpy
+  - beekeepy
 
 workflow:
   rules:
@@ -27,6 +28,9 @@ variables:
   CI_BASE_IMAGE_TAG: "@sha256:080b16fd53013aeb9b89b00a8dfc90fecf886173f46448b05f45cee376c43330"
   CI_BASE_IMAGE: "registry.gitlab.syncad.com/hive/hive/ci-base-image${CI_BASE_IMAGE_TAG}"
 
+  BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
+  HELPY_DIR: ${CI_PROJECT_DIR}/helpy
+
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
@@ -34,7 +38,7 @@ include:
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   - project: 'hive/common-ci-configuration'
     # This should be the same version of Common CI defined in /hive/scripts/ci-helpers/prepare_data_image_job.yml
-    ref: c044f6f635867b07658520fd726d62999af48400
+    ref: 62833b5ff44f5073728658e229f3445394d404c2
     file: '/templates/python_projects.gitlab-ci.yml'
 
 image: ${CI_BASE_IMAGE}
@@ -45,21 +49,35 @@ default:
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| STATIC CODE ANALYSIS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+.static_code_analysis_vars: &static_code_analysis_vars
+  variables:
+    PYPROJECT_DIR: "${HELPY_DIR}"
+    PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/pyproject.toml"
+
 pre_commit_checks:
   stage: static_code_analysis
   extends: .pre_commit_checks_template
+  variables:
+    PYPROJECT_DIR: "${HELPY_DIR}"
+    PRE_COMMIT_CONFIG: "${CI_PROJECT_DIR}/.pre-commit-config.yaml"
+
+formatting_with_ruff_check:
+  stage: static_code_analysis
+  extends: .project_develop_configuration_template
+  <<: *static_code_analysis_vars
+  script:
+    - echo -e "${TXT_BLUE}Checking code formatting with Ruff...${TXT_CLEAR}" &&
+      ruff format --config "${PYPROJECT_CONFIG_PATH}" --check --diff ${PACKAGES_TO_CHECK}
 
 lint_code_with_ruff:
   stage: static_code_analysis
   extends: .lint_code_with_ruff_template
-
-formatting_with_black_check:
-  stage: static_code_analysis
-  extends: .formatting_with_black_check_template
+  <<: *static_code_analysis_vars
 
 type_check_with_mypy:
   stage: static_code_analysis
   extends: .type_check_with_mypy_template
+  <<: *static_code_analysis_vars
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| STATIC CODE ANALYSIS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -93,16 +111,36 @@ prepare_hived_data:
     - data-cache-storage
 
 
-build_wheel:
-  stage: build
+build_helpy_wheel:
+  stage: helpy
   extends: .build_wheel_template
+  variables:
+    PYPROJECT_DIR: "$HELPY_DIR"
+
+
+build_beekeepy_wheel:
+  stage: beekeepy
+  extends: .build_wheel_template
+  needs:
+    - job: build_helpy_wheel
+    - job: deploy_helpy_wheel_to_gitlab
+    - job: prepare_hived_image
+      artifacts: true
+  variables:
+    PYPROJECT_DIR: "$BEEKEEPY_DIR"
+  before_script:
+    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+    - poetry -C "${BEEKEEPY_DIR}" remove --lock -- helpy
+    - poetry -C "${BEEKEEPY_DIR}" add --lock -- "helpy `poetry -C ${BEEKEEPY_DIR} version -s`"  # version of helpy and beekeepy are same
+  tags:
+    - public-runner-docker
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| TESTS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-run_tests:
-  stage: tests
+run_helpy_tests:
+  stage: helpy
   extends: .project_develop_configuration_template
   needs:
     - job: prepare_hived_data
@@ -118,9 +156,10 @@ run_tests:
     HIVED_COMMIT: $HIVED_COMMIT
     HIVED_UID: $HIVED_UID
     PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
+    PYPROJECT_DIR: "$HELPY_DIR"
   script:
     - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
-    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/
+    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/helpy
   artifacts:
     when: always
     expire_in: 1 week
@@ -136,19 +175,27 @@ run_tests:
 .deploy_wheel_needs: &deploy_wheel_needs
   needs:
     - job: pre_commit_checks
-    - job: run_tests
-    - job: build_wheel
+    - job: run_helpy_tests
+    - job: build_helpy_wheel
       artifacts: true
 
-deploy_wheel_to_gitlab:
-  stage: deploy
+deploy_helpy_wheel_to_gitlab:
+  stage: helpy
   extends: .deploy_wheel_to_gitlab_template
   <<: *deploy_wheel_needs
   when: on_success
 
-deploy_wheel_to_pypi:
+deploy_helpy_wheel_to_pypi:
   extends: .deploy_wheel_to_pypi_template
-  stage: deploy
+  stage: helpy
   <<: *deploy_wheel_needs
+
+deploy_beekeepy_wheel_to_gitlab:
+  stage: beekeepy
+  extends: .deploy_wheel_to_gitlab_template
+  needs:
+    - job: build_beekeepy_wheel
+      artifacts: true
+  when: on_success
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| DEPLOY |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
