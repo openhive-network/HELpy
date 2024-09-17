@@ -25,7 +25,7 @@ source = [
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-helpy = {path = "../helpy"}
+helpy = { path = "../helpy", develop = true }
 python = "^3.10"
 [tool.poetry.group.dev.dependencies]
 mypy = "1.10.0"
