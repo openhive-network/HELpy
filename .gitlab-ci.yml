@@ -183,11 +183,15 @@ deploy_helpy_wheel_to_gitlab:
   stage: helpy
   extends: .deploy_wheel_to_gitlab_template
   <<: *deploy_wheel_needs
+  variables:
+    PYPROJECT_DIR: "${HELPY_DIR}"
   when: on_success
 
 deploy_helpy_wheel_to_pypi:
   extends: .deploy_wheel_to_pypi_template
   stage: helpy
+  variables:
+    PYPROJECT_DIR: "${HELPY_DIR}"
   <<: *deploy_wheel_needs
 
 deploy_beekeepy_wheel_to_gitlab:
@@ -196,6 +200,18 @@ deploy_beekeepy_wheel_to_gitlab:
   needs:
     - job: build_beekeepy_wheel
       artifacts: true
+  variables:
+    PYPROJECT_DIR: "${BEEKEEPY_DIR}"
+  when: on_success
+
+deploy_beekeepy_wheel_to_pypi:
+  stage: beekeepy
+  extends: .deploy_wheel_to_pypi_template
+  needs:
+    - job: build_beekeepy_wheel
+      artifacts: true
+  variables:
+    PYPROJECT_DIR: "${BEEKEEPY_DIR}"
   when: on_success
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| DEPLOY |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
