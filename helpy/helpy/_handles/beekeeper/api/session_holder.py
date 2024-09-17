@@ -9,7 +9,7 @@ __all__ = ["SyncSessionHolder", "AsyncSessionHolder"]
 
 
 class Session:
-    def __init__(self, token_or_create_session_return: str | CreateSession | Session):
+    def __init__(self, token_or_create_session_return: str | CreateSession | Session) -> None:
         incoming = token_or_create_session_return
         self.__token = incoming.token if isinstance(incoming, CreateSession | Session) else incoming
 
