@@ -52,14 +52,14 @@ default:
 
 .static_code_analysis_vars: &static_code_analysis_vars
   variables:
-    PYPROJECT_DIR: "${HELPY_DIR}"
+    PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
     PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/pyproject.toml"
 
 pre_commit_checks:
   stage: static_code_analysis
   extends: .pre_commit_checks_template
   variables:
-    PYPROJECT_DIR: "${HELPY_DIR}"
+    PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
     PRE_COMMIT_CONFIG: "${CI_PROJECT_DIR}/.pre-commit-config.yaml"
 
 formatting_with_ruff_check:
