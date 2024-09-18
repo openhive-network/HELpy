@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from test_tools.__private.scope.scope_fixtures import *  # noqa: F403
 
 import helpy
 from helpy._handles.abc.api import AbstractApi, RegisteredApisT

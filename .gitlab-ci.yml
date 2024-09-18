@@ -30,6 +30,7 @@ variables:
 
   BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
   HELPY_DIR: ${CI_PROJECT_DIR}/helpy
+  LOCAL_TOOLS_DIR: ${CI_PROJECT_DIR}/tests/local-tools
 
 include:
   - project: 'hive/hive'
@@ -97,6 +98,20 @@ prepare_hived_image:
     - public-runner-docker
     - hived-for-tests
 
+prepare_hived_testnet_image:
+  extends: .prepare_hived_image
+  needs: []
+  stage: build
+  variables:
+    SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
+    REGISTRY_USER: "$HIVED_CI_IMGBUILDER_USER"
+    REGISTRY_PASS: $HIVED_CI_IMGBUILDER_PASSWORD
+    BINARY_CACHE_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries"
+    HIVE_NETWORK_TYPE: testnet
+  tags:
+    - public-runner-docker
+    - hived-for-tests
+
 prepare_hived_data:
   extends: .prepare_hived_data_5m
   needs:
@@ -122,6 +137,7 @@ build_beekeepy_wheel:
   stage: beekeepy
   extends: .build_wheel_template
   needs:
+    - job: run_beekeepy_tests
     - job: build_helpy_wheel
     - job: deploy_helpy_wheel_to_gitlab
     - job: prepare_hived_image
@@ -139,12 +155,43 @@ build_beekeepy_wheel:
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| TESTS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-run_helpy_tests:
-  stage: helpy
+.run_tests_template:
   extends: .project_develop_configuration_template
   needs:
+    - job: prepare_hived_testnet_image
+      artifacts: true
     - job: prepare_hived_data
       artifacts: true
+  variables:
+    HIVED_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/hived"
+    CLI_WALLET_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/cli_wallet"
+    GET_DEV_KEY_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/get_dev_key"
+    BLOCK_LOG_UTIL_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/block_log_util"
+    SST_DUMP_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/sst_dump"
+    HIVED_COMMIT: $HIVED_COMMIT
+    HIVED_UID: $HIVED_UID
+    PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
+    PYPROJECT_DIR: "$LOCAL_TOOLS_DIR"
+    SUBPROJECT_TEST_TARGET: ""
+    HIVED_HTTP_ENDPOINT: ""
+  before_script:
+    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+    - !reference [.project_develop_configuration_template, before_script]
+  script:
+    - if [ -z "${HIVED_HTTP_ENDPOINT}" ]; then HIVED_HTTP_ENDPOINT=""; else HIVED_HTTP_ENDPOINT="--hived-http-endpoint=${HIVED_HTTP_ENDPOINT}"; fi
+    - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
+    - python3 -m pytest -n auto --durations 0 --junitxml=report.xml ${HIVED_HTTP_ENDPOINT} "tests/${SUBPROJECT_TEST_TARGET}_test"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      junit: $PATH_TO_REPORT
+  tags:
+    - data-cache-storage
+
+run_helpy_tests:
+  stage: helpy
+  extends: .run_tests_template
   services:
     - name: $HIVED_IMAGE_NAME
       alias: hived-instance
@@ -153,20 +200,15 @@ run_helpy_tests:
         LOG_FILE: $CI_JOB_NAME.log
       command: ["--replay-blockchain", "--stop-at-block=5000000"]
   variables:
-    HIVED_COMMIT: $HIVED_COMMIT
-    HIVED_UID: $HIVED_UID
-    PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
-    PYPROJECT_DIR: "$HELPY_DIR"
-  script:
-    - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
-    - python3 -m pytest --durations 0 --junitxml=report.xml --hived-http-endpoint="http://hived-instance:8091" tests/helpy_test
-  artifacts:
-    when: always
-    expire_in: 1 week
-    reports:
-      junit: $PATH_TO_REPORT
-  tags:
-    - data-cache-storage
+    SUBPROJECT_TEST_TARGET: "helpy"
+    HIVED_HTTP_ENDPOINT: "http://hived-instance:8091"
+
+
+run_beekeepy_tests:
+  stage: beekeepy
+  extends: .run_tests_template
+  variables:
+    SUBPROJECT_TEST_TARGET: "beekeepy"
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
