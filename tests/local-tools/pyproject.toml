@@ -1,0 +1,32 @@
+[build-system]
+build-backend = "poetry_dynamic_versioning.backend"
+requires = [
+  "poetry-core>=1.7.0",
+  "poetry-dynamic-versioning>=1.0.0,<2.0.0",
+]
+
+[tool.poetry]
+authors = [
+  "Mateusz Żebrak <mzebrak@syncad.com>",
+  "Krzysztof Mochocki <kmochocki@syncad.com>",
+]
+description = "Pack of tools and dependencies for running helpy tests."
+name = "local-tools"
+packages = [
+  {include = "local_tools"},
+]
+repository = "https://gitlab.syncad.com/hive/helpy"
+source = [
+  {name = "PyPI", priority = "primary"},
+  {name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental"},
+  {name = "gitlab-wax", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental"},
+]
+version = "0.0.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+test-tools = { path = "../../hive/tests/python/hive-local-tools/test-tools", develop = true }
+beekeepy = { path = "../../beekeepy", develop = true }
+pytest = "7.2.0"
+pytest-asyncio = "0.21.0"
+pytest-xdist = "3.1.0"
