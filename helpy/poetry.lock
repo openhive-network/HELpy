@@ -599,17 +599,6 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
-name = "pytest-is-running"
-version = "1.5.0"
-description = "pytest plugin providing a function to check if pytest is running."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pytest_is_running-1.5.0-py3-none-any.whl", hash = "sha256:2bba7f7f4343bf8fbd5eb7ebb895ab21083b2779b89475211deba2d9bfa40f49"},
-    {file = "pytest_is_running-1.5.0.tar.gz", hash = "sha256:dc227f6d33f76c003c2e5b408734fb2cae02dbd627a1018f78d6196a796943e2"},
-]
-
-[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -879,4 +868,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "902fec8d8b3839d6c636a3a403f6fad2180ba0bd41ff24934a02ccf7568eceff"
+content-hash = "77dbbfa1fc2e4c594630e2b7cba7567b7c95083985f824139398c5d08d49b774"
