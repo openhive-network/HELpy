@@ -53,12 +53,6 @@ class UnlockedWallet(Wallet, ContextSync["UnlockedWallet"], ABC):
     @abstractmethod
     def lock_time(self) -> datetime: ...
 
-    def _enter(self) -> UnlockedWallet:
-        return self
-
-    def _finally(self) -> None:
-        self.lock()
-
     def __contains__(self, obj: object) -> bool:
         if isinstance(obj, str):
             return self.has_matching_private_key(key=PublicKey(obj))
