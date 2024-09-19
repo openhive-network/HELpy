@@ -6,7 +6,6 @@ from loguru import logger
 
 from beekeepy._handle.beekeeper import AsyncBeekeeper as AsynchronousBeekeeperHandle
 from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper as AsynchronousRemoteBeekeeperHandle
-from beekeepy._handle.beekeeper import close_if_possible
 from beekeepy._interface.abc.asynchronous.beekeeper import Beekeeper as BeekeeperInterface
 from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
 from beekeepy._interface.asynchronous.session import Session
@@ -46,7 +45,8 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         return self.__instance
 
     def teardown(self) -> None:
-        close_if_possible(self.__instance)
+        if isinstance(self.__instance, AsynchronousBeekeeperHandle):
+            self.__instance.close()
         self.invalidate()
 
     def detach(self) -> None:

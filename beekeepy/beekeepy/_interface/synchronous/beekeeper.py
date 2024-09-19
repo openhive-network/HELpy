@@ -6,7 +6,6 @@ from loguru import logger
 
 from beekeepy._handle.beekeeper import Beekeeper as SynchronousBeekeeperHandle
 from beekeepy._handle.beekeeper import SyncRemoteBeekeeper as SynchronousRemoteBeekeeperHandle
-from beekeepy._handle.beekeeper import close_if_possible
 from beekeepy._interface.abc.packed_object import PackedSyncBeekeeper
 from beekeepy._interface.abc.synchronous.beekeeper import Beekeeper as BeekeeperInterface
 from beekeepy._interface.delay_guard import SyncDelayGuard
@@ -50,7 +49,8 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         return self.__instance
 
     def teardown(self) -> None:
-        close_if_possible(self.__instance)
+        if isinstance(self.__instance, SynchronousBeekeeperHandle):
+            self.__instance.close()
         self.invalidate()
 
     def detach(self) -> None:
