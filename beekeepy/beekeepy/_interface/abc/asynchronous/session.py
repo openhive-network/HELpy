@@ -65,9 +65,3 @@ class Session(ContextAsync["Session"], ABC):
     @property
     @abstractmethod
     async def public_keys(self) -> list[PublicKey]: ...
-
-    async def _aenter(self) -> Session:
-        return self
-
-    async def _afinally(self) -> None:
-        await self.close_session()

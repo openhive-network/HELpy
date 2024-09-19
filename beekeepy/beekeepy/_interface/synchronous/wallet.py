@@ -119,3 +119,9 @@ class UnlockedWallet(UnlockedWalletInterface, Wallet):
     @property
     def lock_time(self) -> datetime:
         return self._beekeeper.api.get_info(token=self.session_token).timeout_time
+
+    def _enter(self) -> UnlockedWalletInterface:
+        return self
+
+    def _finally(self) -> None:
+        self.lock()

@@ -19,12 +19,6 @@ class Beekeeper(ContextSync["Beekeeper"], ABC):
     @abstractmethod
     def session(self) -> Session: ...
 
-    def _enter(self) -> Beekeeper:
-        return self
-
-    def _finally(self) -> None:
-        self.teardown()
-
     @abstractmethod
     def teardown(self) -> None: ...
 

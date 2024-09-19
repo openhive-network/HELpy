@@ -65,9 +65,3 @@ class Session(ContextSync["Session"], ABC):
     @property
     @abstractmethod
     def public_keys(self) -> list[PublicKey]: ...
-
-    def _enter(self) -> Session:
-        return self
-
-    def _finally(self) -> None:
-        self.close_session()
