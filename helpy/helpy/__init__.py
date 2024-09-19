@@ -10,6 +10,7 @@ from helpy._handles import (
 )
 from helpy._handles.settings import Settings
 from helpy._interfaces import wax
+from helpy._interfaces.account_credentials import AccountCredentials
 from helpy._interfaces.asset import Hf26Asset, LegacyAsset
 from helpy._interfaces.config import Config as AbstractConfig
 from helpy._interfaces.context import ContextAsync, ContextSync
@@ -23,6 +24,7 @@ __version__ = "0.0.0"
 
 
 __all__ = [
+    "AccountCredentials",
     "AbstractConfig",
     "AsyncBeekeeper",
     "AsyncHived",
