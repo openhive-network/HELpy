@@ -4,7 +4,6 @@ from functools import wraps
 from typing import Iterator
 
 import pytest
-import test_tools as tt
 from local_tools.beekeepy.generators import (
     default_wallet_credentials,
     generate_account_name,
@@ -19,6 +18,7 @@ from local_tools.beekeepy.models import (
 )
 
 from beekeepy._handle import Beekeeper
+from helpy import AccountCredentials
 
 
 @pytest.fixture()
@@ -46,15 +46,15 @@ def wallet(beekeeper: Beekeeper) -> WalletInfo:
 
 
 @pytest.fixture()
-def account(beekeeper: Beekeeper, wallet: WalletInfo) -> tt.Account:
-    acc = tt.Account(generate_account_name())
+def account(beekeeper: Beekeeper, wallet: WalletInfo) -> AccountCredentials:
+    acc = AccountCredentials.create(generate_account_name())
     beekeeper.api.import_key(wallet_name=wallet.name, wif_key=acc.private_key)
     return acc
 
 
 @pytest.fixture(scope="session")
-def keys_to_import() -> list[tt.Account]:
-    return tt.Account.create_multiple(10)
+def keys_to_import() -> list[AccountCredentials]:
+    return AccountCredentials.create_multiple(10)
 
 
 @pytest.fixture()
@@ -68,7 +68,7 @@ def setup_wallets(beekeeper: Beekeeper) -> WalletsGeneratorT:
                 name=generate_wallet_name(i),
                 password=generate_wallet_password(i),
                 accounts=(
-                    tt.Account.create_multiple(keys_per_wallet, name_base=generate_account_name(i))
+                    AccountCredentials.create_multiple(keys_per_wallet, name_base=generate_account_name(i))
                     if keys_per_wallet
                     else []
                 ),

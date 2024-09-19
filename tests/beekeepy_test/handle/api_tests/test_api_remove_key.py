@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-import test_tools as tt
 
+from helpy import AccountCredentials
 from helpy.exceptions import RequestError
+from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -19,7 +20,7 @@ def test_api_remove_key(
 ) -> None:
     """Test test_api_remove_key will test beekeeper_api_remove_key.."""
     # ARRANGE
-    for account in tt.Account.create_multiple(5):
+    for account in AccountCredentials.create_multiple(5):
         beekeeper.api.import_key(wallet_name=wallet.name, wif_key=account.private_key)
 
         # ACT
@@ -32,7 +33,7 @@ def test_api_remove_key(
     assert len((beekeeper.api.get_public_keys()).keys) == 0, "There should be no keys left."
 
 
-def test_api_remove_key_from_locked(beekeeper: Beekeeper, wallet: WalletInfo, account: tt.Account) -> None:
+def test_api_remove_key_from_locked(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:
     """Test test_api_remove_key_from_locked will try to remove key from locker wallet."""
     # ARRANGE & ACT
     beekeeper.api.lock(wallet_name=wallet.name)
@@ -45,7 +46,7 @@ def test_api_remove_key_from_locked(beekeeper: Beekeeper, wallet: WalletInfo, ac
         )
 
 
-def test_api_remove_key_from_closed(beekeeper: Beekeeper, wallet: WalletInfo, account: tt.Account) -> None:
+def test_api_remove_key_from_closed(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:
     """Test test_api_remove_key_from_closed will try to remove key from closed wallet."""
     # ARRANGE & ACT
     beekeeper.api.close(wallet_name=wallet.name)
@@ -86,5 +87,5 @@ def test_api_remove_key_simple_scenario(beekeeper: Beekeeper, setup_wallets: Wal
     assert key_to_remove.public_key not in bk_keys_after, "Recently removed key shouldn't not be listed."
     # Check if other keys still exists
     bk_pub_keys_before_copy = bk_pub_keys_before.copy()
-    bk_pub_keys_before_copy.remove(key_to_remove.public_key)
+    bk_pub_keys_before_copy.remove(PublicKey(key_to_remove.public_key))
     assert sorted(bk_pub_keys_before_copy) == sorted(bk_pub_keys_after), "Check if beekeeper removes only target key."

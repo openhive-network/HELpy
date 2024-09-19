@@ -6,11 +6,12 @@ import json
 import sys
 from pathlib import Path
 
-import test_tools as tt
 from local_tools.beekeepy.models import WalletInfoWithImportedAccounts
+from loguru import logger
 
 from beekeepy import Settings
 from beekeepy._handle import AsyncBeekeeper
+from helpy import AccountCredentials
 
 
 async def generate_wallets_and_keys(number_of_wallets: int) -> None:
@@ -23,12 +24,12 @@ async def generate_wallets_and_keys(number_of_wallets: int) -> None:
         WalletInfoWithImportedAccounts(
             name=f"wallet-{i}",
             password=f"password-{i}",
-            accounts=tt.Account.create_multiple(number_of_accounts=max(1, i % 5)),
+            accounts=AccountCredentials.create_multiple(number_of_accounts=max(1, i % 5)),
         )
         for i in range(number_of_wallets)
     ]
     source_dir = Path(__file__).parent.resolve()
-    async with AsyncBeekeeper(settings=Settings(working_directory=source_dir / "wallets"), logger=tt.logger) as bk:
+    async with AsyncBeekeeper(settings=Settings(working_directory=source_dir / "wallets"), logger=logger) as bk:
         for wallet in wallets:
             aliased = {}
             await bk.api.create(wallet_name=wallet.name, password=wallet.password)
@@ -53,6 +54,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.number_of_wallets <= 0:
-        tt.logger.error("Value of number-of-wallets should be greater than 0. Aborting.")
+        logger.error("Value of number-of-wallets should be greater than 0. Aborting.")
         sys.exit(-1)
     asyncio.run(generate_wallets_and_keys(number_of_wallets=args.number_of_wallets))

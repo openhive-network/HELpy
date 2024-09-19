@@ -7,13 +7,13 @@ from local_tools.beekeepy.network import raw_http_call
 from schemas.jsonrpc import JSONRPCRequest
 
 if TYPE_CHECKING:
-    import test_tools as tt
     from local_tools.beekeepy.models import WalletInfo
 
     from beekeepy._handle import Beekeeper
+    from helpy import AccountCredentials
 
 
-def test_empty_sign_digest(beekeeper: Beekeeper, wallet: WalletInfo, account: tt.Account) -> None:  # noqa: ARG001
+def test_empty_sign_digest(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:  # noqa: ARG001
     """Test test_empty_sign_digest will check if response from sign_digest is empty."""
     # ARRANGE
     token = beekeeper.session.token

@@ -4,23 +4,23 @@ from functools import wraps
 from typing import TYPE_CHECKING, Iterator
 
 import pytest
-import test_tools as tt
 from loguru import logger
 
 from beekeepy import Settings
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from local_tools.beekeepy.models import SettingsFactory, SettingsLoggerFactory
     from loguru import Logger
 
 
 @pytest.fixture()
-def settings() -> SettingsFactory:
+def settings(working_directory: Path) -> SettingsFactory:
     @wraps(settings)
     def _factory(settings_update: Settings | None = None) -> Settings:
-        context_dir = tt.context.get_current_directory()
-        amount_of_beekeepers_in_context = len([x for x in context_dir.glob("Beekeeper*") if x.is_dir()])
-        working_dir = context_dir / f"Beekeeper{amount_of_beekeepers_in_context}"
+        amount_of_beekeepers_in_working_directory = len([x for x in working_directory.glob("Beekeeper*") if x.is_dir()])
+        working_dir = working_directory / f"Beekeeper{amount_of_beekeepers_in_working_directory}"
         result = settings_update or Settings()
         result.working_directory = working_dir
         return result

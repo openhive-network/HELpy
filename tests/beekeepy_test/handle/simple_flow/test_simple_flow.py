@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-import test_tools as tt
 from local_tools.beekeepy.constants import DIGEST_TO_SIGN
 from local_tools.beekeepy.generators import (
     generate_wallet_name,
     generate_wallet_password,
 )
 from local_tools.beekeepy.models import WalletInfo
+from loguru import logger
 
 from beekeepy import Settings
 from beekeepy._handle import Beekeeper
@@ -58,6 +58,7 @@ PrepereWalletDirResultT = tuple[list[WalletInfoWithKeysToImport], Path, bool]
 @pytest.fixture()
 def prepare_wallet_dir(
     request: pytest.FixtureRequest,
+    working_directory: Path,
     # number_of_wallets: int, use_existing_wallets: bool
 ) -> PrepereWalletDirResultT:
     """Copy wallets (.wallet) files from source_directory into number_of_dirs temp dirs."""
@@ -67,7 +68,7 @@ def prepare_wallet_dir(
 
     source_directory = (Path(__file__).parent / "prepared_wallets") if use_existing_wallets else None
     source_directory_keys: Path | None = None
-    dir_to_create = tt.context.get_current_directory() / f"beekeeper-{number_of_wallets}-{use_existing_wallets}"
+    dir_to_create = working_directory / f"beekeeper-{number_of_wallets}-{use_existing_wallets}"
     if dir_to_create.exists():
         shutil.rmtree(dir_to_create)
     dir_to_create.mkdir()
@@ -185,7 +186,7 @@ def test_simple_flow(
     * List wallet(s),
     * Signing.
     """
-    with Beekeeper(settings=Settings(working_directory=wallet_dir), logger=tt.logger) as beekeeper:
+    with Beekeeper(settings=Settings(working_directory=wallet_dir), logger=logger) as beekeeper:
         # ACT & ASSERT 1
         # In this block we will create new session, and wallet import key to is and sign a digest
         for wallet_nr, wallet in enumerate(wallets):
