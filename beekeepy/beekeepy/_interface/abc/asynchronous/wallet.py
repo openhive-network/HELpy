@@ -52,9 +52,3 @@ class UnlockedWallet(Wallet, ContextAsync["UnlockedWallet"], ABC):
     @property
     @abstractmethod
     async def lock_time(self) -> datetime: ...
-
-    async def _aenter(self) -> UnlockedWallet:
-        return self
-
-    async def _afinally(self) -> None:
-        await self.lock()

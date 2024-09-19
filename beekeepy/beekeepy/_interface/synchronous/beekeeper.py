@@ -67,7 +67,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         return PackedSyncBeekeeper(settings=self._get_instance().settings, unpack_factory=Beekeeper._remote_factory)
 
     @classmethod
-    def _factory(cls, *, settings: Settings | None = None) -> Beekeeper:
+    def _factory(cls, *, settings: Settings | None = None) -> BeekeeperInterface:
         settings = settings or Settings()
         handle = SynchronousBeekeeperHandle(settings=settings, logger=logger)
         cls.__apply_existing_session_token(settings=settings, handle=handle)
@@ -79,7 +79,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         return cls(handle=handle)
 
     @classmethod
-    def _remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> Beekeeper:
+    def _remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> BeekeeperInterface:
         settings = url_or_settings if isinstance(url_or_settings, Settings) else Settings(http_endpoint=url_or_settings)
         handle = SynchronousRemoteBeekeeperHandle(settings=settings)
         cls.__apply_existing_session_token(settings=settings, handle=handle)
@@ -89,3 +89,9 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     def __apply_existing_session_token(cls, settings: Settings, handle: SynchronousRemoteBeekeeperHandle) -> None:
         if settings.use_existing_session:
             handle.set_session_token(settings.use_existing_session)
+
+    def _enter(self) -> BeekeeperInterface:
+        return self
+
+    def _finally(self) -> None:
+        self.teardown()

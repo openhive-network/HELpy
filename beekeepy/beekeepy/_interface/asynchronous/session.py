@@ -137,3 +137,9 @@ class Session(SessionInterface, StateInvalidator):
         wallet = Wallet(name=name, beekeeper=self.__beekeeper, session_token=await self.token, guard=self.__guard)
         self.register_invalidable(wallet)
         return wallet
+
+    async def _aenter(self) -> SessionInterface:
+        return self
+
+    async def _afinally(self) -> None:
+        await self.close_session()

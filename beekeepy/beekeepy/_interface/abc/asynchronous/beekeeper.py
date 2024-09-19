@@ -19,12 +19,6 @@ class Beekeeper(ContextAsync["Beekeeper"], ABC):
     @abstractmethod
     async def session(self) -> Session: ...
 
-    async def _aenter(self) -> Beekeeper:
-        return self
-
-    async def _afinally(self) -> None:
-        self.teardown()
-
     @abstractmethod
     def teardown(self) -> None: ...
 
