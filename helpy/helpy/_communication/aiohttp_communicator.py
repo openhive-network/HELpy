@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class AioHttpCommunicator(AbstractCommunicator):
     """Provides support for aiohttp library."""
 
-    async def async_send(self, url: HttpUrl, data: str) -> str:
+    async def async_send(self, url: HttpUrl, data: bytes) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
@@ -40,5 +40,5 @@ class AioHttpCommunicator(AbstractCommunicator):
             raise ValueError("Retry loop finished, but last_exception was not set")
         raise last_exception
 
-    def send(self, url: HttpUrl, data: str) -> str:
+    def send(self, url: HttpUrl, data: bytes) -> str:
         raise NotImplementedError

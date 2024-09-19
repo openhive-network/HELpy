@@ -46,7 +46,7 @@ class HttpxCommunicator(AbstractCommunicator):
             self.__sync_client = cast(httpx.Client, self.__create_client(httpx.Client))
         return self.__sync_client
 
-    async def async_send(self, url: HttpUrl, data: str) -> str:
+    async def async_send(self, url: HttpUrl, data: bytes) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
@@ -68,7 +68,7 @@ class HttpxCommunicator(AbstractCommunicator):
             raise ValueError("Retry loop finished, but last_exception was not set")
         raise last_exception
 
-    def send(self, url: HttpUrl, data: str) -> str:
+    def send(self, url: HttpUrl, data: bytes) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):

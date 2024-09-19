@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
     communicator = AioHttpCommunicator(settings=Settings(http_endpoint=http_endpoint))
-    response = await communicator.async_send(url=http_endpoint, data=data.json(by_alias=True))
+    response = await communicator.async_send(url=http_endpoint, data=data.json(by_alias=True).encode())
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"
     return parsed
@@ -24,7 +24,7 @@ async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -
 def raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
     communicator = RequestCommunicator(settings=Settings(http_endpoint=http_endpoint))
-    response = communicator.send(url=http_endpoint, data=data.json(by_alias=True))
+    response = communicator.send(url=http_endpoint, data=data.json(by_alias=True).encode())
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"
     return parsed

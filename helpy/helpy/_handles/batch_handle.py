@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class _DelayedResponseWrapper:
-    def __init__(self, url: HttpUrl, request: str, expected_type: type[ExpectResultT]) -> None:
+    def __init__(self, url: HttpUrl, request: bytes, expected_type: type[ExpectResultT]) -> None:
         super().__setattr__("_url", url)
         super().__setattr__("_request", request)
         super().__setattr__("_response", None)
@@ -63,7 +63,7 @@ class _DelayedResponseWrapper:
 
 @dataclass(kw_only=True)
 class _BatchRequestResponseItem:
-    request: str
+    request: bytes
     delayed_result: _DelayedResponseWrapper
 
 
@@ -176,8 +176,8 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
         with _PostRequestManager(self, self.__batch) as mgr:
             mgr.set_responses(await self.__communicator.async_send(url=self.__url, data=query))
 
-    def __prepare_request(self) -> str:
-        return "[" + ",".join([x.request for x in self.__batch]) + "]"
+    def __prepare_request(self) -> bytes:
+        return b"[" + b",".join([x.request for x in self.__batch]) + b"]"
 
     def _get_batch_delayed_result(self, request_id: int) -> _DelayedResponseWrapper:
         return self.__batch[request_id].delayed_result

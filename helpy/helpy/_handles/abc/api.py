@@ -4,7 +4,6 @@ import json
 import re
 from abc import ABC
 from collections import defaultdict
-from datetime import datetime
 from enum import IntEnum
 from functools import partial, wraps
 from typing import (
@@ -68,11 +67,12 @@ class AbstractApi(ABC, Generic[HandleT]):
                     return (o.type, o.value)
                 if isinstance(o, PreconfiguredBaseModel):
                     return o.shallow_dict()
-                if isinstance(o, datetime):
-                    return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # type: ignore[no-untyped-call]
+                for serial_type, serial_function in PreconfiguredBaseModel.Config.json_encoders.items():
+                    if isinstance(o, serial_type):
+                        return serial_function(o)  # type: ignore[no-untyped-call]
                 return super().default(o)
 
-        return partial(json.dumps, cls=JsonEncoder)
+        return partial(json.dumps, cls=JsonEncoder, ensure_ascii=False)
 
     def _serialize_params(self, arguments: ApiArgumentsToSerialize) -> str:
         """Return serialized given params. Can be overloaded."""

@@ -90,7 +90,12 @@ class CommunicationError(HelpyError):
     """Base class for all communication related errors."""
 
     def __init__(
-        self, url: str | Url[Any], request: str, response: CommunicationResponseT | None = None, *, message: str = ""
+        self,
+        url: str | Url[Any],
+        request: str | bytes,
+        response: CommunicationResponseT | None = None,
+        *,
+        message: str = "",
     ) -> None:
         """Contains required details.
 
@@ -137,7 +142,7 @@ class CommunicationError(HelpyError):
 
     def __create_message(self) -> str:
         return (
-            f"Problem occurred during communication with: url={self.url}, request={self.request}, {self._get_reply()}"
+            f"Problem occurred during communication with: url={self.url}, request={self.request!r}, {self._get_reply()}"
         )
 
 

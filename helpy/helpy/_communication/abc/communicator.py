@@ -17,11 +17,11 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
     """Provides basic interface for communicators, which can implement communications using different way."""
 
     @abstractmethod
-    def send(self, url: HttpUrl, data: str) -> str:
+    def send(self, url: HttpUrl, data: bytes) -> str:
         """Sends to given url given data synchronously."""
 
     @abstractmethod
-    async def async_send(self, url: HttpUrl, data: str) -> str:
+    async def async_send(self, url: HttpUrl, data: bytes) -> str:
         """Sends to given url given data asynchronously."""
 
     async def _async_sleep_for_retry(self) -> None:
@@ -42,7 +42,7 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
         return {"Content-Type": "application/json"}
 
     @classmethod
-    def _assert_status_code(cls, *, status_code: int, sent: str, received: str) -> None:
+    def _assert_status_code(cls, *, status_code: int, sent: bytes, received: str) -> None:
         """Checks is received status code is 2xx."""
         ok_status_code_lower_bound = 200
         ok_status_code_upper_bound = 299

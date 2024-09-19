@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-def build_json_rpc_call(*, method: str, params: str, id_: int = 0) -> str:
+def build_json_rpc_call(*, method: str, params: str, id_: int = 0) -> bytes:
     """Builds params for jsonrpc call."""
     return (
         """{"id":"""
@@ -11,4 +11,4 @@ def build_json_rpc_call(*, method: str, params: str, id_: int = 0) -> str:
         + '"'
         + (""","params":""" + params if params else "")
         + "}"
-    )
+    ).encode()
