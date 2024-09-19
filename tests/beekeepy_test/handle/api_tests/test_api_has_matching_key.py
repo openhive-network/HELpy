@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import test_tools as tt
+from helpy import AccountCredentials
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def test_api_has_matching_key(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     # ARRANGE
-    account = tt.Account("alice")
+    account = AccountCredentials.create("alice")
     beekeeper.api.import_key(wallet_name=wallet.name, wif_key=account.private_key)
 
     # ACT

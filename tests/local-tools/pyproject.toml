@@ -25,7 +25,6 @@ version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-test-tools = { path = "../../hive/tests/python/hive-local-tools/test-tools", develop = true }
 beekeepy = { path = "../../beekeepy", develop = true }
 
 [tool.poetry.group.dev.dependencies]

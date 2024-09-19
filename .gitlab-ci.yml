@@ -98,20 +98,6 @@ prepare_hived_image:
     - public-runner-docker
     - hived-for-tests
 
-prepare_hived_testnet_image:
-  extends: .prepare_hived_image
-  needs: []
-  stage: build
-  variables:
-    SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
-    REGISTRY_USER: "$HIVED_CI_IMGBUILDER_USER"
-    REGISTRY_PASS: $HIVED_CI_IMGBUILDER_PASSWORD
-    BINARY_CACHE_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries"
-    HIVE_NETWORK_TYPE: testnet
-  tags:
-    - public-runner-docker
-    - hived-for-tests
-
 prepare_hived_data:
   extends: .prepare_hived_data_5m
   needs:
@@ -162,7 +148,7 @@ build_beekeepy_wheel:
 .run_tests_template:
   extends: .project_develop_configuration_template
   needs:
-    - job: prepare_hived_testnet_image
+    - job: prepare_hived_image
       artifacts: true
   variables:
     HIVED_COMMIT: $HIVED_COMMIT
@@ -172,7 +158,7 @@ build_beekeepy_wheel:
     SUBPROJECT_TEST_TARGET: ""
     HIVED_HTTP_ENDPOINT: ""
   before_script:
-    - cp $CI_PROJECT_DIR/hived-testnet-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
     - !reference [.project_develop_configuration_template, before_script]
   script:
     - if [ -z "${HIVED_HTTP_ENDPOINT}" ]; then HIVED_HTTP_ENDPOINT=""; else HIVED_HTTP_ENDPOINT="--hived-http-endpoint=${HIVED_HTTP_ENDPOINT}"; fi
@@ -209,11 +195,6 @@ run_beekeepy_tests:
   stage: beekeepy
   extends: .run_tests_template
   variables:
-    HIVED_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/hived"
-    CLI_WALLET_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/cli_wallet"
-    GET_DEV_KEY_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/get_dev_key"
-    BLOCK_LOG_UTIL_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/block_log_util"
-    SST_DUMP_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/sst_dump"
     SUBPROJECT_TEST_TARGET: "beekeepy"
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

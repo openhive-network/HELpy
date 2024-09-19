@@ -3,12 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
+from schemas.fields.basic import PublicKey
+
 if TYPE_CHECKING:
-    import test_tools as tt
     from loguru import Logger
 
     from beekeepy import Settings
-    from schemas.fields.basic import PublicKey
+    from helpy import AccountCredentials
 
 
 @dataclass
@@ -19,10 +20,10 @@ class WalletInfo:
 
 @dataclass
 class WalletInfoWithImportedAccounts(WalletInfo):
-    accounts: list[tt.Account]
+    accounts: list[AccountCredentials]
 
     def get_all_public_keys(self) -> list[PublicKey]:
-        return sorted([acc.public_key for acc in self.accounts])
+        return sorted([PublicKey(acc.public_key) for acc in self.accounts])
 
 
 class WalletsGeneratorT(Protocol):

@@ -7,13 +7,13 @@ from local_tools.beekeepy.network import raw_http_call
 from schemas.jsonrpc import JSONRPCRequest
 
 if TYPE_CHECKING:
-    import test_tools as tt
     from local_tools.beekeepy.models import WalletInfo
 
     from beekeepy._handle import Beekeeper
+    from helpy import AccountCredentials
 
 
-def test_sign_digest_response_uniques(beekeeper: Beekeeper, wallet: WalletInfo, account: tt.Account) -> None:  # noqa: ARG001
+def test_sign_digest_response_uniques(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:  # noqa: ARG001
     """Test test_sign_digest_response_uniques will check if signature returned from sign_digest call is unique."""
     # ARRANGE
     expected_signature_amount = 2

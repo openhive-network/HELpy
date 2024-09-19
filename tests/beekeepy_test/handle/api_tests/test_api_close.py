@@ -9,9 +9,8 @@ from local_tools.beekeepy.models import WalletInfo
 from helpy.exceptions import RequestError
 
 if TYPE_CHECKING:
-    import test_tools as tt
-
     from beekeepy._handle import Beekeeper
+    from helpy import AccountCredentials
 
 
 def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
@@ -29,7 +28,7 @@ def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
 
 
 def test_api_close_import_key_to_closed_wallet(
-    beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[tt.Account]
+    beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[AccountCredentials]
 ) -> None:
     """Test test_api_close_import_key_to_closed_wallet will test possibility of importing key into the closed wallet."""
     # ARRANGE
@@ -40,7 +39,9 @@ def test_api_close_import_key_to_closed_wallet(
         beekeeper.api.import_key(wif_key=keys_to_import[0].private_key, wallet_name=wallet.name)
 
 
-def test_api_close_double_close(beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[tt.Account]) -> None:
+def test_api_close_double_close(
+    beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[AccountCredentials]
+) -> None:
     """Test test_api_close_double_close will test possibility of double closing wallet."""
     # ARRANGE
     beekeeper.api.import_key(wif_key=keys_to_import[0].private_key, wallet_name=wallet.name)
