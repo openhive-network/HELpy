@@ -416,7 +416,6 @@ develop = true
 aiohttp = "3.9.1"
 httpx = {version = "0.23.3", extras = ["http2"]}
 loguru = "0.7.2"
-pytest-is-running = "1.5.0"
 python-dateutil = "2.8.2"
 pytz = "2024.2"
 requests = "2.27.1"
@@ -898,17 +897,6 @@ pytest = ">=7.0.0"
 [package.extras]
 docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (>=0.931)", "pytest-trio (>=0.7.0)"]
-
-[[package]]
-name = "pytest-is-running"
-version = "1.5.0"
-description = "pytest plugin providing a function to check if pytest is running."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pytest_is_running-1.5.0-py3-none-any.whl", hash = "sha256:2bba7f7f4343bf8fbd5eb7ebb895ab21083b2779b89475211deba2d9bfa40f49"},
-    {file = "pytest_is_running-1.5.0.tar.gz", hash = "sha256:dc227f6d33f76c003c2e5b408734fb2cae02dbd627a1018f78d6196a796943e2"},
-]
 
 [[package]]
 name = "pytest-xdist"
