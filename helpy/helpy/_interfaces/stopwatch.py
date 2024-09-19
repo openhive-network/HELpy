@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
-
-from pytz import utc
 
 from helpy._interfaces.context import ContextSync
 
@@ -35,4 +33,4 @@ class Stopwatch(ContextSync[StopwatchResult]):
         self.__result.stopped_at = self.__now()
 
     def __now(self) -> datetime:
-        return datetime.now(tz=utc)
+        return datetime.now(tz=timezone.utc)
