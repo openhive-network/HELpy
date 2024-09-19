@@ -38,19 +38,7 @@ __all__ = [
     "AsyncRemoteBeekeeper",
     "Beekeeper",
     "AsyncBeekeeper",
-    "run_if_possible",
-    "close_if_possible",
 ]
-
-
-def run_if_possible(handle: SyncRemoteBeekeeper | AsyncRemoteBeekeeper | Beekeeper | AsyncBeekeeper) -> None:
-    if isinstance(handle, Beekeeper | AsyncBeekeeper):
-        handle.run()
-
-
-def close_if_possible(handle: SyncRemoteBeekeeper | AsyncRemoteBeekeeper | Beekeeper | AsyncBeekeeper) -> None:
-    if isinstance(handle, Beekeeper | AsyncBeekeeper):
-        handle.close()
 
 
 class SyncRemoteBeekeeper(helpy.Beekeeper):
