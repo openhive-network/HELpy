@@ -85,6 +85,10 @@ class Session(SessionInterface, StateInvalidator):
         raise UnknownDecisionPathError
 
     @property
+    def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
+        return [wallet.unlocked for wallet in self.wallets if wallet.unlocked]
+
+    @property
     def token(self) -> str:
         if self.__session_token == "":
             self.__session_token = self.__beekeeper.api.create_session().token
