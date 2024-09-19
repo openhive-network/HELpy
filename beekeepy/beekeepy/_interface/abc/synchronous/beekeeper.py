@@ -35,18 +35,10 @@ class Beekeeper(ContextSync["Beekeeper"], ABC):
     def detach(self) -> None: ...
 
     @classmethod
-    @abstractmethod
-    def _factory(cls, *, settings: Settings | None = None) -> Beekeeper: ...
-
-    @classmethod
     def factory(cls, *, settings: Settings | None = None) -> Beekeeper:
         from beekeepy._interface.synchronous.beekeeper import Beekeeper as BeekeeperImplementation
 
         return BeekeeperImplementation._factory(settings=settings)
-
-    @classmethod
-    @abstractmethod
-    def _remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> Beekeeper: ...
 
     @classmethod
     def remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> Beekeeper:
