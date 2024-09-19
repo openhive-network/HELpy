@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
-
-from pytz import utc
 
 import helpy
 import helpy._communication
@@ -24,7 +22,7 @@ async def send_notification(address: HttpUrl, notification: KnownNotificationT) 
         address.as_string(),
         headers=communicator._json_headers(),
         content=Notification(
-            name=notification.get_notification_name(), time=datetime.now(tz=utc), value=notification
+            name=notification.get_notification_name(), time=datetime.now(tz=timezone.utc), value=notification
         ).json(by_alias=True),
     )
 
