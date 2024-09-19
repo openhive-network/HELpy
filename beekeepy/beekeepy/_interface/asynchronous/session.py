@@ -94,6 +94,15 @@ class Session(SessionInterface, StateInvalidator):
         return [item.public_key for item in (await self.__beekeeper.api.get_public_keys(token=await self.token)).keys]
 
     @property
+    async def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
+        result = []
+        for wallet in await self.wallets:
+            unlocked_wallet = await wallet.unlocked
+            if unlocked_wallet:
+                result.append(unlocked_wallet)
+        return result
+
+    @property
     async def token(self) -> str:
         if self.__session_token == "":
             self.__session_token = (await self.__beekeeper.api.create_session()).token
