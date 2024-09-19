@@ -7,10 +7,10 @@ import pytest
 from helpy.exceptions import RequestError
 
 if TYPE_CHECKING:
-    import test_tools as tt
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
     from beekeepy._handle import Beekeeper
+    from helpy import AccountCredentials
 
 
 def test_api_import_key(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:
@@ -26,7 +26,9 @@ def test_api_import_key(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) 
         ), "Public key of imported wif should match."
 
 
-def test_api_import_key_to_locked(beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[tt.Account]) -> None:
+def test_api_import_key_to_locked(
+    beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[AccountCredentials]
+) -> None:
     """Test test_api_import_key_to_locked will test beekeeper_api.import_key to the locked wallet."""
     # ARRANGE & ACT
     beekeeper.api.lock(wallet_name=wallet.name)
@@ -36,7 +38,9 @@ def test_api_import_key_to_locked(beekeeper: Beekeeper, wallet: WalletInfo, keys
         beekeeper.api.import_key(wallet_name=wallet.name, wif_key=keys_to_import[0].private_key)
 
 
-def test_api_import_key_to_closed(beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[tt.Account]) -> None:
+def test_api_import_key_to_closed(
+    beekeeper: Beekeeper, wallet: WalletInfo, keys_to_import: list[AccountCredentials]
+) -> None:
     """Test test_api_import_key_to_closed will test beekeeper_api.import_key to the closed wallet."""
     # ARRANGE & ACT
     beekeeper.api.close(wallet_name=wallet.name)
