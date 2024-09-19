@@ -129,6 +129,9 @@ prepare_hived_data:
 build_helpy_wheel:
   stage: helpy
   extends: .build_wheel_template
+  needs:
+    - job: pre_commit_checks
+    - job: run_helpy_tests
   variables:
     PYPROJECT_DIR: "$HELPY_DIR"
 
@@ -137,6 +140,7 @@ build_beekeepy_wheel:
   stage: beekeepy
   extends: .build_wheel_template
   needs:
+    - job: pre_commit_checks
     - job: run_beekeepy_tests
     - job: build_helpy_wheel
     - job: deploy_helpy_wheel_to_gitlab
@@ -160,14 +164,7 @@ build_beekeepy_wheel:
   needs:
     - job: prepare_hived_testnet_image
       artifacts: true
-    - job: prepare_hived_data
-      artifacts: true
   variables:
-    HIVED_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/hived"
-    CLI_WALLET_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/cli_wallet"
-    GET_DEV_KEY_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/get_dev_key"
-    BLOCK_LOG_UTIL_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/block_log_util"
-    SST_DUMP_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/sst_dump"
     HIVED_COMMIT: $HIVED_COMMIT
     HIVED_UID: $HIVED_UID
     PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
@@ -175,7 +172,7 @@ build_beekeepy_wheel:
     SUBPROJECT_TEST_TARGET: ""
     HIVED_HTTP_ENDPOINT: ""
   before_script:
-    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+    - cp $CI_PROJECT_DIR/hived-testnet-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
     - !reference [.project_develop_configuration_template, before_script]
   script:
     - if [ -z "${HIVED_HTTP_ENDPOINT}" ]; then HIVED_HTTP_ENDPOINT=""; else HIVED_HTTP_ENDPOINT="--hived-http-endpoint=${HIVED_HTTP_ENDPOINT}"; fi
@@ -192,6 +189,10 @@ build_beekeepy_wheel:
 run_helpy_tests:
   stage: helpy
   extends: .run_tests_template
+  needs:
+  - !reference [.run_tests_template, needs]
+  - job: prepare_hived_data
+    artifacts: true
   services:
     - name: $HIVED_IMAGE_NAME
       alias: hived-instance
@@ -208,6 +209,11 @@ run_beekeepy_tests:
   stage: beekeepy
   extends: .run_tests_template
   variables:
+    HIVED_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/hived"
+    CLI_WALLET_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/cli_wallet"
+    GET_DEV_KEY_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/get_dev_key"
+    BLOCK_LOG_UTIL_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/block_log_util"
+    SST_DUMP_PATH: "$CI_PROJECT_DIR/hived-testnet-binaries/sst_dump"
     SUBPROJECT_TEST_TARGET: "beekeepy"
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
