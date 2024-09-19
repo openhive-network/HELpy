@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Final
-
-import pytz
 
 from helpy import ContextAsync, ContextSync
 from helpy.exceptions import RequestError
@@ -38,7 +36,7 @@ class DelayGuardBase:
         return self._exception_occured
 
     def __now(self) -> datetime:
-        return datetime.now(pytz.utc)
+        return datetime.now(timezone.utc)
 
 
 class SyncDelayGuard(DelayGuardBase, ContextSync["SyncDelayGuard"]):
