@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Generic, Literal, TypeVar
 from urllib.parse import urlparse
 
+from typing_extensions import Self
+
 P2PProtocolT = Literal[""]
 HttpProtocolT = Literal["http", "https"]
 WsProtocolT = Literal["ws", "wss"]
@@ -13,7 +15,7 @@ class Url(Generic[ProtocolT]):
     """Wrapper for Url, for handy access to all of it members with serialization."""
 
     def __init__(self, url: str | Url[ProtocolT], *, protocol: ProtocolT | None = None) -> None:
-        target_protocol: str = protocol or ""
+        target_protocol: str = protocol or self._default_protocol()
         if isinstance(url, Url):
             self.__protocol: str = url.__protocol
             self.__address: str = url.__address
@@ -65,13 +67,25 @@ class Url(Generic[ProtocolT]):
 
         return f"{protocol_prefix}{self.address}{port_suffix}"
 
+    @classmethod
+    def factory(cls, *, port: int = 0, address: str = "127.0.0.1") -> Self:
+        return cls(f"{cls._default_protocol()}://{address}:{port}")
+
+    @classmethod
+    def _default_protocol(cls) -> str:
+        return ""
+
 
 class HttpUrl(Url[HttpProtocolT]):
-    pass
+    @classmethod
+    def _default_protocol(cls) -> str:
+        return "http"
 
 
 class WsUrl(Url[WsProtocolT]):
-    pass
+    @classmethod
+    def _default_protocol(cls) -> str:
+        return "ws"
 
 
 class P2PUrl(Url[P2PProtocolT]):

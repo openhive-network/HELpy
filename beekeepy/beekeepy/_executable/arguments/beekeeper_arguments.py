@@ -10,7 +10,6 @@ from helpy._executable.arguments import Arguments
 
 class BeekeeperArgumentsDefaults:
     DEFAULT_BACKTRACE: ClassVar[Literal["yes", "no"]] = "yes"
-    DEFAULT_DATA_DIR: ClassVar[Path] = Path.cwd()
     DEFAULT_EXPORT_KEYS_WALLET: ClassVar[ExportKeysWalletParams | None] = None
     DEFAULT_LOG_JSON_RPC: ClassVar[Path | None] = None
     DEFAULT_UNLOCK_TIMEOUT: ClassVar[int] = 900
@@ -28,7 +27,7 @@ class ExportKeysWalletParams:
 
 class BeekeeperArguments(Arguments):
     backtrace: Literal["yes", "no"] | None = BeekeeperArgumentsDefaults.DEFAULT_BACKTRACE
-    data_dir: Path = BeekeeperArgumentsDefaults.DEFAULT_DATA_DIR
+    data_dir: Path | None = None
     export_keys_wallet: ExportKeysWalletParams | None = BeekeeperArgumentsDefaults.DEFAULT_EXPORT_KEYS_WALLET
     log_json_rpc: Path | None = BeekeeperArgumentsDefaults.DEFAULT_LOG_JSON_RPC
     unlock_timeout: int | None = BeekeeperArgumentsDefaults.DEFAULT_UNLOCK_TIMEOUT
