@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments, ExportKeysWalletParams
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
-from beekeepy._executable.executable import Executable
 from beekeepy._interface.settings import Settings
 from helpy import HttpUrl, KeyPair
+from helpy._executable.executable import Executable
 
 if TYPE_CHECKING:
     from loguru import Logger
