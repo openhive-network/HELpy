@@ -21,11 +21,11 @@ if TYPE_CHECKING:
     from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._handles.abc.api_collection import (
+    from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
+    from helpy._interfaces.api.abc import (
         AbstractAsyncApiCollection,
         AbstractSyncApiCollection,
     )
-    from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
 
 
@@ -64,6 +64,10 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         self.logger.debug(f"setting http endpoint to: {value.as_string()}")
         with self.update_settings() as settings:
             settings.http_endpoint = value
+
+    @property
+    def apis(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
+        return self.__api
 
     @property
     def api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+    from helpy._interfaces.api.beekeeper_api import AsyncBeekeeperApi, SyncBeekeeperApi
     from helpy._interfaces.url import HttpUrl
 
 _handle_target_service_name = "beekeeper"
@@ -72,8 +72,12 @@ class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
         return BeekeeperSyncApiCollection(owner=self)
 
     @property
+    def apis(self) -> BeekeeperSyncApiCollection:
+        return cast(BeekeeperSyncApiCollection, super().api)
+
+    @property
     def api(self) -> SyncBeekeeperApi:  # type: ignore[override]
-        return cast(BeekeeperSyncApiCollection, super().api).beekeeper
+        return self.apis.beekeeper
 
     def _target_service(self) -> str:
         return _handle_target_service_name
@@ -99,6 +103,10 @@ class AsyncBeekeeper(AbstractAsyncHandle, AsyncSessionHolder):
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:
         return BeekeeperAsyncApiCollection(owner=self)
+
+    @property
+    def apis(self) -> BeekeeperAsyncApiCollection:
+        return cast(BeekeeperAsyncApiCollection, super().api)
 
     @property
     def api(self) -> AsyncBeekeeperApi:  # type: ignore[override]
