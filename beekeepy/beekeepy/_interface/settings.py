@@ -18,9 +18,6 @@ class Settings(HandleSettings):
     http_endpoint: HttpUrl | None = None  # type: ignore[assignment]
     """Endpoint on which python will communicate with beekeeper, required for remote beekeeper."""
 
-    notification_endpoint: HttpUrl | None = None
-    """Endpoint to use for reverse communication between beekeeper and python."""
-
     binary_path: Path | None = None
     """Alternative path to beekeeper binary."""
 

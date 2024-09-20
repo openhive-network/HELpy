@@ -26,8 +26,12 @@ class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
         return self._hived_target_service_name()
 
     @property
-    def api(self) -> HivedAsyncApiCollection:
+    def apis(self) -> HivedAsyncApiCollection:
         return cast(HivedAsyncApiCollection, super().api)
+
+    @property
+    def api(self) -> HivedAsyncApiCollection:
+        return self.apis
 
     async def get_dynamic_global_properties(self) -> HiveHandleCommonHelpers.GetDynamicGlobalPropertiesT:
         return await self.api.database.get_dynamic_global_properties()

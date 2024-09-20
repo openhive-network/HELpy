@@ -4,9 +4,7 @@ from helpy._handles import (
     AsyncBeekeeper,
     AsyncHived,
     Beekeeper,
-    BeekeeperNotificationHandler,
     Hived,
-    HivedNotificationHandler,
 )
 from helpy._handles.settings import Settings
 from helpy._interfaces import wax
@@ -29,12 +27,10 @@ __all__ = [
     "AsyncBeekeeper",
     "AsyncHived",
     "Beekeeper",
-    "BeekeeperNotificationHandler",
     "ContextAsync",
     "ContextSync",
     "Hf26Asset",
     "Hived",
-    "HivedNotificationHandler",
     "HttpUrl",
     "KeyPair",
     "LegacyAsset",

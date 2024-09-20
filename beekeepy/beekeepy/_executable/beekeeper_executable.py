@@ -10,7 +10,7 @@ from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgument
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
 from beekeepy._interface.settings import Settings
-from helpy import HttpUrl, KeyPair
+from helpy import KeyPair
 from helpy._executable.executable import Executable
 
 if TYPE_CHECKING:
@@ -42,7 +42,6 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
                 blocking=True,
                 arguments=BeekeeperArguments(
                     data_dir=tempdir_path,
-                    notifications_endpoint=HttpUrl("0.0.0.0:0"),
                     export_keys_wallet=ExportKeysWalletParams(wallet_name=wallet_name, wallet_password=wallet_password),
                 ),
             )
