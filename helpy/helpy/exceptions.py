@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 import json
 from typing import TYPE_CHECKING, Any
 
@@ -153,8 +154,10 @@ class ExceededAmountOfRetriesError(CommunicationError):
 class InvalidOptionError(HelpyError):
     """Raised if invalid expression is given in config."""
 
+class ExecutableError(HelpyError, ABC):
+    """Base class for errors related to handling executable."""
 
-class TimeoutReachWhileCloseError(HelpyError):
+class TimeoutReachWhileCloseError(ExecutableError):
     """Raises when executable did not closed during specified timeout."""
 
     def __init__(self) -> None:
@@ -162,5 +165,13 @@ class TimeoutReachWhileCloseError(HelpyError):
         super().__init__("Process was force-closed with SIGKILL, because didn't close before timeout")
 
 
-class ExecutableIsNotRunningError(HelpyError):
+class ExecutableIsNotRunningError(ExecutableError):
     """Raises when executable is not running, but user requests action on running instance."""
+
+
+class FailedToStartExecutableError(ExecutableError):
+    """Raises when executable failed to start."""
+
+
+class FailedToDetectReservedPorts(ExecutableError):
+    """Raises when port lookup procedure fails."""

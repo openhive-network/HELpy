@@ -75,11 +75,26 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
     def config(self) -> ConfigT:
         return self.__config
 
+    @property
+    def arguments(self) -> ArgumentT:
+        return self.__arguments
+
     def run(
         self,
         *,
         blocking: bool,
-        arguments: ArgumentT | None = None,
+        environ: dict[str, str] | None = None,
+        propagate_sigint: bool = True,
+    ) -> AutoCloser:
+        return self.__run(
+            blocking=blocking, arguments=self.arguments, environ=environ, propagate_sigint=propagate_sigint
+        )
+
+    def __run(
+        self,
+        *,
+        blocking: bool,
+        arguments: ArgumentT,
         environ: dict[str, str] | None = None,
         propagate_sigint: bool = True,
     ) -> AutoCloser:
@@ -111,17 +126,14 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
         return AutoCloser(self)
 
-    def run_and_get_output(
+    def __run_and_get_output(
         self, arguments: ArgumentT, environ: dict[str, str] | None = None, timeout: float | None = None
     ) -> str:
         command, environment_variables = self.__prepare(arguments=arguments, environ=environ)
         result = subprocess.check_output(command, stderr=subprocess.STDOUT, env=environment_variables, timeout=timeout)
         return result.decode().strip()
 
-    def __prepare(
-        self, arguments: ArgumentT | None, environ: dict[str, str] | None
-    ) -> tuple[list[str], dict[str, str]]:
-        arguments = arguments or self.__arguments
+    def __prepare(self, arguments: ArgumentT, environ: dict[str, str] | None) -> tuple[list[str], dict[str, str]]:
         environ = environ or {}
 
         self.__working_directory.mkdir(exist_ok=True)
@@ -200,15 +212,15 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
     def generate_default_config(self) -> ConfigT:
         path_to_config = self.working_directory / (Config.DEFAULT_FILE_NAME)
-        self.run(blocking=True, arguments=self.__arguments.just_dump_config())
+        self.__run(blocking=True, arguments=self.__arguments.just_dump_config())
         temp_path_to_file = path_to_config.rename(Config.DEFAULT_FILE_NAME + ".tmp")
         return self.config.load(temp_path_to_file)
 
     def get_help_text(self) -> str:
-        return self.run_and_get_output(arguments=self.__arguments.just_get_help())
+        return self.__run_and_get_output(arguments=self.__arguments.just_get_help())
 
     def version(self) -> str:
-        return self.run_and_get_output(arguments=self.__arguments.just_get_version())
+        return self.__run_and_get_output(arguments=self.__arguments.just_get_version())
 
     def reserved_ports(self, *, timeout_seconds: int = 10) -> list[int]:
         assert self.is_running(), "Cannot obtain reserved ports for not started executable"

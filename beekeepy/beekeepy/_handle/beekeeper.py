@@ -1,28 +1,21 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from subprocess import CalledProcessError
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 from beekeepy.exceptions.common import BeekeeperFailedToStartError
 import helpy
 from beekeepy._executable import BeekeeperArguments, BeekeeperExecutable
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgumentsDefaults
+from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._interface.settings import Settings
-from beekeepy.exceptions import BeekeeperIsNotRunningError
-from helpy import ContextAsync, ContextSync
-from helpy.exceptions import ExecutableIsNotRunningError
+from helpy import ContextAsync, ContextSync, HttpUrl, KeyPair
+from helpy._runnable_handle.runnable_handle import RunnableHandle
+from helpy.exceptions import ExecutableError
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from loguru import Logger
-
-    from beekeepy._executable.beekeeper_config import BeekeeperConfig
-    from helpy import KeyPair
-
-
-EnterReturnT = TypeVar("EnterReturnT", bound=helpy.Beekeeper | helpy.AsyncBeekeeper)
+    from helpy._runnable_handle.match_ports import PortMatchingResult
 
 
 __all__ = [
@@ -33,111 +26,62 @@ __all__ = [
 ]
 
 
-class SyncRemoteBeekeeper(helpy.Beekeeper):
+class SyncRemoteBeekeeper(helpy.SyncBeekeeperTemplate[Settings]):
     pass
 
 
-class AsyncRemoteBeekeeper(helpy.AsyncBeekeeper):
+class AsyncRemoteBeekeeper(helpy.AsyncBeekeeperTemplate[Settings]):
     pass
 
 
-class BeekeeperCommon(ABC):
-    def __init__(self, *args: Any, settings: Settings, logger: Logger, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.__exec = BeekeeperExecutable(settings, logger)
-        self.__logger = logger
+class RunnableBeekeeper(RunnableHandle[BeekeeperExecutable, BeekeeperConfig, BeekeeperArguments, Settings]):
+    def _construct_executable(self) -> BeekeeperExecutable:
+        return BeekeeperExecutable(settings=self._get_settings(), logger=self._logger)
 
-    @property
-    def pid(self) -> int:
-        if not self.is_running:
-            raise BeekeeperIsNotRunningError
-        return self.__exec.pid
+    def _get_working_directory_from_cli_arguments(self) -> Path | None:
+        return self.arguments.data_dir
 
-    @property
-    def config(self) -> BeekeeperConfig:
-        return self.__exec.config
+    def _get_http_endpoint_from_cli_arguments(self) -> HttpUrl | None:
+        return self.arguments.webserver_http_endpoint
 
-    @property
-    def is_running(self) -> bool:
-        return self.__exec is not None and self.__exec.is_running()
+    def _get_http_endpoint_from_config(self) -> HttpUrl | None:
+        return self.config.webserver_http_endpoint
 
-    def __wait_till_ready(self) -> None:
-        ports = self.__exec.reserved_ports()
-        if False:
-            raise NotImplementedError("TODO: Fix case when beekeeper is already running")
-        raise TimeoutError("Waiting too long for beekeeper to be up and running")
+    def _unify_cli_arguments(self, working_directory: Path, http_endpoint: HttpUrl) -> None:
+        self.arguments.data_dir = working_directory
+        self.arguments.webserver_http_endpoint = http_endpoint
 
-    def _run(self, settings: Settings, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
-        aca = additional_cli_arguments or BeekeeperArguments()
-        settings.http_endpoint = (
-            aca.webserver_http_endpoint or settings.http_endpoint or helpy.HttpUrl("127.0.0.1:0", protocol="http")
-        )
-        settings.working_directory = (
-            aca.data_dir
-            if aca.data_dir != BeekeeperArgumentsDefaults.DEFAULT_DATA_DIR
-            else self.__exec.working_directory
-        )
-        try:
-            self._run_application(settings=settings, additional_cli_arguments=aca)
-        except CalledProcessError as e:
-            raise BeekeeperFailedToStartError from e
-        try:
-            self.__wait_till_ready()
-        except (AssertionError, TimeoutError) as e:
-            self.close()
-            raise BeekeeperFailedToStartError from e
+    def _unify_config(self, working_directory: Path, http_endpoint: HttpUrl) -> None:  # noqa: ARG002
+        self.config.webserver_http_endpoint = http_endpoint
 
-    def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
-        assert settings.http_endpoint is not None
-        self.__exec.run(
-            blocking=False,
-            arguments=additional_cli_arguments.copy(
-                update={
-                    "webserver_http_endpoint": settings.http_endpoint,
-                    "data_dir": settings.working_directory,
-                }
-            ),
-            propagate_sigint=settings.propagate_sigint,
-        )
+    def run(self, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
+        with self._exec.restore_arguments(additional_cli_arguments):
+            self._pre_run_actions()
+            try:
+                self._run()
+            except ExecutableError as e:
+                raise BeekeeperFailedToStartError from e
 
-    def detach(self) -> int:
-        try:
-            return self.__exec.detach()
-        except ExecutableIsNotRunningError as e:
-            raise BeekeeperIsNotRunningError from e
+    def _write_ports(self, editable_settings: Settings, ports: PortMatchingResult) -> None:
+        editable_settings.http_endpoint = ports.http
 
-    def close(self) -> None:
-        self._close_application()
-
-    def _close_application(self) -> None:
-        if self.__exec.is_running():
-            self.__exec.close(self._get_settings().close_timeout.total_seconds())
+        self.config.webserver_http_endpoint = ports.http
+        self.config.webserver_ws_endpoint = ports.websocket
 
     def export_keys_wallet(
         self, wallet_name: str, wallet_password: str, extract_to: Path | None = None
     ) -> list[KeyPair]:
-        return self.__exec.export_keys_wallet(
+        return self._exec.export_keys_wallet(
             wallet_name=wallet_name, wallet_password=wallet_password, extract_to=extract_to
         )
 
     @abstractmethod
-    def _get_settings(self) -> Settings: ...
+    def _pre_run_actions(self) -> None: ...
 
 
-class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
-    def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
-        self._clear_session()
-        with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
-        self.http_endpoint = self._get_http_endpoint_from_event()
-
+class Beekeeper(RunnableBeekeeper, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
     def _get_settings(self) -> Settings:
-        assert isinstance(self.settings, Settings)
         return self.settings
-
-    @property
-    def settings(self) -> Settings:
-        return cast(Settings, super().settings)
 
     def _enter(self) -> Beekeeper:
         self.run()
@@ -146,21 +90,17 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
     def _finally(self) -> None:
         self.close()
 
-
-class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncBeekeeper"]):
-    def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
-        self._clear_session()
+    def _setup_ports(self, ports: PortMatchingResult) -> None:
         with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
-        self.http_endpoint = self._get_http_endpoint_from_event()
+            self._write_ports(settings, ports)
 
+    def _pre_run_actions(self) -> None:
+        self._clear_session()
+
+
+class AsyncBeekeeper(RunnableBeekeeper, AsyncRemoteBeekeeper, ContextAsync["AsyncBeekeeper"]):
     def _get_settings(self) -> Settings:
-        assert isinstance(self.settings, Settings)
         return self.settings
-
-    @property
-    def settings(self) -> Settings:
-        return cast(Settings, super().settings)
 
     async def _aenter(self) -> AsyncBeekeeper:
         self.run()
@@ -168,3 +108,10 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
 
     async def _afinally(self) -> None:
         self.close()
+
+    def _setup_ports(self, ports: PortMatchingResult) -> None:
+        with self.update_settings() as settings:
+            self._write_ports(settings, ports)
+
+    def _pre_run_actions(self) -> None:
+        self._clear_session()
