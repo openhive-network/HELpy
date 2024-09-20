@@ -38,13 +38,15 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
                 settings=Settings(binary_path=get_beekeeper_binary_path(), working_directory=self.working_directory),
                 logger=self._logger,
             )
-            bk.run(
-                blocking=True,
-                arguments=BeekeeperArguments(
+            with bk.restore_arguments(
+                BeekeeperArguments(
                     data_dir=tempdir_path,
                     export_keys_wallet=ExportKeysWalletParams(wallet_name=wallet_name, wallet_password=wallet_password),
-                ),
-            )
+                )
+            ):
+                bk.run(
+                    blocking=True,
+                )
 
         keys_path = bk.working_directory / f"{wallet_name}.keys"
         if extract_to is not None:
