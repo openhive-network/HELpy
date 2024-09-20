@@ -152,3 +152,11 @@ class ExceededAmountOfRetriesError(CommunicationError):
 
 class InvalidOptionError(HelpyError):
     """Raised if invalid expression is given in config."""
+
+
+class TimeoutReachWhileCloseError(HelpyError):
+    """Raises when executable did not closed during specified timeout."""
+
+    def __init__(self) -> None:
+        """Constructor."""
+        super().__init__("Process was force-closed with SIGKILL, because didn't close before timeout")

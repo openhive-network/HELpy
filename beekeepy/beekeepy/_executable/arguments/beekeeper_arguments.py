@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar, Literal
 
-from beekeepy._executable.arguments.arguments import Arguments
 from helpy import HttpUrl
+from helpy._executable.arguments import Arguments
 
 
 class BeekeeperArgumentsDefaults:

@@ -39,14 +39,6 @@ class WalletIsLockedError(BeekeepyError):
         super().__init__(f"Wallet `{wallet_name}` is locked.")
 
 
-class TimeoutReachWhileCloseError(BeekeepyError):
-    """Raises when beekeeper did not closed during specified timeout."""
-
-    def __init__(self) -> None:
-        """Constructor."""
-        super().__init__("Process was force-closed with SIGKILL, because didn't close before timeout")
-
-
 class UnknownDecisionPathError(BeekeepyError):
     """Error created to suppress mypy error: `Missing return statement  [return]`."""
 
