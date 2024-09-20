@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol, TypeVar
 
 from loguru import logger
 
@@ -28,18 +28,20 @@ if TYPE_CHECKING:
     )
     from helpy._interfaces.url import HttpUrl
 
+RemoteSettingsT = TypeVar("RemoteSettingsT", bound=Settings)
+
 
 class MissingResultError(HelpyError):
     """Raised if response does not have any response."""
 
 
-class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
+class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC):
     """Provides basic interface for all network handles."""
 
     def __init__(
         self,
         *args: Any,
-        settings: Settings,
+        settings: RemoteSettingsT,
         **kwargs: Any,
     ) -> None:
         """Constructs handle to network service.
@@ -153,7 +155,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     def __workaround_communication_problem_with_node(  # noqa: C901
         send_request: _SyncCall | _AsyncCall,
     ) -> Callable[..., JSONRPCResult[Any]]:
-        def __handle_exception(this: AbstractHandle, exception: RequestError | CommunicationError) -> None:
+        def __handle_exception(this: AbstractHandle[Any], exception: RequestError | CommunicationError) -> None:
             ignored_messages = [
                 "Unable to acquire database lock",
                 "Unable to acquire forkdb lock",
@@ -165,7 +167,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
                     return
             raise exception
 
-        def sync_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+        def sync_impl(this: AbstractHandle[Any], *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
             while True:
                 try:
                     return send_request(*[this, *args], **kwargs)  # type: ignore[return-value]
@@ -174,7 +176,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
                 except RequestError as exception:
                     __handle_exception(this, exception)
 
-        async def async_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
+        async def async_impl(this: AbstractHandle[Any], *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
             while True:
                 try:
                     return await send_request(*[this, *args], **kwargs)  # type: ignore[no-any-return, misc]
@@ -188,7 +190,7 @@ def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
     return __workaround_communication_problem_with_node
 
 
-class AbstractAsyncHandle(AbstractHandle, ABC):
+class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT], ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     @_retry_on_unable_to_acquire_database_lock(async_version=True)  # type: ignore[arg-type]
@@ -221,7 +223,7 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
         """Returns async batch handle."""
 
 
-class AbstractSyncHandle(AbstractHandle, ABC):
+class AbstractSyncHandle(AbstractHandle[RemoteSettingsT], ABC):
     """Base class for service handlers that uses synchronous communication."""
 
     @_retry_on_unable_to_acquire_database_lock(async_version=False)  # type: ignore[arg-type]

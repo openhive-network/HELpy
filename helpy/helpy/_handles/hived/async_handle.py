@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, cast
 
-from helpy._handles.abc.handle import AbstractAsyncHandle
+from helpy._handles.abc.handle import AbstractAsyncHandle, RemoteSettingsT
 from helpy._handles.batch_handle import AsyncBatchHandle
 from helpy._handles.hived.api.api_collection import (
     HivedAsyncApiCollection,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from schemas.fields.basic import AccountName
 
 
-class AsyncHived(AbstractAsyncHandle, HiveHandleCommonHelpers):
+class AsyncHived(AbstractAsyncHandle[RemoteSettingsT], HiveHandleCommonHelpers):
     def _construct_api(self) -> HivedAsyncApiCollection:
         return HivedAsyncApiCollection(owner=self)
 

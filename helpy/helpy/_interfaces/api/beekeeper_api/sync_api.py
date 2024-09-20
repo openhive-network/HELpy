@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from helpy._handles.beekeeper.api.apply_session_token import sync_apply_session_token
 from helpy._handles.beekeeper.api.beekeeper_api_commons import BeekeeperApiCommons
@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
     api = AbstractSyncApi._endpoint
 
-    _owner: Beekeeper | _SyncSessionBatchHandle
+    _owner: Beekeeper[Any] | _SyncSessionBatchHandle
 
-    def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
+    def __init__(self, owner: Beekeeper[Any] | _SyncSessionBatchHandle) -> None:
         self._verify_is_owner_can_hold_session_token(owner=owner)
         super().__init__(owner=owner)
 

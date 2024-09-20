@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from helpy._handles import (
-    AsyncBeekeeper,
-    AsyncHived,
-    Beekeeper,
-    Hived,
+    AsyncBeekeeper as AsyncBeekeeperTemplate,
+)
+from helpy._handles import (
+    AsyncHived as AsyncHivedTemplate,
+)
+from helpy._handles import (
+    Beekeeper as SyncBeekeeperTemplate,
+)
+from helpy._handles import (
+    Hived as SyncHivedTemplate,
 )
 from helpy._handles.settings import Settings
 from helpy._interfaces import wax
@@ -21,11 +27,18 @@ from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 __version__ = "0.0.0"
 
 
+AsyncBeekeeper = AsyncBeekeeperTemplate[Settings]
+AsyncHived = AsyncHivedTemplate[Settings]
+Beekeeper = SyncBeekeeperTemplate[Settings]
+Hived = SyncHivedTemplate[Settings]
+
 __all__ = [
-    "AccountCredentials",
     "AbstractConfig",
+    "AccountCredentials",
     "AsyncBeekeeper",
+    "AsyncBeekeeperTemplate",
     "AsyncHived",
+    "AsyncHivedTemplate",
     "Beekeeper",
     "ContextAsync",
     "ContextSync",
@@ -40,6 +53,8 @@ __all__ = [
     "SpeedUpRateTimeControl",
     "StartTimeControl",
     "Stopwatch",
+    "SyncBeekeeperTemplate",
+    "SyncHivedTemplate",
     "Time",
     "TimeFormats",
     "Transaction",

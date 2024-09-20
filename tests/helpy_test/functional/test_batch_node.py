@@ -7,8 +7,7 @@ import pytest
 from helpy.exceptions import CommunicationError, NothingToSendError, ResponseNotReadyError
 
 if TYPE_CHECKING:
-    from helpy._handles.hived.async_handle import AsyncHived
-    from helpy._handles.hived.sync_handle import Hived
+    from helpy import AsyncHived, Hived
 
 
 def test_batch_node(sync_node: Hived) -> None:
