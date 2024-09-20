@@ -2,45 +2,45 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._handles.abc.api_collection import (
+from helpy._interfaces.api.abc import (
     AbstractAsyncApiCollection,
     AbstractSyncApiCollection,
 )
-from helpy._handles.hived.api.account_by_key_api import (
+from helpy._interfaces.api.account_by_key_api import (
     AsyncAccountByKeyApi,
     SyncAccountByKeyApi,
 )
-from helpy._handles.hived.api.account_history_api import (
+from helpy._interfaces.api.account_history_api import (
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
-from helpy._handles.hived.api.block_api import AsyncBlockApi, SyncBlockApi
-from helpy._handles.hived.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
-from helpy._handles.hived.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
-from helpy._handles.hived.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
-from helpy._handles.hived.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
-from helpy._handles.hived.api.market_history_api import (
+from helpy._interfaces.api.block_api import AsyncBlockApi, SyncBlockApi
+from helpy._interfaces.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
+from helpy._interfaces.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
+from helpy._interfaces.api.debug_node_api import AsyncDebugNodeApi, SyncDebugNodeApi
+from helpy._interfaces.api.jsonrpc import AsyncJsonrpc, SyncJsonrpc
+from helpy._interfaces.api.market_history_api import (
     AsyncMarketHistoryApi,
     SyncMarketHistoryApi,
 )
-from helpy._handles.hived.api.network_broadcast_api import (
+from helpy._interfaces.api.network_broadcast_api import (
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
 )
-from helpy._handles.hived.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
-from helpy._handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
-from helpy._handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
-from helpy._handles.hived.api.transaction_status_api import (
+from helpy._interfaces.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
+from helpy._interfaces.api.rc_api import AsyncRcApi, SyncRcApi
+from helpy._interfaces.api.reputation_api import AsyncReputationApi, SyncReputationApi
+from helpy._interfaces.api.transaction_status_api import (
     AsyncTransactionStatusApi,
     SyncTransactionStatusApi,
 )
-from helpy._handles.hived.api.wallet_bridge_api import (
+from helpy._interfaces.api.wallet_bridge_api import (
     AsyncWalletBridgeApi,
     SyncWalletBridgeApi,
 )
 
 if TYPE_CHECKING:
-    from helpy._handles.abc.api import AsyncHandleT, SyncHandleT
+    from helpy._interfaces.api.abc import AsyncHandleT, SyncHandleT
 
 
 class HivedAsyncApiCollection(AbstractAsyncApiCollection):

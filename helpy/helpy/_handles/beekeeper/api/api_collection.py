@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._handles.abc.api_collection import (
+from helpy._interfaces.api.abc import (
     AbstractAsyncApiCollection,
     AbstractSyncApiCollection,
 )
-from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+from helpy._interfaces.api.beekeeper_api import AsyncBeekeeperApi, SyncBeekeeperApi
 
 if TYPE_CHECKING:
     from helpy._handles.beekeeper.handle import (
