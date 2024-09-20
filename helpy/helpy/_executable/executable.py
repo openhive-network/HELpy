@@ -6,6 +6,7 @@ import subprocess
 import time
 import warnings
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import psutil
@@ -17,6 +18,7 @@ from helpy._interfaces.context import ContextSync
 from helpy.exceptions import TimeoutReachWhileCloseError
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
     from loguru import Logger
@@ -181,6 +183,16 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
     def log_has_phrase(self, text: str) -> bool:
         return text in self.__files
+
+    @contextmanager
+    def restore_arguments(self, new_arguments: ArgumentT | None) -> Iterator[None]:
+        if new_arguments is not None:
+            __backup = self.__arguments
+            self.__arguments = new_arguments
+            yield
+            self.__arguments = __backup
+        else:
+            yield
 
     @abstractmethod
     def _construct_config(self) -> ConfigT: ...
