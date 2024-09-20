@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, Any, NoReturn, cast
 
-from helpy._handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
+from helpy._handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle, RemoteSettingsT
 from helpy._handles.batch_handle import ApiFactory, AsyncBatchHandle, SyncBatchHandle
 from helpy._handles.beekeeper.api.api_collection import (
     BeekeeperAsyncApiCollection,
@@ -65,7 +65,7 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], As
         _raise_acquire_not_possible()
 
 
-class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
+class Beekeeper(AbstractSyncHandle[RemoteSettingsT], SyncSessionHolder):
     """Synchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperSyncApiCollection:
@@ -98,7 +98,7 @@ class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
         return _random_string()
 
 
-class AsyncBeekeeper(AbstractAsyncHandle, AsyncSessionHolder):
+class AsyncBeekeeper(AbstractAsyncHandle[RemoteSettingsT], AsyncSessionHolder):
     """Asynchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:

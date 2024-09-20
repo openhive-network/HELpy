@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-SyncHandleT = AbstractSyncHandle | SyncBatchHandle[Any]
-AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle[Any]
+SyncHandleT = AbstractSyncHandle[Any] | SyncBatchHandle[Any]
+AsyncHandleT = AbstractAsyncHandle[Any] | AsyncBatchHandle[Any]
 HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
