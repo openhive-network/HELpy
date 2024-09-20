@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Protocol
 
-from helpy._handles.abc.api import HandleT
+from helpy._interfaces.api.abc import HandleT
 
 if TYPE_CHECKING:
     from helpy._handles.beekeeper.api.session_holder import AsyncSessionHolder, SyncSessionHolder
