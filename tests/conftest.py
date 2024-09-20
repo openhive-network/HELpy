@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import helpy
-from helpy._handles.abc.api import AbstractApi, RegisteredApisT
+from helpy._interfaces.api.abc import AbstractApi, RegisteredApisT
 
 
 def _convert_test_name_to_directory_name(test_name: str) -> str:

@@ -38,11 +38,6 @@ class Packed(UniqueSettingsHolder[Settings], Generic[FactoryT]):
     def __init__(self, settings: HelpySettings, unpack_factory: FactoryT) -> None:
         super().__init__(settings=cast(Settings, settings))
         self._unpack_factory = unpack_factory
-        self._prepare_settings_for_packing()
-
-    def _prepare_settings_for_packing(self) -> None:
-        with self.update_settings() as settings:
-            settings.notification_endpoint = None
 
 
 class PackedSyncBeekeeper(Packed[_SyncRemoteFactoryCallable]):

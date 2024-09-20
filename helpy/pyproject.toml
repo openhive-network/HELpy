@@ -24,11 +24,12 @@ source = [
 version = "0.0.0"
 
 [tool.poetry.dependencies]
+python = "^3.10"
 aiohttp = "3.9.1"
 httpx = {extras = ["http2"], version = "0.23.3"}
 loguru = "0.7.2"
-python = "^3.10"
 python-dateutil = "2.8.2"
+psutil = "6.0.0"
 requests = "2.27.1"
 schemas = "0.0.1.dev307+6f4cbb8"
 wax = "0.3.10.dev25+8044195"

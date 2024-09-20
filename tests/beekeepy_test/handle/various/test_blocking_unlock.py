@@ -98,14 +98,8 @@ async def test_wallet_blocking_timeout(beekeeper: AsyncBeekeeper, wallet: Wallet
     assert wallets[0].name == wallet.name
 
     unlock_jsons = []
-    assert beekeeper.settings.notification_endpoint is not None
     for i in range(5):
-        session = (
-            await beekeeper.api.create_session(
-                notifications_endpoint=beekeeper.settings.notification_endpoint.as_string(with_protocol=False),
-                salt=f"salt-{i}",
-            )
-        ).token
+        session = (await beekeeper.api.create_session(salt=f"salt-{i}")).token
         unlock_json = JSONRPCRequest(
             method="beekeeper_api.unlock",
             params={

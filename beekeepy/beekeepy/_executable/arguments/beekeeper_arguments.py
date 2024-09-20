@@ -13,7 +13,6 @@ class BeekeeperArgumentsDefaults:
     DEFAULT_DATA_DIR: ClassVar[Path] = Path.cwd()
     DEFAULT_EXPORT_KEYS_WALLET: ClassVar[ExportKeysWalletParams | None] = None
     DEFAULT_LOG_JSON_RPC: ClassVar[Path | None] = None
-    DEFAULT_NOTIFICATIONS_ENDPOINT: ClassVar[HttpUrl | None] = None
     DEFAULT_UNLOCK_TIMEOUT: ClassVar[int] = 900
     DEFAULT_UNLOCK_INTERVAL: ClassVar[int] = 500
     DEFAULT_WALLET_DIR: ClassVar[Path] = Path.cwd()
@@ -32,7 +31,6 @@ class BeekeeperArguments(Arguments):
     data_dir: Path = BeekeeperArgumentsDefaults.DEFAULT_DATA_DIR
     export_keys_wallet: ExportKeysWalletParams | None = BeekeeperArgumentsDefaults.DEFAULT_EXPORT_KEYS_WALLET
     log_json_rpc: Path | None = BeekeeperArgumentsDefaults.DEFAULT_LOG_JSON_RPC
-    notifications_endpoint: HttpUrl | None = BeekeeperArgumentsDefaults.DEFAULT_NOTIFICATIONS_ENDPOINT
     unlock_timeout: int | None = BeekeeperArgumentsDefaults.DEFAULT_UNLOCK_TIMEOUT
     wallet_dir: Path | None = BeekeeperArgumentsDefaults.DEFAULT_WALLET_DIR
     webserver_thread_pool_size: int | None = BeekeeperArgumentsDefaults.DEFAULT_WEBSERVER_THREAD_POOL_SIZE

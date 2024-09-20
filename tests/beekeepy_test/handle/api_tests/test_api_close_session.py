@@ -69,11 +69,7 @@ def test_api_close_session_not_existing(create_session: bool, beekeeper: Beekeep
     """Test test_api_close_session_not_existing will test possibility of closing not existing session."""
     # ARRANGE
     if create_session:
-        assert beekeeper.settings.notification_endpoint is not None
-        beekeeper.api.create_session(
-            notifications_endpoint=beekeeper.settings.notification_endpoint.as_string(with_protocol=False),
-            salt="salt",
-        )
+        beekeeper.api.create_session(salt="salt")
 
     # ACT & ASSERT
     beekeeper.set_session_token(WRONG_TOKEN)
