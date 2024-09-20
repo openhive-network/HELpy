@@ -23,7 +23,6 @@ class BeekeeperConfig(Config):
     webserver_ws_endpoint: WsUrl | None = None
     webserver_ws_deflate: int = 0
     webserver_thread_pool_size: int = 1
-    notifications_endpoint: HttpUrl | None = BeekeeperDefaults.DEFAULT_NOTIFICATIONS_ENDPOINT
     backtrace: str = BeekeeperDefaults.DEFAULT_BACKTRACE
     plugin: list[str] = Field(default_factory=lambda: ["json_rpc", "webserver"])
     export_keys_wallet: ExportKeysWalletParams | None = BeekeeperDefaults.DEFAULT_EXPORT_KEYS_WALLET

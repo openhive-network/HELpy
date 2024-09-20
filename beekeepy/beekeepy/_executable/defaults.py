@@ -20,7 +20,6 @@ class BeekeeperDefaults(BaseModel):
     DEFAULT_DATA_DIR: ClassVar[Path] = Path.cwd()
     DEFAULT_EXPORT_KEYS_WALLET: ClassVar[ExportKeysWalletParams | None] = None
     DEFAULT_LOG_JSON_RPC: ClassVar[Path | None] = None
-    DEFAULT_NOTIFICATIONS_ENDPOINT: ClassVar[HttpUrl | None] = None
     DEFAULT_UNLOCK_TIMEOUT: ClassVar[int] = 900
     DEFAULT_UNLOCK_INTERVAL: ClassVar[int] = 500
     DEFAULT_WALLET_DIR: ClassVar[Path] = Path.cwd()

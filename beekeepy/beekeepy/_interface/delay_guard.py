@@ -26,7 +26,7 @@ class DelayGuardBase:
     def _handle_exception_impl(self, ex: BaseException, _: TracebackType | None) -> bool:
         self._exception_occured = isinstance(ex, RequestError)
         self._next_time_unlock = self.__now() + self.BEEKEEPER_DELAY_TIME
-        return True
+        return False
 
     def _handle_no_exception_impl(self) -> None:
         self._exception_occured = False

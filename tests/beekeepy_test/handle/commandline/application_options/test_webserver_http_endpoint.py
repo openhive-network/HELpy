@@ -16,15 +16,12 @@ if TYPE_CHECKING:
     from beekeepy._handle import Beekeeper
 
 
-def check_webserver_http_endpoint(*, nofification_endpoint: HttpUrl, webserver_http_endpoint: HttpUrl) -> None:
+def check_webserver_http_endpoint(*, webserver_http_endpoint: HttpUrl) -> None:
     """Check if beekeeper is listening on given endpoint."""
     data = {
         "jsonrpc": "2.0",
         "method": "beekeeper_api.create_session",
-        "params": {
-            "salt": "avocado",
-            "notifications_endpoint": nofification_endpoint.as_string(with_protocol=False),
-        },
+        "params": {"salt": "avocado"},
         "id": 1,
     }
 
@@ -49,8 +46,4 @@ def test_webserver_http_endpoint(beekeeper_not_started: Beekeeper, webserver_htt
     )
 
     # ASSERT
-    assert beekeeper_not_started.settings.notification_endpoint is not None
-    check_webserver_http_endpoint(
-        nofification_endpoint=beekeeper_not_started.settings.notification_endpoint,
-        webserver_http_endpoint=webserver_http_endpoint,
-    )
+    check_webserver_http_endpoint(webserver_http_endpoint=webserver_http_endpoint)

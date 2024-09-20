@@ -26,8 +26,12 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
         return self._hived_target_service_name()
 
     @property
-    def api(self) -> HivedSyncApiCollection:
+    def apis(self) -> HivedSyncApiCollection:
         return cast(HivedSyncApiCollection, super().api)
+
+    @property
+    def api(self) -> HivedSyncApiCollection:
+        return self.apis
 
     def get_dynamic_global_properties(self) -> HiveHandleCommonHelpers.GetDynamicGlobalPropertiesT:
         return self.api.database.get_dynamic_global_properties()
