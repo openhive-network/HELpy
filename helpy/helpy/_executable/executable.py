@@ -3,15 +3,18 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+import time
 import warnings
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from beekeepy._executable.arguments.arguments import Arguments
-from beekeepy._executable.streams import StreamsHolder
-from beekeepy.exceptions import BeekeeperIsNotRunningError, TimeoutReachWhileCloseError
+import psutil
+
+from helpy._executable.arguments import Arguments
+from helpy._executable.streams import StreamsHolder
 from helpy._interfaces.config import Config
 from helpy._interfaces.context import ContextSync
+from helpy.exceptions import ExecutableIsNotRunningError, TimeoutReachWhileCloseError
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -136,7 +139,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
     def detach(self) -> int:
         if self.__process is None:
-            raise BeekeeperIsNotRunningError
+            raise ExecutableIsNotRunningError
         pid = self.pid
         self.__process = None
         self.__files.close()
@@ -194,3 +197,13 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
     def version(self) -> str:
         return self.run_and_get_output(arguments=self.__arguments.just_get_version())
+
+    def reserved_ports(self, *, timeout_seconds: int = 10) -> list[int]:
+        assert self.is_running(), "Cannot obtain reserved ports for not started executable"
+        start = time.perf_counter()
+        while start + timeout_seconds >= time.perf_counter():
+            connections = psutil.net_connections("inet4")
+            reserved_ports = [connection.laddr[1] for connection in connections if connection.pid == self.pid]  # type: ignore[misc]
+            if reserved_ports:
+                return reserved_ports
+        raise TimeoutError
