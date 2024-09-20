@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from helpy._interfaces.api.abc import (
     AbstractAsyncApiCollection,
@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
     """Beekeepers collection of available apis in async version."""
 
-    _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
+    _owner: AsyncBeekeeper[Any] | _AsyncSessionBatchHandle
 
-    def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
+    def __init__(self, owner: AsyncBeekeeper[Any] | _AsyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = AsyncBeekeeperApi(owner=self._owner)
 
@@ -30,8 +30,8 @@ class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
 class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
     """Beekeepers collection of available apis in async version."""
 
-    _owner: Beekeeper | _SyncSessionBatchHandle
+    _owner: Beekeeper[Any] | _SyncSessionBatchHandle
 
-    def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
+    def __init__(self, owner: Beekeeper[Any] | _SyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = SyncBeekeeperApi(owner=self._owner)

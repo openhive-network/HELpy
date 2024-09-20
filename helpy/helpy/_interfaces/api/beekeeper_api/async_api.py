@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from helpy._handles.beekeeper.api.apply_session_token import async_apply_session_token
 from helpy._handles.beekeeper.api.beekeeper_api_commons import BeekeeperApiCommons
@@ -16,9 +16,9 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
     """Set of endpoints, that allows asynchronous communication with beekeeper service."""
 
     api = AbstractAsyncApi._endpoint
-    _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
+    _owner: AsyncBeekeeper[Any] | _AsyncSessionBatchHandle
 
-    def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
+    def __init__(self, owner: AsyncBeekeeper[Any] | _AsyncSessionBatchHandle) -> None:
         self._verify_is_owner_can_hold_session_token(owner=owner)
         super().__init__(owner=owner)
 
