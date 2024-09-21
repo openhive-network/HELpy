@@ -50,9 +50,9 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         """Returns is process running. Note: Proxy method to Executable.is_running."""
         return self._exec.is_running()
 
-    def detach(self) -> None:
+    def detach(self) -> int:
         """Detaches process and allows to keep it after closing python script."""
-        self._exec.detach()
+        return self._exec.detach()
 
     def close(self) -> None:
         """Closes running process. If process is not running, method does nothing."""
