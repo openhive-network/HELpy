@@ -27,9 +27,6 @@ Application Options:
           --export-keys-wallet "["green-wallet", 
           "PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk"]" 
 
-  --notifications-endpoint arg
-          list of addresses, that will receive notification about in-chain 
-          events
   --unlock-interval arg (=500)
           Protection against unlocking by bots. Every wrong `unlock` enables a 
           delay. By default 500[ms].
@@ -63,4 +60,3 @@ Application Command Line Options:
           Directory containing configuration file config.ini. Default location: $HOME/.beekeeper or CWD/. beekeeper
   -c [ --config ] filename (="config.ini")
           Configuration file name relative to data-dir
-
