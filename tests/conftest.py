@@ -30,12 +30,14 @@ def _convert_test_name_to_directory_name(test_name: str) -> str:
 @pytest.fixture(autouse=True)
 def working_directory(request: pytest.FixtureRequest) -> Path:
     name_of_directory = _convert_test_name_to_directory_name(request.node.name)
-    path_to_generated = request.node.path.parent / name_of_directory
-    if path_to_generated.exists():
-        shutil.rmtree(path_to_generated)
-    path_to_generated.mkdir()
-    assert isinstance(path_to_generated, Path), "given object is not Path"
-    return path_to_generated
+    path_to_module_generated = request.node.path.parent / f"generated_{request.node.path.stem}"
+    path_to_module_generated.mkdir(exist_ok=True)
+    path_to_test_artifacts = path_to_module_generated / name_of_directory
+    if path_to_test_artifacts.exists():
+        shutil.rmtree(path_to_test_artifacts)
+    path_to_test_artifacts.mkdir()
+    assert isinstance(path_to_test_artifacts, Path), "given object is not Path"
+    return path_to_test_artifacts
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
