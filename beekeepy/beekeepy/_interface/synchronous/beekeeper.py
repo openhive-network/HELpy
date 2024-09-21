@@ -15,6 +15,7 @@ from beekeepy._interface.synchronous.session import Session
 from beekeepy.exceptions import (
     BeekeeperAlreadyRunningError,
     DetachRemoteBeekeeperError,
+    InvalidatedStateByClosingBeekeeperError,
     UnknownDecisionPathError,
 )
 
@@ -51,7 +52,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     def teardown(self) -> None:
         if isinstance(self.__instance, SynchronousBeekeeperHandle):
             self.__instance.close()
-        self.invalidate()
+        self.invalidate(InvalidatedStateByClosingBeekeeperError())
 
     def detach(self) -> None:
         if not isinstance(self.__instance, SynchronousBeekeeperHandle):

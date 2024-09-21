@@ -12,7 +12,12 @@ from beekeepy._interface.asynchronous.session import Session
 from beekeepy._interface.delay_guard import AsyncDelayGuard
 from beekeepy._interface.settings import Settings
 from beekeepy._interface.state_invalidator import StateInvalidator
-from beekeepy.exceptions import BeekeeperAlreadyRunningError, DetachRemoteBeekeeperError, UnknownDecisionPathError
+from beekeepy.exceptions import (
+    BeekeeperAlreadyRunningError,
+    DetachRemoteBeekeeperError,
+    InvalidatedStateByClosingBeekeeperError,
+    UnknownDecisionPathError,
+)
 
 if TYPE_CHECKING:
     from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper
@@ -47,7 +52,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     def teardown(self) -> None:
         if isinstance(self.__instance, AsynchronousBeekeeperHandle):
             self.__instance.close()
-        self.invalidate()
+        self.invalidate(InvalidatedStateByClosingBeekeeperError())
 
     def detach(self) -> None:
         if not isinstance(self.__instance, AsynchronousBeekeeperHandle):
