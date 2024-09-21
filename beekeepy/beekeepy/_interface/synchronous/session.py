@@ -11,6 +11,7 @@ from beekeepy._interface.synchronous.wallet import (
 )
 from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout, validate_wallet_name
 from beekeepy.exceptions import (
+    InvalidatedStateByClosingSessionError,
     InvalidWalletError,
     NoWalletWithSuchNameError,
     WalletWithSuchNameAlreadyExistsError,
@@ -67,7 +68,7 @@ class Session(SessionInterface, StateInvalidator):
     def close_session(self) -> None:
         if self.__beekeeper.is_session_token_set():
             self.__beekeeper.api.close_session(token=self.token)
-            self.invalidate()
+            self.invalidate(InvalidatedStateByClosingSessionError())
 
     def lock_all(self) -> list[WalletInterface]:
         self.__beekeeper.api.lock_all(token=self.token)
