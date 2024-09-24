@@ -94,7 +94,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             self._unify_config(settings.working_directory, settings.http_endpoint)
 
         try:
-            self._exec.run(blocking=False, environ=environment_variables, propagate_sigint=settings.propagate_sigint)
+            self._exec._run(blocking=False, environ=environment_variables, propagate_sigint=settings.propagate_sigint)
         except SubprocessError as e:
             raise FailedToStartExecutableError from e
         try:
