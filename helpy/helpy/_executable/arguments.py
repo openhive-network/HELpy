@@ -48,12 +48,23 @@ class Arguments(PreconfiguredBaseModel, ABC):
         return cli_arguments
 
     def process(self, *, with_prefix: bool = True) -> list[str]:
-        pattern = "--{0}" if with_prefix else "{0}"
+        pattern = self._generate_argument_prefix(with_prefix=with_prefix)
         return self.__prepare_arguments(pattern)
+
+    def _generate_argument_prefix(self, *, with_prefix: bool) -> str:
+        return "--{0}" if with_prefix else "{0}"
+
+    def update_with(self, other: Self | None) -> None:
+        if other is None:
+            return
+
+        for other_name, other_value in other.dict(exclude_unset=True, exclude_defaults=True, exclude_none=True):
+            assert isinstance(other_name, str), "Member name has to be string"
+            setattr(self, other_name, other_value)  # type: ignore[has-type]
 
     @classmethod
     def just_get_help(cls) -> Self:
-        return cls(help_=True)
+        return cls(help=True)
 
     @classmethod
     def just_get_version(cls) -> Self:

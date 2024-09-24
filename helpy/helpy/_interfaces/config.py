@@ -26,7 +26,7 @@ class Config(BaseModel):
             for member_name, member_value in self.__dict__.items():
                 if member_value is not None:
                     out_file.write(
-                        f"{self._convert_member_name_to_config_name(member_name)}={self._convert_member_value_to_config_value(member_value)}\n"
+                        f"{self._convert_member_name_to_config_name(member_name)}={self._convert_member_value_to_config_value(member_name, member_value)}\n"
                     )
 
     @classmethod
@@ -57,7 +57,7 @@ class Config(BaseModel):
         return config_name.strip().replace("-", "_")
 
     @classmethod
-    def _convert_member_value_to_config_value(cls, member_value: Any) -> str:
+    def _convert_member_value_to_config_value(cls, member_name: str, member_value: Any) -> str:  # noqa: ARG003
         if isinstance(member_value, list):
             return " ".join(member_value)
 
@@ -79,6 +79,9 @@ class Config(BaseModel):
         config_value = config_value.strip()
         if config_value is None:
             return None
+
+        if "str" in str(expected):
+            return config_value.strip('"')
 
         if expected == Path:
             return Path(config_value.replace('"', ""))
