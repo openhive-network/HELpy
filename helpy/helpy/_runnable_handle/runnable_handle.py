@@ -91,7 +91,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             self._unify_cli_arguments(settings.working_directory, settings.http_endpoint)
             self._unify_config(settings.working_directory, settings.http_endpoint)
 
-        self._exec.run(blocking=False, environ=environment_variables, propagate_sigint=settings.propagate_sigint)
+        self._exec._run(blocking=False, environ=environment_variables, propagate_sigint=settings.propagate_sigint)
         self._wait_for_app_to_start()
         self._setup_ports(match_ports(self._exec.reserved_ports()))
 

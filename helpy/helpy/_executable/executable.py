@@ -4,7 +4,6 @@ import os
 import signal
 import subprocess
 import time
-import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
@@ -26,7 +25,7 @@ if TYPE_CHECKING:
 
 class Closeable(ABC):
     @abstractmethod
-    def close(self) -> None: ...
+    def close(self, timeout_secs: float = 10.0) -> None: ...
 
 
 class AutoCloser(ContextSync[None]):
@@ -79,7 +78,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
     def arguments(self) -> ArgumentT:
         return self.__arguments
 
-    def run(
+    def _run(
         self,
         *,
         blocking: bool,
@@ -99,6 +98,10 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         propagate_sigint: bool = True,
     ) -> AutoCloser:
         command, environment_variables = self.__prepare(arguments=arguments, environ=environ)
+        self._logger.info("starting `{binary_name}` as: `{command}`",
+            binary_name = self.__executable_path.stem,
+            command = command
+        )
 
         if blocking:
             with self.__files.stdout as stdout, self.__files.stderr as stderr:
@@ -126,7 +129,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
         return AutoCloser(self)
 
-    def __run_and_get_output(
+    def run_and_get_output(
         self, arguments: ArgumentT, environ: dict[str, str] | None = None, timeout: float | None = None
     ) -> str:
         command, environment_variables = self.__prepare(arguments=arguments, environ=environ)
@@ -175,17 +178,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             self.__process.wait()
         self.__process = None
         self.__files.close()
-        self.__warn_if_pid_files_exists()
 
-    def __warn_if_pid_files_exists(self) -> None:
-        if self.__pid_files_exists():
-            warnings.warn(
-                f"PID file has not been removed, malfunction may occur. Working directory: {self.working_directory}",
-                stacklevel=2,
-            )
-
-    def __pid_files_exists(self) -> bool:
-        return len(list(self.working_directory.glob("*.pid"))) > 0
 
     def is_running(self) -> bool:
         if not self.__process:
@@ -219,10 +212,10 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         return self.config.load(temp_path_to_file)
 
     def get_help_text(self) -> str:
-        return self.__run_and_get_output(arguments=self.__arguments.just_get_help())
+        return self.run_and_get_output(arguments=self.__arguments.just_get_help())
 
     def version(self) -> str:
-        return self.__run_and_get_output(arguments=self.__arguments.just_get_version())
+        return self.run_and_get_output(arguments=self.__arguments.just_get_version())
 
     def reserved_ports(self, *, timeout_seconds: int = 10) -> list[int]:
         assert self.is_running(), "Cannot obtain reserved ports for not started executable"
