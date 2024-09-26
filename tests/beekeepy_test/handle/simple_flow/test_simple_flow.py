@@ -226,6 +226,7 @@ def test_simple_flow(
         # In this block we will unlock wallet which should be locked by timeout,
         # close it, and lastly close all sessions.
         time.sleep(2)
+        assert all(w.unlocked is False for w in beekeeper.api.list_wallets().wallets), "Not all wallets are locked"
         for wallet_nr, wallet in enumerate(wallets):
             beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
             assert_wallet_unlocked(beekeeper, wallet.name)

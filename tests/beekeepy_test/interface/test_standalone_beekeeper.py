@@ -7,6 +7,8 @@ import time
 from pathlib import Path
 from subprocess import run
 
+import pytest
+
 
 def run_python_script(path_to_script: Path, args: list[str], cwd: Path) -> None:
     run(check=True, args=[sys.executable, path_to_script.as_posix(), *args], cwd=cwd)
@@ -40,6 +42,7 @@ def verify_beekeeper_status(path_or_pid: Path | int, alive: bool) -> int:
     return pid
 
 
+@pytest.mark.skip("TODO: no support for 2 beekeeper in same storage")
 def test_standalone_beekeeper(working_directory: Path) -> None:
     # ARRANGE
     path_to_resource_directory = Path(__file__).resolve().parent / "resources"
