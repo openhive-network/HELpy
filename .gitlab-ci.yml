@@ -53,7 +53,7 @@ default:
 .static_code_analysis_vars: &static_code_analysis_vars
   variables:
     PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
-    PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/pyproject.toml"
+    PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/tests/local-tools/pyproject.toml"
 
 pre_commit_checks:
   stage: static_code_analysis

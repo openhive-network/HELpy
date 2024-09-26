@@ -164,7 +164,7 @@ tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
 name = "beekeepy"
-version = "1.25.99"
+version = "0.0.0"
 description = "All in one package for beekeeper interaction via Python interface."
 optional = false
 python-versions = "^3.10"

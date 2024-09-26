@@ -39,14 +39,16 @@ repos:
     hooks:
       - id: ruff
         name: linting code with Ruff
-        args: [ "--fix" ]
+        args: [ "--fix", "--config", "./tests/local-tools/pyproject.toml" ]
       - id: ruff-format
         name: format code using Ruff formatter
+        args: [ "--config", "./tests/local-tools/pyproject.toml" ]
   - repo: local
     hooks:
     - id: mypy
       name: type check with mypy
       entry: mypy
+      args: ["--config-file", "./tests/local-tools/pyproject.toml"]
       language: system
       types: [ python ]
   - repo: https://github.com/codespell-project/codespell
