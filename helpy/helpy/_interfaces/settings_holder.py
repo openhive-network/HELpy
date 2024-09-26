@@ -31,11 +31,13 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
 
     @property
     def _settings(self) -> SettingsT:
-        """Obtain original settings instance. Can be used for making shared settings between self and other instance of SharedSettingsHolder.
+        """Obtain original settings instance.
+
+        Can be used for making shared settings between self and other instance of SharedSettingsHolder.
 
         Warning:
             Not intended for public usage.
-        """  # noqa: E501
+        """
         return self.__settings
 
     def _get_copy_of_settings(self) -> SettingsT:
