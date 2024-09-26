@@ -6,6 +6,7 @@ from helpy._interfaces.api.abc import (
     AbstractAsyncApiCollection,
     AbstractSyncApiCollection,
 )
+from helpy._interfaces.api.app_status_api import AsyncAppStatusApi, SyncAppStatusApi
 from helpy._interfaces.api.beekeeper_api import AsyncBeekeeperApi, SyncBeekeeperApi
 
 if TYPE_CHECKING:
@@ -25,6 +26,7 @@ class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
     def __init__(self, owner: AsyncBeekeeper[Any] | _AsyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = AsyncBeekeeperApi(owner=self._owner)
+        self.app_status = AsyncAppStatusApi(owner=self._owner)
 
 
 class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
@@ -35,3 +37,4 @@ class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
     def __init__(self, owner: Beekeeper[Any] | _SyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = SyncBeekeeperApi(owner=self._owner)
+        self.app_status = SyncAppStatusApi(owner=self._owner)

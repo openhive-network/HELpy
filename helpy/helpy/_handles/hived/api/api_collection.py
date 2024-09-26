@@ -14,6 +14,7 @@ from helpy._interfaces.api.account_history_api import (
     AsyncAccountHistoryApi,
     SyncAccountHistoryApi,
 )
+from helpy._interfaces.api.app_status_api import AsyncAppStatusApi, SyncAppStatusApi
 from helpy._interfaces.api.block_api import AsyncBlockApi, SyncBlockApi
 from helpy._interfaces.api.condenser_api import AsyncCondenserApi, SyncCondenserApi
 from helpy._interfaces.api.database_api import AsyncDatabaseApi, SyncDatabaseApi
@@ -48,6 +49,7 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         super().__init__(owner)
         self.account_by_key = AsyncAccountByKeyApi(owner=self._owner)
         self.account_history = AsyncAccountHistoryApi(owner=self._owner)
+        self.app_status = AsyncAppStatusApi(owner=self._owner)
         self.block = AsyncBlockApi(owner=self._owner)
         self.condenser = AsyncCondenserApi(owner=self._owner)
         self.database = AsyncDatabaseApi(owner=self._owner)
@@ -67,6 +69,7 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         super().__init__(owner)
         self.account_by_key = SyncAccountByKeyApi(owner=self._owner)
         self.account_history = SyncAccountHistoryApi(owner=self._owner)
+        self.app_status = SyncAppStatusApi(owner=self._owner)
         self.block = SyncBlockApi(owner=self._owner)
         self.condenser = SyncCondenserApi(owner=self._owner)
         self.database = SyncDatabaseApi(owner=self._owner)
