@@ -21,14 +21,15 @@ class Transaction(SchemasTransaction):
         Calculates signature digest (sig_digest) for any chain basing on chain_id.
 
         Note:
-            This digest is used as data to sign with private key and such signature should be appended to signatures member
+            This digest is used as data to sign with private key and
+            such signature should be appended to signatures member
 
         Args:
             chain_id: chain id of chain for which signature is calculated
 
         Returns:
             str: signature digest
-        """  # noqa: E501
+        """
         return calculate_sig_digest(transaction=self, chain_id=chain_id)
 
     def recalculate_tapos(self, block_id: str) -> None:

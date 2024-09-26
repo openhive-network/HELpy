@@ -23,4 +23,7 @@ class BeekeeperNotificationHandler(AppbaseNotificationHandler):
         """Called when beekeeper attempts to close wallets in session with given token."""
 
     async def on_opening_beekeeper_failed(self, notification: Notification[OpeningBeekeeperFailed]) -> None:
-        """Called, when beekeeper failed to start, because of already running other beekeeper in selected working directory."""  # noqa: E501
+        """Called, when beekeeper failed to start.
+
+        That is because of already running other beekeeper in selected working directory.
+        """
