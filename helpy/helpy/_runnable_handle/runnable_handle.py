@@ -4,6 +4,7 @@ import time
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
+from subprocess import SubprocessError
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
 
 from loguru import logger as default_logger
@@ -12,8 +13,7 @@ from helpy._executable.executable import ArgumentT, ConfigT, Executable
 from helpy._interfaces.url import HttpUrl
 from helpy._runnable_handle.match_ports import PortMatchingResult, match_ports
 from helpy._runnable_handle.settings import Settings
-from helpy.exceptions import FailedToDetectReservedPorts, FailedToStartExecutableError
-from subprocess import SubprocessError
+from helpy.exceptions import FailedToDetectReservedPortsError, FailedToStartExecutableError
 
 if TYPE_CHECKING:
     from loguru import Logger
@@ -100,7 +100,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         try:
             self._wait_for_app_to_start()
         except TimeoutError as e:
-            raise FailedToDetectReservedPorts from e
+            raise FailedToDetectReservedPortsError from e
         self._setup_ports(match_ports(self._exec.reserved_ports()))
 
     @abstractmethod

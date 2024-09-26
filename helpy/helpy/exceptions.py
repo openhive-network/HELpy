@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC
 import json
+from abc import ABC
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -154,8 +154,10 @@ class ExceededAmountOfRetriesError(CommunicationError):
 class InvalidOptionError(HelpyError):
     """Raised if invalid expression is given in config."""
 
+
 class ExecutableError(HelpyError, ABC):
     """Base class for errors related to handling executable."""
+
 
 class TimeoutReachWhileCloseError(ExecutableError):
     """Raises when executable did not closed during specified timeout."""
@@ -173,5 +175,5 @@ class FailedToStartExecutableError(ExecutableError):
     """Raises when executable failed to start."""
 
 
-class FailedToDetectReservedPorts(ExecutableError):
+class FailedToDetectReservedPortsError(ExecutableError):
     """Raises when port lookup procedure fails."""

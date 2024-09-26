@@ -98,9 +98,8 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         propagate_sigint: bool = True,
     ) -> AutoCloser:
         command, environment_variables = self.__prepare(arguments=arguments, environ=environ)
-        self._logger.info("starting `{binary_name}` as: `{command}`",
-            binary_name = self.__executable_path.stem,
-            command = command
+        self._logger.info(
+            "starting `{binary_name}` as: `{command}`", binary_name=self.__executable_path.stem, command=command
         )
 
         if blocking:
@@ -176,7 +175,6 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             self.__process.wait()
         self.__process = None
         self.__files.close()
-
 
     def is_running(self) -> bool:
         if not self.__process:
