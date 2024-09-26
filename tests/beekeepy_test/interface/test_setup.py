@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 
 from beekeepy import Beekeeper
+from beekeepy.exceptions import InvalidatedStateByClosingBeekeeperError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import SettingsFactory
@@ -29,14 +31,17 @@ def test_closing_with_delete(settings: SettingsFactory) -> None:
 
     # ACT & ASSERT (no throw)
     bk.teardown()
-    assert not (sets.working_directory / "beekeeper.pid").exists()
+    with pytest.raises(InvalidatedStateByClosingBeekeeperError):
+        bk.create_session()
 
 
 def test_closing_with_with(settings: SettingsFactory) -> None:
     # ARRANGE, ACT & ASSERT (no throw)
     sets = settings()
-    with Beekeeper.factory(settings=sets):
-        assert (sets.working_directory / "beekeeper.pid").exists()
+    with Beekeeper.factory(settings=sets) as bk, bk.create_session() as session:
+        pass
+    with pytest.raises(InvalidatedStateByClosingBeekeeperError):
+        session.wallets  # noqa: B018  # part of test
 
 
 def test_session_tokens(settings: SettingsFactory) -> None:
