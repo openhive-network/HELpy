@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 class RequestCommunicator(AbstractCommunicator):
     """Provides support for requests library (only synchronous)."""
 
-    async def async_send(self, url: HttpUrl, data: str) -> str:
+    async def _async_send(self, url: HttpUrl, data: bytes) -> str:
         raise NotImplementedError
 
-    def send(self, url: HttpUrl, data: str) -> str:
+    def _send(self, url: HttpUrl, data: bytes) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
