@@ -68,7 +68,7 @@ class Transaction(SchemasTransaction):
         Args:
             block_time: time of block for reference (but can be any time).
             extra_time: length of expiration. Current default is maximum expiration time measuring from current
-                        head block number. Defaults to timedelta(minutes=30).
+                        head block number.
         """
         self.expiration = cast(HiveDateTime, block_time + extra_time)
 
@@ -90,7 +90,7 @@ class Transaction(SchemasTransaction):
         Creates empty transaction object with default values.
 
         Args:
-            block_id: If given, tapos is automatically calculated. Defaults to None.
+            block_id: If given, tapos is automatically calculated.
 
         Returns:
             TransactionHelper: Empty transaction.
