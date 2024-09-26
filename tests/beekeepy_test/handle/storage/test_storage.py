@@ -10,7 +10,7 @@ from loguru import logger
 
 from beekeepy import Settings
 from beekeepy._handle import Beekeeper
-from beekeepy.exceptions import BeekeeperAlreadyRunningError
+from beekeepy.exceptions import BeekeeperFailedToStartError
 from helpy import HttpUrl
 
 
@@ -36,10 +36,8 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
 
         # ACT & ASSERT 2
         bk2 = Beekeeper(settings=settings, logger=logger)
-        with pytest.raises(BeekeeperAlreadyRunningError) as err:
+        with pytest.raises(BeekeeperFailedToStartError):
             bk2.run()
-        assert err.value.pid == bk1.pid, "PID is pointing to invalid process"
-        assert err.value.address == bk1.http_endpoint, "Address is pointing to invalid endpoint"
 
         assert checkers.check_for_pattern_in_file(
             bk2.settings.working_directory / "stderr.log",

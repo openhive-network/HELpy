@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import helpy
@@ -9,7 +10,7 @@ from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgument
 from beekeepy._handle.beekeeper_callbacks import BeekeeperNotificationCallbacks
 from beekeepy._handle.beekeeper_notification_handler import NotificationHandler
 from beekeepy._interface.settings import Settings
-from beekeepy.exceptions import BeekeeperAlreadyRunningError, BeekeeperIsNotRunningError
+from beekeepy.exceptions import BeekeeperFailedToStartError, BeekeeperIsNotRunningError
 from helpy import ContextAsync, ContextSync, HttpUrl
 from helpy._communication.universal_notification_server import (
     UniversalNotificationServer,
@@ -101,12 +102,6 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
     def __wait_till_ready(self) -> None:
         assert self.__notification_event_handler is not None, "Notification event handler hasn't been set"
         if not self.__notification_event_handler.http_listening_event.wait(timeout=5):
-            if self.__notification_event_handler.already_working_beekeeper_event.is_set():
-                addr = self.__notification_event_handler.already_working_beekeeper_http_address
-                pid = self.__notification_event_handler.already_working_beekeeper_pid
-                assert addr is not None, "Notification incomplete: missing http address"
-                assert pid is not None, "Notification incomplete: missing PID"
-                raise BeekeeperAlreadyRunningError(address=addr, pid=pid)
             raise TimeoutError("Waiting too long for beekeeper to be up and running")
 
     def _handle_error(self, error: Error) -> None:
@@ -128,12 +123,15 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
             if aca.data_dir != BeekeeperArgumentsDefaults.DEFAULT_DATA_DIR
             else self.__exec.working_directory
         )
-        self._run_application(settings=settings, additional_cli_arguments=aca)
+        try:
+            self._run_application(settings=settings, additional_cli_arguments=aca)
+        except CalledProcessError as e:
+            raise BeekeeperFailedToStartError from e
         try:
             self.__wait_till_ready()
-        except BeekeeperAlreadyRunningError:
+        except (AssertionError, TimeoutError) as e:
             self.close()
-            raise
+            raise BeekeeperFailedToStartError from e
 
     def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
         assert settings.notification_endpoint is not None
@@ -150,9 +148,10 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
             propagate_sigint=settings.propagate_sigint,
         )
 
-    def detach(self) -> None:
-        self.__exec.detach()
+    def detach(self) -> int:
+        pid = self.__exec.detach()
         self.__close_notification_server()
+        return pid
 
     def close(self) -> None:
         self._close_application()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from beekeepy.exceptions.base import (
     BeekeeperExecutableError,
@@ -9,25 +9,13 @@ from beekeepy.exceptions.base import (
     InvalidatedStateError,
 )
 
-if TYPE_CHECKING:
-    from helpy import HttpUrl
-
 
 class BeekeeperIsNotRunningError(BeekeeperExecutableError):
     """Raises if after user tries to access options available only when process is running."""
 
 
-class BeekeeperAlreadyRunningError(BeekeepyError):
-    """Raises if beekeeper executable is already running.
-
-    It is done by capturing this exception you can get connection information to already running instance.
-    """
-
-    def __init__(self, address: HttpUrl, pid: int) -> None:
-        """Constructor."""
-        self.address = address
-        self.pid = pid
-        super().__init__(f"Beekeeper is already running under {address=} with {pid=}")
+class BeekeeperFailedToStartError(BeekeeperExecutableError):
+    """Raises if beekeeper exited with non-0 exit code."""
 
 
 class WalletIsLockedError(BeekeepyError):

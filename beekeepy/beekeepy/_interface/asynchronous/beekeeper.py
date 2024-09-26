@@ -12,7 +12,7 @@ from beekeepy._interface.asynchronous.session import Session
 from beekeepy._interface.delay_guard import AsyncDelayGuard
 from beekeepy._interface.settings import Settings
 from beekeepy._interface.state_invalidator import StateInvalidator
-from beekeepy.exceptions import BeekeeperAlreadyRunningError, DetachRemoteBeekeeperError, UnknownDecisionPathError
+from beekeepy.exceptions import DetachRemoteBeekeeperError, UnknownDecisionPathError
 
 if TYPE_CHECKING:
     from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper
@@ -49,10 +49,10 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             self.__instance.close()
         self.invalidate()
 
-    def detach(self) -> None:
+    def detach(self) -> int:
         if not isinstance(self.__instance, AsynchronousBeekeeperHandle):
             raise DetachRemoteBeekeeperError
-        self.__instance.detach()
+        return self.__instance.detach()
 
     def __create_session(self, token: str | None = None) -> SessionInterface:
         session = Session(beekeeper=self._get_instance(), use_session_token=token, guard=self.__guard)
@@ -67,11 +67,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         settings = settings or Settings()
         handle = AsynchronousBeekeeperHandle(settings=settings, logger=logger)
         cls.__apply_existing_session_token(settings=settings, handle=handle)
-        try:
-            handle.run()
-        except BeekeeperAlreadyRunningError as err:
-            settings.http_endpoint = err.address
-            return await cls._remote_factory(url_or_settings=settings)
+        handle.run()
         return cls(handle=handle)
 
     @classmethod
