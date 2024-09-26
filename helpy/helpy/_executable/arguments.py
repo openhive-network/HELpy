@@ -58,13 +58,13 @@ class Arguments(PreconfiguredBaseModel, ABC):
         if other is None:
             return
 
-        for other_name, other_value in other.dict(exclude_unset=True, exclude_defaults=True, exclude_none=True):
+        for other_name, other_value in other.dict(exclude_unset=True, exclude_defaults=True, exclude_none=True).items():
             assert isinstance(other_name, str), "Member name has to be string"
-            setattr(self, other_name, other_value)  # type: ignore[has-type]
+            setattr(self, other_name, other_value)
 
     @classmethod
     def just_get_help(cls) -> Self:
-        return cls(help=True)
+        return cls(help_=True)
 
     @classmethod
     def just_get_version(cls) -> Self:

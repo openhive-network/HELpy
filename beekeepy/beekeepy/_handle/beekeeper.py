@@ -3,11 +3,11 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from beekeepy.exceptions.common import BeekeeperFailedToStartError
 import helpy
 from beekeepy._executable import BeekeeperArguments, BeekeeperExecutable
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._interface.settings import Settings
+from beekeepy.exceptions.common import BeekeeperFailedToStartError
 from helpy import ContextAsync, ContextSync, HttpUrl, KeyPair
 from helpy._runnable_handle.runnable_handle import RunnableHandle
 from helpy.exceptions import ExecutableError

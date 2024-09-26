@@ -11,7 +11,7 @@ from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
 from beekeepy._interface.settings import Settings
 from helpy import KeyPair
-from helpy._executable.executable import Executable
+from helpy._executable.executable import AutoCloser, Executable
 
 if TYPE_CHECKING:
     from loguru import Logger
@@ -55,3 +55,12 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
 
         with keys_path.open("r") as file:
             return [KeyPair(**obj) for obj in json.load(file)]
+
+    def run(
+        self,
+        *,
+        blocking: bool,
+        environ: dict[str, str] | None = None,
+        propagate_sigint: bool = True,
+    ) -> AutoCloser:
+        return self._run(blocking=blocking, environ=environ, propagate_sigint=propagate_sigint)

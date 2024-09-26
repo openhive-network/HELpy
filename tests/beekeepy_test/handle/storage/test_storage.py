@@ -11,7 +11,6 @@ from beekeepy import Settings
 from beekeepy._handle import Beekeeper
 from beekeepy.exceptions import BeekeeperFailedToStartError
 
-
 if TYPE_CHECKING:
     from pathlib import Path
 
