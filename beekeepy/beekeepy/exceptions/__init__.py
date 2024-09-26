@@ -9,7 +9,7 @@ from beekeepy.exceptions.base import (
     SchemaDetectableError,
 )
 from beekeepy.exceptions.common import (
-    BeekeeperAlreadyRunningError,
+    BeekeeperFailedToStartError,
     BeekeeperIsNotRunningError,
     DetachRemoteBeekeeperError,
     InvalidatedStateByClosingBeekeeperError,
@@ -37,8 +37,8 @@ from beekeepy.exceptions.detectable import (
 )
 
 __all__ = [
-    "BeekeeperAlreadyRunningError",
     "BeekeeperExecutableError",
+    "BeekeeperFailedToStartError",
     "BeekeeperHandleError",
     "BeekeeperIsNotRunningError",
     "BeekeepyError",

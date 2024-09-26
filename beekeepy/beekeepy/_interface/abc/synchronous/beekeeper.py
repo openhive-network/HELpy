@@ -26,7 +26,8 @@ class Beekeeper(ContextSync["Beekeeper"], ABC):
     def pack(self) -> PackedSyncBeekeeper: ...
 
     @abstractmethod
-    def detach(self) -> None: ...
+    def detach(self) -> int:
+        """Detaches process and returns PID."""
 
     @classmethod
     def factory(cls, *, settings: Settings | None = None) -> Beekeeper:

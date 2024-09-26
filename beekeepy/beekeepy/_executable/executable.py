@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from beekeepy._executable.arguments.arguments import Arguments
 from beekeepy._executable.streams import StreamsHolder
-from beekeepy.exceptions import TimeoutReachWhileCloseError
+from beekeepy.exceptions import BeekeeperIsNotRunningError, TimeoutReachWhileCloseError
 from helpy._interfaces.config import Config
 from helpy._interfaces.context import ContextSync
 
@@ -137,12 +137,13 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
     def __raise_exception_if_timeout_on_close(self) -> None:
         raise TimeoutReachWhileCloseError
 
-    def detach(self) -> None:
+    def detach(self) -> int:
         if self.__process is None:
-            return
-
+            raise BeekeeperIsNotRunningError
+        pid = self.pid
         self.__process = None
         self.__files.close()
+        return pid
 
     def close(self, timeout_secs: float = 10.0) -> None:
         if self.__process is None:
