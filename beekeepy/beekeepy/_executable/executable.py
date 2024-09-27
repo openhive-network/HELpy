@@ -122,10 +122,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         self.__working_directory.mkdir(exist_ok=True)
         command: list[str] = [self.__executable_path.as_posix(), *(arguments.process())]
         self._logger.debug(
-            "Starting {binary_name} in {working_directory} with arguments: {command}",
-            binary_name=self.__executable_path.name,
-            working_directory=self.working_directory,
-            command=" ".join(command),
+            f"Starting {self.__executable_path.name} in {self.working_directory} with arguments: {' '.join(command)}"
         )
 
         environment_variables = dict(os.environ)
@@ -152,7 +149,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         self.__process.send_signal(signal.SIGINT)
         try:
             return_code = self.__process.wait(timeout=timeout_secs)
-            self._logger.debug("Closed with {return_code} return code", return_code=return_code)
+            self._logger.debug(f"Closed with {return_code} return code")
         except subprocess.TimeoutExpired:
             self.__raise_exception_if_timeout_on_close()
             self.__process.kill()
