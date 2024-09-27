@@ -21,7 +21,10 @@ def prepare_directory(path: Path) -> None:
     path.mkdir()
 
 
-@pytest.mark.skip("TODO: no support for 2 beekeeper in same storage")
+@pytest.mark.skip(
+    "TODO: waiting for fix when beekeeper closes immediately after"
+    "detection of second beekeeper with dedicated exit code"
+)
 def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
     """
     Test test_multiply_beekeepeer_same_storage will check, if it is possible to run multiple instances of

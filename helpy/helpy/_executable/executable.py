@@ -187,13 +187,14 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
     @contextmanager
     def restore_arguments(self, new_arguments: ArgumentT | None) -> Iterator[None]:
-        if new_arguments is not None:
-            __backup = self.__arguments
-            self.__arguments = new_arguments
+        __backup = self.__arguments
+        self.__arguments = new_arguments or self.__arguments
+        try:
             yield
+        except:  # noqa: TRY302 # https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
+            raise
+        finally:
             self.__arguments = __backup
-        else:
-            yield
 
     @abstractmethod
     def _construct_config(self) -> ConfigT: ...
