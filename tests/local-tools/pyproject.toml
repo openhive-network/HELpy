@@ -57,6 +57,7 @@ ignore = [
   "D212", # Multi-line docstring summary should start at the first line; because we re using D213
   "D401", # Too restrictive
   "D413", # Missing blank line after last section
+  "G004", # Too restructive, f-string are acceptable in logger calls
   "TRY003", # Avoid specifying long messages outside the exception class; too restrictive
   "ANN101",  # Missing annotation for self; makes no sense
   "ANN102",  # Missing annotation for cls; makes no sense

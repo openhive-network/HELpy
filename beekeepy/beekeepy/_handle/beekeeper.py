@@ -105,10 +105,10 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
             raise TimeoutError("Waiting too long for beekeeper to be up and running")
 
     def _handle_error(self, error: Error) -> None:
-        self.__logger.error("Beekeepr error: `{error}`", error=error.json())
+        self.__logger.error(f"Beekeepr error: `{error.json()}`")
 
     def _handle_status_change(self, status: Status) -> None:
-        self.__logger.info("Beekeeper status change to: `{current_status}`", current_status=status.current_status)
+        self.__logger.info(f"Beekeeper status change to: `{status.current_status}`")
 
     def _run(self, settings: Settings, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         aca = additional_cli_arguments or BeekeeperArguments()

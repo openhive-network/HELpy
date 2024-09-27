@@ -61,7 +61,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
     @http_endpoint.setter
     def http_endpoint(self, value: HttpUrl) -> None:
         """Set http endpoint."""
-        self.logger.debug("setting http endpoint to: {value}", value=value.as_string())
+        self.logger.debug(f"setting http endpoint to: {value.as_string()}")
         with self.update_settings() as settings:
             settings.http_endpoint = value
 
@@ -219,18 +219,11 @@ class AbstractSyncHandle(AbstractHandle, ABC):
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = build_json_rpc_call(method=endpoint, params=params)
-        self.logger.debug(
-            "sending to `{address}`: `{request}`",
-            address=self.http_endpoint.as_string(),
-            request=request,
-        )
+        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
             response = self._communicator.send(self.http_endpoint, data=request)
-        self.logger.debug(
-            "got response in {record:.5f}s from `{address}`: `{response}`",
-            record=record.seconds_delta,
-            address=self.http_endpoint.as_string(),
-            response=response,
+        self.logger.trace(
+            f"got response in {record.seconds_delta:.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
         return self._response_handle(params=params, response=response, expected_type=expected_type)
 
