@@ -80,9 +80,6 @@ class Config(BaseModel):
         if config_value is None:
             return None
 
-        if "str" in str(expected):
-            return config_value.strip('"')
-
         if expected == Path:
             return Path(config_value.replace('"', ""))
 
@@ -101,5 +98,8 @@ class Config(BaseModel):
                 return False
 
             raise InvalidOptionError(f"Expected `yes` or `no`, got: `{config_value}`")
+
+        if "str" in str(expected):
+            return config_value.strip('"')
 
         return expected(config_value) if expected is not None else None

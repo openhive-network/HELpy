@@ -22,7 +22,9 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
         super().__init__(settings.binary_path or get_beekeeper_binary_path(), settings.working_directory, logger)
 
     def _construct_config(self) -> BeekeeperConfig:
-        return BeekeeperConfig(wallet_dir=self.working_directory)
+        config = BeekeeperConfig(wallet_dir=self.working_directory)
+        config.plugin.append("app_status_api")
+        return config
 
     def _construct_arguments(self) -> BeekeeperArguments:
         return BeekeeperArguments(data_dir=self.working_directory)

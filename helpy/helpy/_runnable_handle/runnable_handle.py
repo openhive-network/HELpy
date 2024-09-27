@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 import warnings
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from pathlib import Path
 from subprocess import SubprocessError
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
@@ -10,13 +11,16 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
 from loguru import logger as default_logger
 
 from helpy._executable.executable import ArgumentT, ConfigT, Executable
-from helpy._interfaces.url import HttpUrl
+from helpy._handles.app_status_probe.handle import AppStatusProbe
+from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 from helpy._runnable_handle.match_ports import PortMatchingResult, match_ports
 from helpy._runnable_handle.settings import Settings
-from helpy.exceptions import FailedToDetectReservedPortsError, FailedToStartExecutableError
+from helpy.exceptions import FailedToDetectReservedPortsError, FailedToStartExecutableError, RequestError
 
 if TYPE_CHECKING:
     from loguru import Logger
+
+    from schemas.apis.app_status_api import GetAppStatus
 
 
 ExecutableT = TypeVar("ExecutableT", bound=Executable[Any, Any])
@@ -101,7 +105,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             self._wait_for_app_to_start()
         except TimeoutError as e:
             raise FailedToDetectReservedPortsError from e
-        self._setup_ports(match_ports(self._exec.reserved_ports()))
+        self._setup_ports(self.__discover_ports())
 
     @abstractmethod
     def _construct_executable(self) -> ExecutableT:
@@ -158,6 +162,8 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
     def _wait_for_app_to_start(self) -> None:
         """Waits for application to start."""
         while not self._exec.reserved_ports():
+            if not self._exec.is_running():
+                raise FailedToStartExecutableError
             time.sleep(0.1)
 
     def __choose_working_directory(self, settings: Settings) -> Path:
@@ -195,3 +201,40 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         if settings_value is not None:
             return settings_value
         return default_value
+
+    def __discover_ports(self) -> PortMatchingResult:
+        reserved_ports = self._exec.reserved_ports()
+        matched_ports = match_ports(reserved_ports)
+        if matched_ports.http is None:
+            warnings.warn("Given executable probably does not provide http network access", stacklevel=3)
+            return matched_ports
+
+        handle = AppStatusProbe(settings=Settings(http_endpoint=matched_ports.http, timeout=timedelta(seconds=1)))
+        status: None | GetAppStatus = None
+        try:
+            status = handle.api.get_app_status()
+        except RequestError as e:
+            if "Method app_status_api.get_app_status does not exist." in e.error:
+                warnings.warn(
+                    "HTTP port detected, but cannot obtain further information. app_status_api plugin is not enabled!",
+                    stacklevel=3,
+                )
+                return matched_ports
+            raise
+
+        assert status, "Error has not been caught and further port discovery started"
+        http = status.webservers.HTTP
+        assert http, "Http cannot be None, as AppStatusProbe is already connected via http"
+        assert (
+            http.port == matched_ports.http.port
+        ), "Http cannot differ from detected ports, because it is already connected"
+
+        ws = status.webservers.WS
+        if ws and matched_ports.websocket and ws.port != matched_ports.websocket.port:
+            matched_ports.websocket = WsUrl.factory(port=ws.port)
+
+        p2p = status.webservers.P2P
+        if p2p and p2p.port not in [x.port for x in matched_ports.p2p]:
+            matched_ports.p2p = [P2PUrl.factory(port=p2p.port)]
+
+        return matched_ports
