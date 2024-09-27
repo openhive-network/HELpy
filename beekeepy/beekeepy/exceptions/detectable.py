@@ -45,15 +45,15 @@ class WalletWithSuchNameAlreadyExistsError(DetectableError):
 
 
 class InvalidPrivateKeyError(DetectableError):
-    """Raises when given private key was rejected by beekeeper because of format."""
+    """Raises when given private key or keys were rejected by beekeeper because of format."""
 
-    def __init__(self, wif: str) -> None:
+    def __init__(self, wifs: str | list[str]) -> None:
         """Constructor.
 
         Args:
-            wif (str): private key that was rejected because of format
+            wifs (str | list[str]): private key or keys that was rejected because of format
         """
-        super().__init__(f"given private key is invalid: `{wif}`")
+        super().__init__(f"given private key or keys are invalid: `{wifs}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return isinstance(ex, RequestError) and "Assert Exception:false: Key can't be constructed" in ex.error
@@ -62,16 +62,24 @@ class InvalidPrivateKeyError(DetectableError):
 class NotExistingKeyError(DetectableError):
     """Raises when user tries to remove key that not exists."""
 
-    def __init__(self, public_key: str) -> None:
+    def __init__(self, public_key: str, wallet_name: str | None = None) -> None:
         """Constructor.
 
         Args:
             public_key (str): key that user tries to use, but it does not exist
         """
+        self.public_key = public_key
+        self.wallet_name = wallet_name
         super().__init__(f"cannot use key that does not exist: `{public_key}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, RequestError) and "Assert Exception:false: Key not in wallet" in ex.error
+        return isinstance(ex, RequestError) and any(
+            error_message in ex.error
+            for error_message in [
+                "Assert Exception:false: Key not in wallet",
+                f"Assert Exception:false: Public key {self.public_key} not found in {self.wallet_name} wallet",
+            ]
+        )
 
 
 class MissingSTMPrefixError(DetectableError):
@@ -91,22 +99,23 @@ class MissingSTMPrefixError(DetectableError):
             isinstance(ex, RequestError)
             and (
                 "Assert Exception:source.substr( 0, prefix.size() ) == prefix: "
-                f"public key requires STM prefix, but was given `{self.public_key}`"
+                "public key requires STM prefix, but was given "
+                f"`{self.public_key}`"
             )
             in ex.error
         )
 
 
 class InvalidPublicKeyError(DetectableError):
-    """Raises when given public key was rejected by beekeeper because of format."""
+    """Raises when given public key or keys were rejected by beekeeper because of format."""
 
-    def __init__(self, public_key: str) -> None:
+    def __init__(self, public_keys: str | list[str]) -> None:
         """Constructor.
 
         Args:
-            public_key (str): public key that was rejected because of format
+            public_keys (str | list[str]): public key or keys that were rejected because of format
         """
-        super().__init__(f"given public key is invalid: `{public_key}`")
+        super().__init__(f"Given public key or keys are invalid: `{public_keys}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return isinstance(ex, RequestError) and "Assert Exception:s == sizeof(data):" in ex.error

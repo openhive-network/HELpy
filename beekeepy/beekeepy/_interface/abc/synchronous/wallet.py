@@ -38,6 +38,9 @@ class UnlockedWallet(Wallet, ContextSync["UnlockedWallet"], ABC):
     def import_key(self, *, private_key: str) -> PublicKey: ...
 
     @abstractmethod
+    def import_keys(self, *, private_keys: list[str]) -> list[PublicKey]: ...
+
+    @abstractmethod
     def remove_key(self, *, key: str) -> None: ...
 
     @abstractmethod
@@ -52,6 +55,12 @@ class UnlockedWallet(Wallet, ContextSync["UnlockedWallet"], ABC):
     @property
     @abstractmethod
     def lock_time(self) -> datetime: ...
+
+    @abstractmethod
+    def encrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str, nonce: int = 0) -> str: ...
+
+    @abstractmethod
+    def decrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str) -> str: ...
 
     def __contains__(self, obj: object) -> bool:
         if isinstance(obj, str):

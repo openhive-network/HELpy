@@ -38,6 +38,9 @@ class UnlockedWallet(Wallet, ContextAsync["UnlockedWallet"], ABC):
     async def import_key(self, *, private_key: str) -> PublicKey: ...
 
     @abstractmethod
+    async def import_keys(self, *, private_keys: list[str]) -> list[PublicKey]: ...
+
+    @abstractmethod
     async def remove_key(self, *, key: str) -> None: ...
 
     @abstractmethod
@@ -52,3 +55,9 @@ class UnlockedWallet(Wallet, ContextAsync["UnlockedWallet"], ABC):
     @property
     @abstractmethod
     async def lock_time(self) -> datetime: ...
+
+    @abstractmethod
+    async def encrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str, nonce: int = 0) -> str: ...
+
+    @abstractmethod
+    async def decrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str) -> str: ...
