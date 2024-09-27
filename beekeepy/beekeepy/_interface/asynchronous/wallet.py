@@ -83,7 +83,7 @@ class UnlockedWallet(Wallet, UnlockedWalletInterface):
     @wallet_unlocked
     async def import_key(self, *, private_key: str) -> PublicKey:
         validate_private_keys(private_key=private_key)
-        with InvalidPrivateKeyError(wif=private_key):
+        with InvalidPrivateKeyError(wifs=private_key):
             return (
                 await self._beekeeper.api.import_key(
                     wallet_name=self.name, wif_key=private_key, token=self.session_token
@@ -92,10 +92,24 @@ class UnlockedWallet(Wallet, UnlockedWalletInterface):
         raise UnknownDecisionPathError
 
     @wallet_unlocked
+    async def import_keys(self, *, private_keys: list[str]) -> list[PublicKey]:
+        validate_private_keys(**{f"private_key_{i}": private_key for i, private_key in enumerate(private_keys)})
+
+        with InvalidPrivateKeyError(wifs=private_keys):
+            return (
+                await self._beekeeper.api.import_keys(
+                    wallet_name=self.name,
+                    wif_keys=private_keys,
+                    token=self.session_token,
+                )
+            ).public_keys
+        raise UnknownDecisionPathError
+
+    @wallet_unlocked
     async def remove_key(self, *, key: str) -> None:
         validate_public_keys(key=key)
         with NotExistingKeyError(public_key=key), MissingSTMPrefixError(public_key=key), InvalidPublicKeyError(
-            public_key=key
+            public_keys=key
         ):
             await self._beekeeper.api.remove_key(wallet_name=self.name, public_key=key, token=self.session_token)
 
@@ -107,7 +121,7 @@ class UnlockedWallet(Wallet, UnlockedWalletInterface):
     async def sign_digest(self, *, sig_digest: str, key: str) -> Signature:
         validate_public_keys(key=key)
         validate_digest(sig_digest=sig_digest)
-        with MissingSTMPrefixError(public_key=key), InvalidPublicKeyError(public_key=key), NotExistingKeyError(
+        with MissingSTMPrefixError(public_key=key), InvalidPublicKeyError(public_keys=key), NotExistingKeyError(
             public_key=key
         ):
             return (
@@ -129,6 +143,45 @@ class UnlockedWallet(Wallet, UnlockedWalletInterface):
     @property
     async def lock_time(self) -> datetime:
         return (await self._beekeeper.api.get_info(token=self.session_token)).timeout_time
+
+    @wallet_unlocked
+    async def encrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str, nonce: int = 0) -> str:
+        validate_public_keys(from_key=from_key, to_key=to_key)
+        with MissingSTMPrefixError(public_key=from_key), MissingSTMPrefixError(
+            public_key=to_key
+        ), InvalidPublicKeyError(public_keys=[from_key, to_key]), NotExistingKeyError(
+            public_key=from_key, wallet_name=self.name
+        ), NotExistingKeyError(public_key=to_key, wallet_name=self.name):
+            return (
+                await self._beekeeper.api.encrypt_data(
+                    wallet_name=self.name,
+                    from_public_key=from_key,
+                    to_public_key=to_key,
+                    content=content,
+                    nonce=nonce,
+                    token=self.session_token,
+                )
+            ).encrypted_content
+        raise UnknownDecisionPathError
+
+    @wallet_unlocked
+    async def decrypt_data(self, *, from_key: PublicKey, to_key: PublicKey, content: str) -> str:
+        validate_public_keys(from_key=from_key, to_key=to_key)
+        with MissingSTMPrefixError(public_key=from_key), MissingSTMPrefixError(
+            public_key=to_key
+        ), InvalidPublicKeyError(public_keys=[from_key, to_key]), NotExistingKeyError(
+            public_key=from_key, wallet_name=self.name
+        ), NotExistingKeyError(public_key=to_key, wallet_name=self.name):
+            return (
+                await self._beekeeper.api.decrypt_data(
+                    wallet_name=self.name,
+                    from_public_key=from_key,
+                    to_public_key=to_key,
+                    encrypted_content=content,
+                    token=self.session_token,
+                )
+            ).decrypted_content
+        raise UnknownDecisionPathError
 
     async def _aenter(self) -> UnlockedWalletInterface:
         return self
