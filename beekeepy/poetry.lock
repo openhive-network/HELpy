@@ -340,7 +340,7 @@ loguru = "0.7.2"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
 schemas = "0.0.1.dev307+6f4cbb8"
-wax = "0.3.10.dev25+8044195"
+wax = "0.3.10.dev180+112455a"
 
 [package.source]
 type = "directory"
@@ -741,12 +741,12 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "wax"
-version = "0.3.10.dev25+8044195"
+version = "0.3.10.dev180+112455a"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "wax-0.3.10.dev25+8044195-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:a5ff06bd8f982aaafcd9adb358834138293e220cd3b9e05289a2cf5ea3f829fb"},
+    {file = "wax-0.3.10.dev180+112455a-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:eea5aa452d2a56cf3c35002d3ac883afa8cba6a7ecebaf8bf11fae21e0ca0014"},
 ]
 
 [package.dependencies]

@@ -719,12 +719,12 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "wax"
-version = "0.3.10.dev25+8044195"
+version = "0.3.10.dev180+112455a"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "wax-0.3.10.dev25+8044195-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:a5ff06bd8f982aaafcd9adb358834138293e220cd3b9e05289a2cf5ea3f829fb"},
+    {file = "wax-0.3.10.dev180+112455a-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:eea5aa452d2a56cf3c35002d3ac883afa8cba6a7ecebaf8bf11fae21e0ca0014"},
 ]
 
 [package.dependencies]
@@ -857,4 +857,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1f4315e6319a1b394c59ac84fe4c289f60f1e14326e9a56323cc5b364120c2a4"
+content-hash = "b87a520f02f8542f32707211f673b09f6d8434e09730944268a78ff7e1a13088"
