@@ -75,7 +75,7 @@ class AbstractApi(ABC, Generic[HandleT]):
                     return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # type: ignore[no-untyped-call]
                 return super().default(o)
 
-        return partial(json.dumps, cls=JsonEncoder)
+        return partial(json.dumps, cls=JsonEncoder, ensure_ascii=False)
 
     def _serialize_params(self, arguments: ApiArgumentsToSerialize) -> str:
         """Return serialized given params. Can be overloaded."""
