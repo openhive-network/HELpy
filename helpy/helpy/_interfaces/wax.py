@@ -13,6 +13,10 @@ from schemas.fields.basic import PublicKey
 from schemas.transaction import Transaction, TransactionLegacy
 
 if TYPE_CHECKING:
+    from schemas.fields.assets.hbd import AssetHbdHF26
+    from schemas.fields.assets.hive import AssetHiveHF26
+    from schemas.fields.assets.vests import AssetVestsHF26
+    from schemas.fields.compound import Price
     from schemas.operations.representations import HF26Representation
     from schemas.operations.representations.representation_value_typevar import RepresentationValueT
 
@@ -284,3 +288,22 @@ def decrypt_memo(content: str, second_step_callback: SecondStepEncryptionCallbac
         to_key=__cpp_to_python_string(encrypted_memo.other_encryption_key),
         content=__cpp_to_python_string(encrypted_memo.encrypted_content),
     )
+
+
+def estimate_hive_collateral(
+    current_median_history: Price[AssetHiveHF26, AssetHbdHF26, AssetVestsHF26],
+    current_min_history: Price[AssetHiveHF26, AssetHbdHF26, AssetVestsHF26],
+    hbd_amount_to_get: AssetHbdHF26,
+) -> Hf26Asset.AnyT:
+    hive_collateral = wax.estimate_hive_collateral(
+        current_median_history=wax.python_price(
+            base=__schema_asset_to_wax(current_median_history.base),
+            quote=__schema_asset_to_wax(current_median_history.quote),
+        ),
+        current_min_history=wax.python_price(
+            base=__schema_asset_to_wax(current_min_history.base),
+            quote=__schema_asset_to_wax(current_min_history.quote),
+        ),
+        hbd_amount_to_get=__schema_asset_to_wax(hbd_amount_to_get),
+    )
+    return __wax_asset_to_schema(hive_collateral)
