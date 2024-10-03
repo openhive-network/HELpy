@@ -16,6 +16,7 @@ from beekeepy.exceptions import (
     DetachRemoteBeekeeperError,
     UnknownDecisionPathError,
 )
+from beekeepy.exceptions.common import InvalidatedStateByClosingBeekeeperError
 
 if TYPE_CHECKING:
     from beekeepy._handle.beekeeper import SyncRemoteBeekeeper
@@ -47,10 +48,11 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     def _get_instance(self) -> SyncRemoteBeekeeper:
         return self.__instance
 
+    @StateInvalidator.empty_call_after_invalidation(None)
     def teardown(self) -> None:
         if isinstance(self.__instance, SynchronousBeekeeperHandle):
             self.__instance.close()
-        self.invalidate()
+        self.invalidate(InvalidatedStateByClosingBeekeeperError())
 
     def detach(self) -> int:
         if not isinstance(self.__instance, SynchronousBeekeeperHandle):
