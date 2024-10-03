@@ -15,7 +15,7 @@ from beekeepy.exceptions import (
     NoWalletWithSuchNameError,
     WalletWithSuchNameAlreadyExistsError,
 )
-from beekeepy.exceptions.common import UnknownDecisionPathError
+from beekeepy.exceptions.common import InvalidatedStateByClosingSessionError, UnknownDecisionPathError
 from beekeepy.exceptions.detectable import NotExistingKeyError
 
 if TYPE_CHECKING:
@@ -65,9 +65,9 @@ class Session(SessionInterface, StateInvalidator):
         return self.__construct_wallet(name=name)
 
     def close_session(self) -> None:
-        if self.__beekeeper.is_session_token_set():
+        if self.__session_token != "":
             self.__beekeeper.api.close_session(token=self.token)
-            self.invalidate()
+            self.invalidate(InvalidatedStateByClosingSessionError())
 
     def lock_all(self) -> list[WalletInterface]:
         self.__beekeeper.api.lock_all(token=self.token)
