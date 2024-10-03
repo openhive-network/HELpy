@@ -24,7 +24,7 @@ def _convert_test_name_to_directory_name(test_name: str) -> str:
 
         directory_name.append(character_to_append)
 
-    return "".join(directory_name)
+    return "generated_" + "".join(directory_name)
 
 
 @pytest.fixture(autouse=True)
