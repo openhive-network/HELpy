@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from typing import TYPE_CHECKING, Any
 
 from beekeepy._interface.abc.synchronous.session import Password
@@ -16,7 +15,7 @@ from beekeepy.exceptions import (
     NoWalletWithSuchNameError,
     WalletWithSuchNameAlreadyExistsError,
 )
-from beekeepy.exceptions.common import UnknownDecisionPathError
+from beekeepy.exceptions.common import InvalidatedStateByClosingSessionError, UnknownDecisionPathError
 from beekeepy.exceptions.detectable import NotExistingKeyError
 
 if TYPE_CHECKING:
@@ -68,9 +67,7 @@ class Session(SessionInterface, StateInvalidator):
     def close_session(self) -> None:
         if self.__session_token != "":
             self.__beekeeper.api.close_session(token=self.token)
-            self.invalidate()
-        else:
-            warnings.warn("The session was not closed because the token was not set", stacklevel=1)
+            self.invalidate(InvalidatedStateByClosingSessionError())
 
     def lock_all(self) -> list[WalletInterface]:
         self.__beekeeper.api.lock_all(token=self.token)
