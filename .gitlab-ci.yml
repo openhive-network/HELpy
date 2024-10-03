@@ -35,11 +35,11 @@ variables:
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
-    ref: 8039e32fb584fbf06f4bd0bf5eae3a7b360dae1b
+    ref: f2246843532bf7ea903175e7951392b2d27b5e87
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   - project: 'hive/common-ci-configuration'
     # This should be the same version of Common CI defined in /hive/scripts/ci-helpers/prepare_data_image_job.yml
-    ref: 62833b5ff44f5073728658e229f3445394d404c2
+    ref: 682ba2e16cfc4ef192478d2d21c4b5a52bbd4678
     file: '/templates/python_projects.gitlab-ci.yml'
 
 image: ${CI_BASE_IMAGE}
