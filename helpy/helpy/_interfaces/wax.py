@@ -107,7 +107,7 @@ def calculate_transaction_id(transaction: Transaction) -> str:
     return __cpp_to_python_string(result.result)
 
 
-def calculate_legacy_sig_digest(transaction: TransactionLegacy, chain_id: str) -> str:
+def calculate_legacy_sig_digest(transaction: Transaction, chain_id: str) -> str:
     result = wax.calculate_legacy_sig_digest(__as_binary_json(transaction), __python_to_cpp_string(chain_id))
     __validate_wax_response(result)
     return __cpp_to_python_string(result.result)
