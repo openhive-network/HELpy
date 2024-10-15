@@ -339,8 +339,8 @@ httpx = {version = "0.23.3", extras = ["http2"]}
 loguru = "0.7.2"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev311+5bf88ae"
-wax = "0.3.10.dev196+de24f0e"
+schemas = "0.0.1.dev320+f4fdcfe"
+wax = "0.3.10.dev227+a000255"
 
 [package.source]
 type = "directory"
@@ -681,12 +681,12 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev311+5bf88ae"
+version = "0.0.1.dev320+f4fdcfe"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev311+5bf88ae-py3-none-any.whl", hash = "sha256:2786151632aa19365e8e2f7e72fa21f3607f87c41a9069a9765fb9a1ca35420c"},
+    {file = "schemas-0.0.1.dev320+f4fdcfe-py3-none-any.whl", hash = "sha256:b2106d4f429ca7aa04e723ef1072004f4705344eeeb0737a7eb6ee0248221992"},
 ]
 
 [package.dependencies]
@@ -748,12 +748,12 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "wax"
-version = "0.3.10.dev196+de24f0e"
+version = "0.3.10.dev227+a000255"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "wax-0.3.10.dev196+de24f0e-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:1cb6c7b6b230c7cb0893bee675ed850653df58b8016e79d58989a7fa7bfbda19"},
+    {file = "wax-0.3.10.dev227+a000255-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:33d35f07c91ae3916cd1ba3dc883c2f58a4eee33f2e5a04fe8139c61d1244b69"},
 ]
 
 [package.dependencies]
