@@ -30,8 +30,8 @@ loguru = "0.7.2"
 python = "^3.10"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev307+6f4cbb8"
-wax = "0.3.10.dev180+112455a"
+schemas = "0.0.1.dev310+c0550c1"
+wax = "0.3.10.dev196+de24f0e"
 
 [tool.poetry-dynamic-versioning]
 enable = true
