@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from pydantic import Field
+
+from beekeepy._executable.beekeeper_common import (
+    BeekeeperCommon,
+)
+from helpy._executable.arguments import Arguments
+
+
+# All config items are automatically generated
+class BeekeeperArguments(BeekeeperCommon, Arguments):
+{GENERATED-ITEMS}

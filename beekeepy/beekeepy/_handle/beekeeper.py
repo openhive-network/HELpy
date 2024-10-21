@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import helpy
 from beekeepy._executable import BeekeeperArguments, BeekeeperExecutable
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgumentsDefaults
+from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
 from beekeepy._handle.beekeeper_callbacks import BeekeeperNotificationCallbacks
 from beekeepy._handle.beekeeper_notification_handler import NotificationHandler
 from beekeepy._interface.settings import Settings

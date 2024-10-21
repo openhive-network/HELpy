@@ -8,4 +8,4 @@ from helpy._interfaces.config import Config
 
 # All config items are automatically generated
 class BeekeeperConfig(BeekeeperCommon, Config):
-    pass
+{GENERATED-ITEMS}
