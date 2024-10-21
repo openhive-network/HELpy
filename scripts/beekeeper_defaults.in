@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import ClassVar
+
+from pydantic import BaseModel, Field
+
+from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams  # noqa: TCH001
+from helpy import (  # noqa: TCH001
+    HttpUrl,
+    WsUrl,
+)
+
+
+class BeekeeperDefaults(BaseModel):
+{GENERATED-ITEMS}

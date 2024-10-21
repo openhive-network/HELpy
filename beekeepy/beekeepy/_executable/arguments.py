@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from helpy import HttpUrl
-
 from pydantic import Field
 
+from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams
+from helpy import HttpUrl
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
@@ -19,31 +18,39 @@ class Arguments(PreconfiguredBaseModel):
     version: bool = False
     dump_config: bool = False
 
-    class Config:
-        arbitrary_types_allowed = True
-
     def __convert_member_name_to_cli_value(self, member_name: str) -> str:
         return member_name.replace("_", "-")
 
-    def __convert_member_value_to_string(self, member_value: int | str | Path | Any) -> str:
-        if isinstance(member_value, bool):
-            return ""
-        if isinstance(member_value, str):
-            return member_value
-        if isinstance(member_value, int):
-            return str(member_value)
-        if isinstance(member_value, Path):
-            return member_value.as_posix()
-        if isinstance(member_value, HttpUrl):
-            return member_value.as_string(with_protocol=False)
-        raise TypeError("Invalid type")
+    def __convert_member_value_to_string(self, name: str, member_value: int | str | Path | Any) -> list[str]:
+        response = []
+        if isinstance(member_value, list):
+            temp_response = []
+            for item in member_value:
+                temp_response.extend(self.__convert_member_value_to_string(name, item))
+            response = temp_response
+        elif isinstance(member_value, bool):
+            response = [name, ""]
+        elif isinstance(member_value, str):
+            response = [name, member_value]
+        elif isinstance(member_value, int):
+            response = [name, str(member_value)]
+        elif isinstance(member_value, Path):
+            response = [name, member_value.as_posix()]
+        elif isinstance(member_value, HttpUrl):
+            response = [name, member_value.as_string(with_protocol=False)]
+        elif isinstance(member_value, ExportKeysWalletParams):
+            response = [name, f'["{member_value[0]}","{member_value[1]}"]']
+        else:
+            raise TypeError("Invalid type")
+
+        return response
 
     def __prepare_arguments(self, pattern: str) -> list[str]:
         data = self.dict(by_alias=True, exclude_none=True, exclude_unset=True, exclude_defaults=True)
         cli_arguments: list[str] = []
         for k, v in data.items():
-            cli_arguments.append(pattern.format(self.__convert_member_name_to_cli_value(k)))
-            cli_arguments.append(self.__convert_member_value_to_string(v))
+            name = pattern.format(self.__convert_member_name_to_cli_value(k))
+            cli_arguments.extend(self.__convert_member_value_to_string(name, v))
         return cli_arguments
 
     def process(self, *, with_prefix: bool = True) -> list[str]:

@@ -10,7 +10,7 @@ Application Options:
   --webserver-ws-endpoint arg
           Local websocket endpoint for webserver requests.
   --webserver-ws-deflate arg (=0)
-          Enable the RFC-7692 permessage-deflate extension for the WebSocket server (only used if the client requests 
+          Enable the RFC-7692 permessage-deflate extension for the WebSocket server (only used if the client requests
           it).  This may save bandwidth at the expense of CPU
   --webserver-thread-pool-size arg (=32)
           Number of threads used to handle queries. Default: 32.
@@ -20,23 +20,23 @@ Application Options:
           File name with a server's private key.
 
   --export-keys-wallet arg
-          Export explicitly private keys to a local file `wallet_name.keys`. 
-          Both [name, password] are required for every wallet. By default is 
-          empty.Two wallets example: --export-keys-wallet "["blue-wallet", 
-          "PW5JViFn5gd4rt6ohk7DQMgHzQN6Z9FuMRfKoE5Ysk25mkjy5AY1b"]" 
-          --export-keys-wallet "["green-wallet", 
-          "PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk"]" 
+          Export explicitly private keys to a local file `wallet_name.keys`.
+          Both [name, password] are required for every wallet. By default is
+          empty.Two wallets example: --export-keys-wallet "["blue-wallet",
+          "PW5JViFn5gd4rt6ohk7DQMgHzQN6Z9FuMRfKoE5Ysk25mkjy5AY1b"]"
+          --export-keys-wallet "["green-wallet",
+          "PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk"]"
 
   --unlock-interval arg (=500)
-          Protection against unlocking by bots. Every wrong `unlock` enables a 
+          Protection against unlocking by bots. Every wrong `unlock` enables a
           delay. By default 500[ms].
   --wallet-dir arg (=.)
-          The path of the wallet files (absolute path or relative to 
+          The path of the wallet files (absolute path or relative to
           application data dir)
   --unlock-timeout arg (=900)
-          Timeout for unlocked wallet in seconds (default 900 (15 
+          Timeout for unlocked wallet in seconds (default 900 (15
           minutes)).Wallets will be automatically locked after specified number
-          of seconds of inactivity.Activity is defined as any wallet command 
+          of seconds of inactivity.Activity is defined as any wallet command
           e.g. list-wallets.
   --backtrace arg (=yes)
           Whether to print backtrace on SIGSEGV
@@ -46,17 +46,20 @@ Application Config Options:
           Plugin(s) to enable, may be specified multiple times
 
 Application Command Line Options:
-  -h [ --help ] 
+  -h [ --help ]
           Print this help message and exit.
-  -v [ --version ] 
+  -v [ --version ]
           Print version information.
-  --dump-config 
+  --dump-config
           Dump configuration and exit
-  --list-plugins 
+  --list-plugins
           Print names of all available plugins and exit
-  --generate-completions 
+  --generate-completions
           Generate bash auto-complete script (try: eval "$(hived --generate-completions)")
   -d [ --data-dir ] dir
           Directory containing configuration file config.ini. Default location: $HOME/.beekeeper or CWD/. beekeeper
   -c [ --config ] filename (="config.ini")
           Configuration file name relative to data-dir
+  --dump-options
+          Dump information about all supported command line and config options in JSON format and exit
+

@@ -1,0 +1,13 @@
+from __future__ import annotations
+
+from pathlib import Path  # noqa: TCH003
+
+from beekeepy._executable.beekeeper_defaults import BeekeeperDefaults
+from helpy import HttpUrl, WsUrl  # noqa: TCH001
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
+
+
+# All config items are automatically generated
+class BeekeeperCommon(PreconfiguredBaseModel):
+    """Parameters used in command line and in config file."""
+{GENERATED-ITEMS}

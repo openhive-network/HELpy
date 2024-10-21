@@ -135,6 +135,8 @@ build_beekeepy_wheel:
     - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
     - python3 -m pytest --asyncio-mode auto -n auto --durations 0 --junitxml=report.xml ${HIVED_HTTP_ENDPOINT} "tests/${SUBPROJECT_TEST_TARGET}_test"
   artifacts:
+    paths:
+    - "**/generated_*"
     when: always
     expire_in: 1 week
     reports:

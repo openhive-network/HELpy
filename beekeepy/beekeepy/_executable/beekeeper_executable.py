@@ -43,12 +43,10 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
             with bk.restore_arguments(
                 BeekeeperArguments(
                     data_dir=tempdir_path,
-                    export_keys_wallet=ExportKeysWalletParams(wallet_name=wallet_name, wallet_password=wallet_password),
+                    export_keys_wallet=[ExportKeysWalletParams(field_0=wallet_name, field_1=wallet_password)],
                 )
             ):
-                bk.run(
-                    blocking=True,
-                )
+                bk.run(blocking=True)
 
         keys_path = bk.working_directory / f"{wallet_name}.keys"
         if extract_to is not None:
