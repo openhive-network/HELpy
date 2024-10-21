@@ -3,9 +3,11 @@ from __future__ import annotations
 from beekeepy._executable.beekeeper_common import (
     BeekeeperCommon,
 )
-from helpy._interfaces.config import Config
+from helpy._executable.arguments import Arguments
+
+from pathlib import Path
 from pydantic import Field
 
 # All config items are automatically generated
-class BeekeeperConfig(BeekeeperCommon, Config):
-    pass
+class BeekeeperArguments(BeekeeperCommon, Arguments):
+{GENERATED-ITEMS}

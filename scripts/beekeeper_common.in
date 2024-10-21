@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+from helpy import HttpUrl, WsUrl
+from helpy._interfaces.config import Config
+
+from pathlib import Path
+from pydantic import Field
+
+def http_webserver_default() -> HttpUrl:
+    return HttpUrl("0.0.0.0:0")
+
+
+# All config items are automatically generated
+class BeekeeperCommon(Config):
+{GENERATED-ITEMS}

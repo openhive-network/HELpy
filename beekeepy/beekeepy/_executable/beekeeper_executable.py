@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments, ExportKeysWalletParams
+from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
 from beekeepy._interface.settings import Settings
@@ -43,7 +43,7 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
             with bk.restore_arguments(
                 BeekeeperArguments(
                     data_dir=tempdir_path,
-                    export_keys_wallet=ExportKeysWalletParams(wallet_name=wallet_name, wallet_password=wallet_password),
+                    export_keys_wallet=[wallet_name, wallet_password],
                 )
             ):
                 bk.run(

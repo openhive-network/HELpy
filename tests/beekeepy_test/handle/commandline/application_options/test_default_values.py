@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from beekeepy._executable.beekeeper_config import (
-    BeekeeperConfig,
-    http_webserver_default,
-)
+from beekeepy._executable.beekeeper_common import http_webserver_default
+from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.defaults import BeekeeperDefaults
 
 if TYPE_CHECKING:
