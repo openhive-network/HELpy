@@ -78,7 +78,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         self.__show_warning_if_executable_already_running()
         return cast(ConfigT, self._exec.generate_default_config())
 
-    def _run(self, *, environment_variables: dict[str, str] | None = None, perform_unification: bool = True) -> None:
+    def _run(self, *, environment_variables: dict[str, str] | None = None, perform_unification: bool = True, blocking: bool = False, save_config: bool = True) -> None:
         """
         Runs executable and unifies arguments.
 
@@ -98,7 +98,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             self._unify_config(settings.working_directory, settings.http_endpoint)
 
         try:
-            self._exec._run(blocking=False, environ=environment_variables, propagate_sigint=settings.propagate_sigint)
+            self._exec._run(blocking=blocking, environ=environment_variables, propagate_sigint=settings.propagate_sigint, save_config=save_config)
         except SubprocessError as e:
             raise FailedToStartExecutableError from e
         try:
@@ -134,7 +134,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
     @abstractmethod
     def _unify_cli_arguments(self, working_directory: Path, http_endpoint: HttpUrl) -> None:
         """
-        Writes selected values to given cli arguments and returns it.
+        Writes selected values to given cli arguments.
 
         Args:
             working_directory -- chosen working path to be set in cli arguments.

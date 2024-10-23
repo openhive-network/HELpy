@@ -69,7 +69,7 @@ class Url(Generic[ProtocolT]):
 
     @classmethod
     def factory(cls, *, port: int = 0, address: str = "127.0.0.1") -> Self:
-        return cls(f"{cls._default_protocol()}://{address}:{port}")
+        return cls( (f"{cls._default_protocol()}://" if cls._default_protocol() else "") + f"{address}:{port}")
 
     @classmethod
     def _default_protocol(cls) -> str:

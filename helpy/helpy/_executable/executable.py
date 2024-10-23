@@ -84,9 +84,10 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         blocking: bool,
         environ: dict[str, str] | None = None,
         propagate_sigint: bool = True,
+        save_config: bool = True
     ) -> AutoCloser:
         return self.__run(
-            blocking=blocking, arguments=self.arguments, environ=environ, propagate_sigint=propagate_sigint
+            blocking=blocking, arguments=self.arguments, environ=environ, propagate_sigint=propagate_sigint, save_config=save_config
         )
 
     def __run(
@@ -96,8 +97,9 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         arguments: ArgumentT,
         environ: dict[str, str] | None = None,
         propagate_sigint: bool = True,
+        save_config: bool = True
     ) -> AutoCloser:
-        command, environment_variables = self.__prepare(arguments=arguments, environ=environ)
+        command, environment_variables = self.__prepare(arguments=arguments, environ=environ, save_config=save_config)
         self._logger.info(
             "starting `{binary_name}` as: `{command}`", binary_name=self.__executable_path.stem, command=command
         )
@@ -135,7 +137,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         result = subprocess.check_output(command, stderr=subprocess.STDOUT, env=environment_variables, timeout=timeout)
         return result.decode().strip()
 
-    def __prepare(self, arguments: ArgumentT, environ: dict[str, str] | None) -> tuple[list[str], dict[str, str]]:
+    def __prepare(self, arguments: ArgumentT, environ: dict[str, str] | None, save_config: bool = True) -> tuple[list[str], dict[str, str]]:
         environ = environ or {}
 
         self.__working_directory.mkdir(exist_ok=True)
@@ -146,7 +148,8 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
 
         environment_variables = dict(os.environ)
         environment_variables.update(environ)
-        self.config.save(self.working_directory)
+        if save_config:
+            self.config.save(self.working_directory)
 
         return command, environment_variables
 
@@ -203,9 +206,11 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
     def _construct_arguments(self) -> ArgumentT: ...
 
     def generate_default_config(self) -> ConfigT:
-        path_to_config = self.working_directory / (Config.DEFAULT_FILE_NAME)
-        self.__run(blocking=True, arguments=self.__arguments.just_dump_config())
-        temp_path_to_file = path_to_config.rename(Config.DEFAULT_FILE_NAME + ".tmp")
+        path_to_config = self.working_directory / Config.DEFAULT_FILE_NAME
+        orig_path_to_config = path_to_config.rename(path_to_config.with_suffix(".ini.orig")) # temporary move it to not interfere with config generation
+        self.__run(blocking=True, arguments=self.__arguments.just_dump_config(), save_config=False)
+        temp_path_to_file = path_to_config.rename(path_to_config.with_suffix(".ini.tmp"))
+        orig_path_to_config.rename(path_to_config)
         return self.config.load(temp_path_to_file)
 
     def get_help_text(self) -> str:
