@@ -339,7 +339,7 @@ httpx = {version = "0.23.3", extras = ["http2"]}
 loguru = "0.7.2"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev310+c0550c1"
+schemas = "0.0.1.dev311+5bf88ae"
 wax = "0.3.10.dev196+de24f0e"
 
 [package.source]
@@ -681,12 +681,12 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev310+c0550c1"
+version = "0.0.1.dev311+5bf88ae"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev310+c0550c1-py3-none-any.whl", hash = "sha256:ea13a5c800371261aec2c565f7712abdb10575a3bca5b7cb0f72b94b712cca39"},
+    {file = "schemas-0.0.1.dev311+5bf88ae-py3-none-any.whl", hash = "sha256:2786151632aa19365e8e2f7e72fa21f3607f87c41a9069a9765fb9a1ca35420c"},
 ]
 
 [package.dependencies]
