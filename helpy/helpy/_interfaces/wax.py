@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Callable, Protocol
 
 from pydantic import ValidationError
 
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from schemas.fields.assets.hive import AssetHiveHF26
     from schemas.fields.assets.vests import AssetVestsHF26
     from schemas.fields.compound import Price
+    from schemas.fields.hex import Hex
     from schemas.operations.representations import HF26Representation
     from schemas.operations.representations.representation_value_typevar import RepresentationValueT
 
@@ -307,3 +308,55 @@ def estimate_hive_collateral(
         hbd_amount_to_get=__schema_asset_to_wax(hbd_amount_to_get),
     )
     return __wax_asset_to_schema(hive_collateral)
+
+
+def collect_signing_keys(
+    transaction: Transaction, retrieve_authorities: Callable[[list[bytes]], dict[bytes, wax.python_authorities]]
+) -> list[str]:
+    return [
+        __cpp_to_python_string(key)
+        for key in wax.collect_signing_keys(__as_binary_json(transaction), retrieve_authorities)
+    ]
+
+
+def minimize_required_signatures(
+    signed_transaction: Transaction,
+    chain_id: Hex,
+    available_keys: list[PublicKey],
+    authorities_map: dict[bytes, wax.python_authorities],
+    get_witness_key: Callable[[bytes], bytes],
+) -> list[str]:
+    python_minimize_required_signatures_data = wax.python_minimize_required_signatures_data(
+        chain_id=__python_to_cpp_string(chain_id),
+        available_keys=[__python_to_cpp_string(key) for key in available_keys],
+        authorities_map=authorities_map,
+        get_witness_key=get_witness_key,
+    )
+
+    minimized_signatures = wax.minimize_required_signatures(
+        __as_binary_json(signed_transaction), python_minimize_required_signatures_data
+    )
+
+    return [__cpp_to_python_string(key) for key in minimized_signatures]
+
+
+def generate_password_based_private_key(account_name: str, role: str, password: str) -> list[str]:
+    private_key = wax.generate_password_based_private_key(
+        account=__python_to_cpp_string(account_name),
+        role=__python_to_cpp_string(role),
+        password=__python_to_cpp_string(password),
+    )
+    return [
+        __cpp_to_python_string(private_key.associated_public_key),
+        __cpp_to_python_string(private_key.wif_private_key),
+    ]
+
+
+def suggest_brain_key() -> dict[str, str]:
+    brain_key = wax.suggest_brain_key()
+
+    return {
+        "brain_priv_key": __cpp_to_python_string(brain_key.brain_key),
+        "wif_priv_key": __cpp_to_python_string(brain_key.wif_private_key),
+        "pub_key": __cpp_to_python_string(brain_key.associated_public_key),
+    }
