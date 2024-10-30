@@ -118,6 +118,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         if "result" not in parsed_response:
             raise MissingResultError
 
+        logger.error(response)
         serialized_data = get_response_model(expected_type, **parsed_response)
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
