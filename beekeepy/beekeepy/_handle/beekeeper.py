@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from subprocess import CalledProcessError
+from threading import Event
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import helpy
@@ -56,6 +57,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         self.__exec = BeekeeperExecutable(settings, logger)
         self.__notification_server: UniversalNotificationServer | None = None
         self.__notification_event_handler: NotificationHandler | None = None
+        self.__beekeeper_is_ready: Event | None = None
         self.__logger = logger
 
     @property
@@ -90,6 +92,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
             notification_endpoint=address_from_cli_arguments
             or self._get_settings().notification_endpoint,  # this has to be accessed directly from settings
         )
+        self.__beekeeper_is_ready = Event()
 
     def __close_notification_server(self) -> None:
         if self.__notification_server is not None:
@@ -99,16 +102,24 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         if self.__notification_event_handler is not None:
             self.__notification_event_handler = None
 
+        self.__beekeeper_is_ready = None
+
     def __wait_till_ready(self) -> None:
         assert self.__notification_event_handler is not None, "Notification event handler hasn't been set"
+        assert self.__beekeeper_is_ready is not None, "self.__beekeeper_is_ready is not set, error!"
         if not self.__notification_event_handler.http_listening_event.wait(timeout=5):
-            raise TimeoutError("Waiting too long for beekeeper to be up and running")
+            raise TimeoutError("Waiting too long for beekeepers webserver to start")
+        if not self.__beekeeper_is_ready.wait(timeout=5):
+            raise TimeoutError("Waiting too long for beekeeper notify about being ready")
 
     def _handle_error(self, error: Error) -> None:
         self.__logger.error(f"Beekeepr error: `{error.json()}`")
 
     def _handle_status_change(self, status: Status) -> None:
         self.__logger.info(f"Beekeeper status change to: `{status.current_status}`")
+        if status.current_status == "beekeeper is ready":
+            assert self.__beekeeper_is_ready is not None, "self.__beekeeper_is_ready is not set, error!"
+            self.__beekeeper_is_ready.set()
 
     def _run(self, settings: Settings, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         aca = additional_cli_arguments or BeekeeperArguments()
