@@ -118,7 +118,11 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         if "result" not in parsed_response:
             raise MissingResultError
 
-        if "HIVE_SECOND_CASHOUT_WINDOW" not in response and "reward_hbd_balance" not in response and "pending_rewarded_vesting_hive" not in response:
+        if (
+            "HIVE_SECOND_CASHOUT_WINDOW" not in response
+            and "reward_hbd_balance" not in response
+            and "pending_rewarded_vesting_hive" not in response
+        ):
             logger.error(response)
         serialized_data = get_response_model(expected_type, **parsed_response)
         assert isinstance(serialized_data, JSONRPCResult)
