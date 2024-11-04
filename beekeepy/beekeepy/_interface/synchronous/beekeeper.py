@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from os import environ
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from loguru import logger
@@ -73,7 +74,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         settings = settings or Settings()
         handle = SynchronousBeekeeperHandle(settings=settings, logger=logger)
         if "LOG_BEEKEEPER_REQUEST" in environ:
-            handle.config.log_json_rpc = "json_rpc"
+            handle.config.log_json_rpc = Path("json_rpc")
         cls.__apply_existing_session_token(settings=settings, handle=handle)
         handle.run()
         return cls(handle=handle)
