@@ -31,7 +31,7 @@ class BeekeeperDefaults(BaseModel):
     DEFAULT_DATA_DIR: ClassVar[Path | None] = None
     DEFAULT_DUMP_CONFIG: ClassVar[bool] = False
     DEFAULT_DUMP_OPTIONS: ClassVar[bool] = False
-    DEFAULT_EXPORT_KEYS_WALLET: ClassVar[list[ExportKeysWalletParams]] = Field(default_factory=list)
+    DEFAULT_EXPORT_KEYS_WALLET: ClassVar[list[ExportKeysWalletParams]] = []
     DEFAULT_GENERATE_COMPLETIONS: ClassVar[bool] = False
     DEFAULT_HELP: ClassVar[bool] = False
     DEFAULT_LIST_PLUGINS: ClassVar[bool] = False

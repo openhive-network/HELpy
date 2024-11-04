@@ -111,7 +111,7 @@ def read_value(name: str, value: OptionValue) -> tuple[str, str]:
                 for item in value.default_value:
                     content += f' = "{item}"'
             else:
-                content += " = Field(default_factory=list)"
+                content += " = []"
         elif current_type == "str":
             content += f' = "{value.default_value}"'
         elif current_type == "Path":
