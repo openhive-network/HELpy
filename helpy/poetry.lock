@@ -659,12 +659,12 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev320+f4fdcfe"
+version = "0.0.1.dev323+c5bf0df"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev320+f4fdcfe-py3-none-any.whl", hash = "sha256:b2106d4f429ca7aa04e723ef1072004f4705344eeeb0737a7eb6ee0248221992"},
+    {file = "schemas-0.0.1.dev323+c5bf0df-py3-none-any.whl", hash = "sha256:94c8b5bfbe0ac9aaa73d3d4528da3288681a69e37c1d822688b77822def41b52"},
 ]
 
 [package.dependencies]
@@ -864,4 +864,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "804379f44f3e1721dc71b8fb5ff0af85f3e516827736fe66670289e5db92bc23"
+content-hash = "74858d8ab925fb9193360c07e0a5de2e37d30b902091bb676749606a2a26993c"
