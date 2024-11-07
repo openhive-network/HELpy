@@ -30,7 +30,7 @@ loguru = "0.7.2"
 python = "^3.10"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev322+d79a96e"
+schemas = "0.0.1.dev327+d3d2399"
 wax = "0.3.10.dev227+a000255"
 
 [tool.poetry-dynamic-versioning]
