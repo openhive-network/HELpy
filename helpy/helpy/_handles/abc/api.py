@@ -29,7 +29,7 @@ from schemas.operations.representations.legacy_representation import LegacyRepre
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
 
-    from schemas.jsonrpc import ExpectResultT
+    from schemas.jsonrpc_models.jsonrpc_models import ExpectResultT
 
 
 P = ParamSpec("P")

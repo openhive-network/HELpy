@@ -13,7 +13,8 @@ from helpy._handles.settings import Settings
 from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import CommunicationError, HelpyError, RequestError
-from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
+from schemas.jsonrpc import get_response_model
+from schemas.jsonrpc_models.jsonrpc_models import ExpectResultT, JSONRPCResult
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

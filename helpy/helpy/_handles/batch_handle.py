@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync, EnterReturnT
 from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
-from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
+from schemas.jsonrpc import get_response_model
+from schemas.jsonrpc_models.jsonrpc_models import ExpectResultT, JSONRPCResult
 
 if TYPE_CHECKING:
     from types import TracebackType

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from local_tools.beekeepy.network import raw_http_call
 
-from schemas.jsonrpc import JSONRPCRequest
+from schemas.jsonrpc_constants import JSONRPCRequest
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
