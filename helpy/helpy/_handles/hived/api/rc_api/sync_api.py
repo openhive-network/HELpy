@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from helpy._handles.abc.api import AbstractSyncApi
-from helpy._interfaces.asset.asset import Hf26Asset  # noqa: TCH001
 from schemas.apis import rc_api  # noqa: TCH001
 
 
@@ -9,9 +8,7 @@ class RcApi(AbstractSyncApi):
     api = AbstractSyncApi._endpoint
 
     @api
-    def find_rc_accounts(
-        self, *, accounts: list[str], refresh_mana: bool = False
-    ) -> rc_api.FindRcAccounts[Hf26Asset.VestsT]:
+    def find_rc_accounts(self, *, accounts: list[str], refresh_mana: bool = False) -> rc_api.FindRcAccounts:
         raise NotImplementedError
 
     @api
@@ -23,9 +20,7 @@ class RcApi(AbstractSyncApi):
         raise NotImplementedError
 
     @api
-    def list_rc_accounts(
-        self, *, accounts: list[str], refresh_mana: bool = False
-    ) -> rc_api.ListRcAccounts[Hf26Asset.VestsT]:
+    def list_rc_accounts(self, *, accounts: list[str], refresh_mana: bool = False) -> rc_api.ListRcAccounts:
         raise NotImplementedError
 
     @api

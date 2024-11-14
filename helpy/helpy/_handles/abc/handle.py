@@ -13,7 +13,8 @@ from helpy._handles.settings import Settings
 from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy.exceptions import CommunicationError, HelpyError, RequestError
-from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
+from schemas.jsonrpc import get_response_model
+from schemas.jsonrpc_models.jsonrpc_models import ExpectResultT, JSONRPCResult
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -107,7 +108,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
 
     @classmethod
     def _response_handle(
-        cls, params: str, response: str, expected_type: type[ExpectResultT]
+        cls, params: str, response: str, expected_type: type[ExpectResultT], endpoint: str
     ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
         parsed_response = json.loads(response)
@@ -118,7 +119,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         if "result" not in parsed_response:
             raise MissingResultError
 
-        serialized_data = get_response_model(expected_type, **parsed_response)
+        serialized_data = get_response_model(expected_type, endpoint, **parsed_response)
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
@@ -199,7 +200,7 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
         self.logger.trace(
             f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
-        return self._response_handle(params=params, response=response, expected_type=expected_type)
+        return self._response_handle(params=params, response=response, expected_type=expected_type, endpoint=endpoint)
 
     def _is_synchronous(self) -> bool:
         return True
@@ -225,7 +226,7 @@ class AbstractSyncHandle(AbstractHandle, ABC):
         self.logger.trace(
             f"got response in {record.seconds_delta:.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
-        return self._response_handle(params=params, response=response, expected_type=expected_type)
+        return self._response_handle(params=params, response=response, expected_type=expected_type, endpoint=endpoint)
 
     def _is_synchronous(self) -> bool:
         return False

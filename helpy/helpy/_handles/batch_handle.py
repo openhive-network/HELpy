@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync, EnterReturnT
 from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
-from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
+from schemas.jsonrpc import get_response_model
+from schemas.jsonrpc_models.jsonrpc_models import ExpectResultT, JSONRPCResult
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -21,12 +22,13 @@ if TYPE_CHECKING:
 
 
 class _DelayedResponseWrapper:
-    def __init__(self, url: HttpUrl, request: str, expected_type: type[ExpectResultT]) -> None:
+    def __init__(self, url: HttpUrl, request: str, expected_type: type[ExpectResultT], endpoint: str) -> None:
         super().__setattr__("_url", url)
         super().__setattr__("_request", request)
         super().__setattr__("_response", None)
         super().__setattr__("_exception", None)
         super().__setattr__("_expected_type", expected_type)
+        super().__setattr__("_endpoint", endpoint)
 
     def __check_is_response_available(self) -> None:
         if (exception := super().__getattribute__("_exception")) is not None:
@@ -53,7 +55,9 @@ class _DelayedResponseWrapper:
 
     def _set_response(self, **kwargs: Any) -> None:
         expected_type = super().__getattribute__("_expected_type")
-        response = get_response_model(expected_type, **kwargs)
+        endpoint = super().__getattribute__("_endpoint")
+
+        response = get_response_model(expected_type, endpoint, **kwargs)
         assert isinstance(response, JSONRPCResult), "Expected JSONRPCResult, model cannot be found."
         super().__setattr__("_response", response.result)
 
@@ -160,7 +164,9 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
             result: Any
 
         request = build_json_rpc_call(method=endpoint, params=params, id_=len(self.__batch))
-        delayed_result = _DelayedResponseWrapper(url=self.__url, request=request, expected_type=expect_type)
+        delayed_result = _DelayedResponseWrapper(
+            url=self.__url, request=request, expected_type=expect_type, endpoint=endpoint
+        )
         self.__batch.append(_BatchRequestResponseItem(request=request, delayed_result=delayed_result))
         return DummyResponse(result=delayed_result)  # type: ignore[return-value]
 

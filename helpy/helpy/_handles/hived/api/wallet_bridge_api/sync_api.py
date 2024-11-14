@@ -4,7 +4,6 @@ from datetime import datetime  # noqa: TCH003
 
 from helpy._handles.abc.api import AbstractSyncApi, ApiArgumentSerialization
 from helpy._handles.hived.api.wallet_bridge_api.common import WalletBridgeApiCommons
-from helpy._interfaces.asset.asset import Hf26Asset  # noqa: TCH001
 from schemas.apis import wallet_bridge_api  # noqa: TCH001
 from schemas.transaction import Transaction  # noqa: TCH001
 
@@ -24,7 +23,7 @@ class WalletBridgeApi(AbstractSyncApi, WalletBridgeApiCommons):
         raise NotImplementedError
 
     @api
-    def get_chain_properties(self) -> wallet_bridge_api.GetChainProperties[Hf26Asset.HiveT]:
+    def get_chain_properties(self) -> wallet_bridge_api.GetChainProperties:
         raise NotImplementedError
 
     @api
