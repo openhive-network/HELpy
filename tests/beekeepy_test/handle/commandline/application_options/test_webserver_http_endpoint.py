@@ -31,7 +31,7 @@ def check_webserver_http_endpoint(*, nofification_endpoint: HttpUrl, webserver_h
     resp = requests.post(webserver_http_endpoint.as_string(), data=json.dumps(data), timeout=10.0)
     assert resp.ok
     resp_json = resp.json()
-    get_response_model(beekeeper_api.CreateSession, **resp_json)
+    get_response_model(beekeeper_api.CreateSession, "beekeeper_api.create_session", **resp_json)
 
 
 @pytest.mark.parametrize(

@@ -10,7 +10,7 @@ from local_tools.beekeepy.network import async_raw_http_call
 
 from beekeepy._handle import AsyncBeekeeper
 from beekeepy._interface.delay_guard import DelayGuardBase
-from schemas.jsonrpc import JSONRPCRequest
+from schemas.jsonrpc_constants import JSONRPCRequest
 
 if TYPE_CHECKING:
     from helpy import HttpUrl as Url

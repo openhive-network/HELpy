@@ -9,7 +9,7 @@ from helpy.communicators import AioHttpCommunicator, RequestCommunicator
 
 if TYPE_CHECKING:
     from helpy import HttpUrl
-    from schemas.jsonrpc import JSONRPCRequest
+    from schemas.jsonrpc_constants import JSONRPCRequest
 
 
 async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
