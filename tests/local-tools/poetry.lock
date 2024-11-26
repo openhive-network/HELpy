@@ -407,7 +407,7 @@ httpx = {version = "0.23.3", extras = ["http2"]}
 loguru = "0.7.2"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev327+d3d2399"
+schemas = "0.0.1.dev326+f57ff53"
 wax = "0.3.10.dev227+a000255"
 
 [package.source]
@@ -1055,12 +1055,12 @@ files = [
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev327+d3d2399"
+version = "0.0.1.dev326+f57ff53"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev327+d3d2399-py3-none-any.whl", hash = "sha256:7a705aec75b80fefde675febd8c7184a215e7242ff055f707fc0e38a2bf22f59"},
+    {file = "schemas-0.0.1.dev326+f57ff53-py3-none-any.whl", hash = "sha256:39a2ac294c5d4a3954458dfc1bc1e7513612ca95d0f9c29301bcf9ee0b3a95be"},
 ]
 
 [package.dependencies]
