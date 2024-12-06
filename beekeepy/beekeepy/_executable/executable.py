@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from beekeepy._executable.arguments.arguments import Arguments
 from beekeepy._executable.streams import StreamsHolder
+from beekeepy._interface.config import Config
+from beekeepy._interface.context import ContextSync
 from beekeepy.exceptions import BeekeeperIsNotRunningError, TimeoutReachWhileCloseError
-from helpy._interfaces.config import Config
-from helpy._interfaces.context import ContextSync
 
 if TYPE_CHECKING:
     from pathlib import Path

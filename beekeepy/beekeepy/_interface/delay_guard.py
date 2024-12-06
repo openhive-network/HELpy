@@ -5,8 +5,8 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Final
 
-from helpy import ContextAsync, ContextSync
-from helpy.exceptions import RequestError
+from beekeepy._interface.context import ContextAsync, ContextSync
+from beekeepy.exceptions.common import RequestError
 
 if TYPE_CHECKING:
     from types import TracebackType

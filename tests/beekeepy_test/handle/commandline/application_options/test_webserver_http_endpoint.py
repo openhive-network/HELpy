@@ -8,7 +8,7 @@ import requests
 from local_tools.beekeepy.network import get_port
 
 from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
-from helpy import HttpUrl
+from beekeepy._interface.url import HttpUrl
 from schemas.apis import beekeeper_api
 from schemas.jsonrpc import get_response_model
 

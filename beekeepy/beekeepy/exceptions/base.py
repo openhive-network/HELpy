@@ -5,14 +5,13 @@ from typing import TYPE_CHECKING
 
 from pydantic import StrRegexError
 
-from helpy import ContextSync
-from helpy.exceptions import HelpyError
+from beekeepy._interface.context import ContextSync
 
 if TYPE_CHECKING:
     from types import TracebackType
 
 
-class BeekeepyError(HelpyError, ABC):
+class BeekeepyError(Exception):
     """Base class for all exception raised by beekeepy."""
 
 

@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from beekeepy._interface.abc.asynchronous.session import (
         Session as SessionInterface,
     )
-    from helpy import HttpUrl
+    from beekeepy._interface.url import HttpUrl
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):

@@ -3,12 +3,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from helpy import ContextAsync, HttpUrl
+from beekeepy._interface.context import ContextAsync
 
 if TYPE_CHECKING:
     from beekeepy._interface.abc.asynchronous.session import Session
     from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
     from beekeepy._interface.settings import Settings
+    from beekeepy._interface.url import HttpUrl
 
 
 class Beekeeper(ContextAsync["Beekeeper"], ABC):

@@ -2,19 +2,18 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from subprocess import CalledProcessError
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar
 
-import helpy
+from beekeepy._communication.universal_notification_server import UniversalNotificationServer
 from beekeepy._executable import BeekeeperArguments, BeekeeperExecutable
 from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgumentsDefaults
+from beekeepy._handle import beekeeper_handler
 from beekeepy._handle.beekeeper_callbacks import BeekeeperNotificationCallbacks
 from beekeepy._handle.beekeeper_notification_handler import NotificationHandler
+from beekeepy._interface.context import ContextAsync, ContextSync
 from beekeepy._interface.settings import Settings
+from beekeepy._interface.url import HttpUrl
 from beekeepy.exceptions import BeekeeperFailedToStartError, BeekeeperIsNotRunningError
-from helpy import ContextAsync, ContextSync, HttpUrl
-from helpy._communication.universal_notification_server import (
-    UniversalNotificationServer,
-)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -22,7 +21,7 @@ if TYPE_CHECKING:
     from loguru import Logger
 
     from beekeepy._executable.beekeeper_config import BeekeeperConfig
-    from helpy import KeyPair
+    from beekeepy._interface.key_pair import KeyPair
     from schemas.notifications import (
         Error,
         Notification,
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     )
 
 
-EnterReturnT = TypeVar("EnterReturnT", bound=helpy.Beekeeper | helpy.AsyncBeekeeper)
+EnterReturnT = TypeVar("EnterReturnT", bound=beekeeper_handler.Beekeeper | beekeeper_handler.AsyncBeekeeper)
 
 
 __all__ = [
@@ -42,11 +41,11 @@ __all__ = [
 ]
 
 
-class SyncRemoteBeekeeper(helpy.Beekeeper):
+class SyncRemoteBeekeeper(beekeeper_handler.Beekeeper):
     pass
 
 
-class AsyncRemoteBeekeeper(helpy.AsyncBeekeeper):
+class AsyncRemoteBeekeeper(beekeeper_handler.AsyncBeekeeper):
     pass
 
 
@@ -65,7 +64,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         return self.__exec.pid
 
     @property
-    def notification_endpoint(self) -> helpy.HttpUrl:
+    def notification_endpoint(self) -> HttpUrl:
         endpoint = self._get_settings().notification_endpoint
         assert endpoint is not None, "Notification endpoint is not set"
         return endpoint
@@ -114,9 +113,9 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         aca = additional_cli_arguments or BeekeeperArguments()
         self.__setup_notification_server(address_from_cli_arguments=aca.notifications_endpoint)
         assert self.__notification_server is not None, "Creation of notification server failed"
-        settings.notification_endpoint = helpy.HttpUrl(f"127.0.0.1:{self.__notification_server.run()}", protocol="http")
+        settings.notification_endpoint = HttpUrl(f"127.0.0.1:{self.__notification_server.run()}", protocol="http")
         settings.http_endpoint = (
-            aca.webserver_http_endpoint or settings.http_endpoint or helpy.HttpUrl("127.0.0.1:0", protocol="http")
+            aca.webserver_http_endpoint or settings.http_endpoint or HttpUrl("127.0.0.1:0", protocol="http")
         )
         settings.working_directory = (
             aca.data_dir
@@ -164,7 +163,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
     def _http_webserver_ready(self, notification: Notification[WebserverListening]) -> None:
         """It is converted by _get_http_endpoint_from_event."""
 
-    def _get_http_endpoint_from_event(self) -> helpy.HttpUrl:
+    def _get_http_endpoint_from_event(self) -> HttpUrl:
         assert self.__notification_event_handler is not None, "Notification event handler hasn't been set"
         # <###> if you get exception from here, and have consistent way of reproduce please report <###>
         # make sure you didn't forget to call beekeeper.run() method
@@ -187,7 +186,7 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
+            self._run(settings=settings, additional_cli_arguments=additional_cli_arguments)
         self.http_endpoint = self._get_http_endpoint_from_event()
 
     def _get_settings(self) -> Settings:
@@ -196,7 +195,7 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
 
     @property
     def settings(self) -> Settings:
-        return cast(Settings, super().settings)
+        return super().settings
 
     def _enter(self) -> Beekeeper:
         self.run()
@@ -210,7 +209,7 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
+            self._run(settings=settings, additional_cli_arguments=additional_cli_arguments)
         self.http_endpoint = self._get_http_endpoint_from_event()
 
     def _get_settings(self) -> Settings:
@@ -219,7 +218,7 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
 
     @property
     def settings(self) -> Settings:
-        return cast(Settings, super().settings)
+        return super().settings
 
     async def _aenter(self) -> AsyncBeekeeper:
         self.run()

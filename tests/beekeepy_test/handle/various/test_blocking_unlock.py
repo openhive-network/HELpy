@@ -13,7 +13,7 @@ from beekeepy._interface.delay_guard import DelayGuardBase
 from schemas.jsonrpc import JSONRPCRequest
 
 if TYPE_CHECKING:
-    from helpy import HttpUrl as Url
+    from beekeepy._interface.url import HttpUrl as Url
 
 
 # We have 500ms time period protection on ulocking wallet.

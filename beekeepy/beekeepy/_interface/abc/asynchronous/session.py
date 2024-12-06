@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeAlias, overload
 
-from helpy import ContextAsync
+from beekeepy._interface.context import ContextAsync
 
 if TYPE_CHECKING:
     from beekeepy._interface.abc.asynchronous.wallet import UnlockedWallet, Wallet

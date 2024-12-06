@@ -21,7 +21,6 @@ from beekeepy.exceptions import (
     NotExistingKeyError,
     UnknownDecisionPathError,
 )
-from helpy import wax
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -72,10 +71,6 @@ class Wallet(WalletCommons[SyncRemoteBeekeeper, SyncWalletLocked, SyncDelayGuard
 
 class UnlockedWallet(UnlockedWalletInterface, Wallet):
     wallet_unlocked = WalletCommons.check_wallet
-
-    @wallet_unlocked
-    def generate_key(self, *, salt: str | None = None) -> PublicKey:  # noqa: ARG002
-        return self.import_key(private_key=wax.generate_private_key())
 
     @wallet_unlocked
     def import_key(self, *, private_key: str) -> PublicKey:

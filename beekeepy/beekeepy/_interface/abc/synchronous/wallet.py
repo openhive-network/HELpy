@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from beekeepy._interface.common import ContainsWalletName
-from helpy import ContextSync
+from beekeepy._interface.context import ContextSync
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
@@ -31,9 +31,6 @@ class Wallet(ContainsWalletName, ABC):
 
 
 class UnlockedWallet(Wallet, ContextSync["UnlockedWallet"], ABC):
-    @abstractmethod
-    def generate_key(self, *, salt: str | None = None) -> PublicKey: ...
-
     @abstractmethod
     def import_key(self, *, private_key: str) -> PublicKey: ...
 

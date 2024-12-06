@@ -6,7 +6,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from helpy import HttpUrl  # noqa: TCH001
+from beekeepy._interface.url import HttpUrl  # noqa: TCH001
 
 
 @dataclass

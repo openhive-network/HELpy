@@ -4,7 +4,7 @@ import json
 from typing import TYPE_CHECKING, Final
 
 from beekeepy._handle import Beekeeper
-from helpy import KeyPair
+from beekeepy._interface.key_pair import KeyPair
 
 if TYPE_CHECKING:
     from pathlib import Path

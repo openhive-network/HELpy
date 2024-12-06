@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Final
+import json
+from typing import TYPE_CHECKING, Any, Final
 
 from beekeepy.exceptions.base import (
     BeekeeperExecutableError,
@@ -8,6 +9,123 @@ from beekeepy.exceptions.base import (
     BeekeepyError,
     InvalidatedStateError,
 )
+
+if TYPE_CHECKING:
+    from beekeepy._interface.url import Url
+
+
+JsonT = dict[str, Any]
+CommunicationResponseT = str | JsonT | list[JsonT]
+
+
+class CommunicationError(BeekeepyError):
+    """Base class for all communication related errors."""
+
+    def __init__(
+        self,
+        url: str | Url[Any],
+        request: str | bytes,
+        response: CommunicationResponseT | None = None,
+        *,
+        message: str = "",
+    ) -> None:
+        """Contains required details.
+
+        Args:
+            url: where request has been send
+            request: content of request
+            response: content of response. Defaults to None.
+            message: additional information about error. Defaults to "".
+        """
+        self.url = str(url)
+        self.request = request
+        self.response = response
+        message = message or self.__create_message()
+        super().__init__(message)
+
+    def get_response_error_messages(self) -> list[str]:
+        """Obtains error message from response."""
+        result = self.get_response()
+        if result is None:
+            return []
+
+        if isinstance(result, dict):
+            message = result.get("error", {}).get("message", None)
+            return [str(message)] if message is not None else []
+
+        messages = []
+        for item in result:
+            message = item.get("error", {}).get("message", None)
+            if message is not None:
+                messages.append(str(message))
+        return messages
+
+    def get_response(self) -> JsonT | list[JsonT] | None:
+        return self.response if isinstance(self.response, dict | list) else None
+
+    def _get_reply(self) -> str:
+        if (result := self.get_response()) is not None:
+            return f"response={result}"
+
+        if self.response is not None:
+            return f"response={self.response}"
+
+        return "no response available"
+
+    def __create_message(self) -> str:
+        return (
+            f"Problem occurred during communication with: url={self.url}, request={self.request!r}, {self._get_reply()}"
+        )
+
+
+class RequestError(BeekeepyError):
+    """Raised if error field is in the response."""
+
+    def __init__(self, send: str, error: str | JsonT) -> None:
+        """
+        Initialize a RequestError.
+
+        Parameters:
+        - send (str): The request sent.
+        - error (str | JsonT): The error received in response.
+
+        Returns:
+        None
+        """
+        self.send = send
+        self.error = self.__try_extract_exception_message(error)
+        super().__init__(f"{send=} | {self.error=}")
+
+    def __try_extract_exception_message(self, error: str | JsonT) -> str | JsonT:
+        try:
+            parsed_error = json.loads(error) if isinstance(error, str) else error
+            if not isinstance(error, dict):
+                return error
+            return parsed_error.get("message", error)  # type: ignore[no-any-return]
+        except json.JSONDecodeError:
+            return error
+
+
+class BatchRequestError(BeekeepyError):
+    """Base class for batch related errors."""
+
+
+class NothingToSendError(BatchRequestError):
+    """Raised if there is nothing to send, example.
+
+    with node.batch():
+        pass
+        # here on exit NothingToSendError will be raised
+    """
+
+
+class ResponseNotReadyError(BatchRequestError):
+    """Raised on access to response when it's not ready.
+
+    with node.batch() as x:
+        resp = x.api.some_endpoint()
+        assert resp.some_var == 1  # here ResponseNotReadyError will be raised
+    """
 
 
 class BeekeeperIsNotRunningError(BeekeeperExecutableError):
@@ -112,3 +230,7 @@ class InvalidatedStateByClosingSessionError(InvalidatedStateError):
             invalidated_by="calling close_session on session objecct",
             how_to="creating new session again by calling beekeeper.create_session",
         )
+
+
+class InvalidOptionError(BeekeepyError):
+    """Raised if invalid expression is given in config."""
