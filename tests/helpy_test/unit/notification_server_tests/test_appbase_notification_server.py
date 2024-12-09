@@ -12,7 +12,7 @@ from tests.helpy_test.unit.notification_server_tests.counting_notification_handl
 )
 
 if TYPE_CHECKING:
-    from helpy._interfaces.url import HttpUrl
+    from beekeepy._interface.url import HttpUrl
     from schemas.notifications import KnownNotificationT
 
 CounterGetterT = Callable[[CountingAppbaseNotificationHandler], int]

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._communication.appbase_notification_handler import AppbaseNotificationHandler
-from helpy._communication.notification_decorator import notification
+from beekeepy._communication.appbase_notification_handler import AppbaseNotificationHandler
+from beekeepy._communication.notification_decorator import notification
 from schemas.notifications import P2PListening, SwitchingForks
 
 if TYPE_CHECKING:

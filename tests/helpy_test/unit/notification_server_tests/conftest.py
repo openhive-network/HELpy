@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy import HttpUrl
-from helpy._communication.universal_notification_server import UniversalNotificationServer
+from beekeepy._communication.universal_notification_server import UniversalNotificationServer
+from beekeepy._interface.url import HttpUrl
 from tests.helpy_test.unit.notification_server_tests.counting_notification_handlers import (
     CountingAppbaseNotificationHandler,
 )

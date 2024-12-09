@@ -4,8 +4,8 @@ from typing import Any, cast
 
 import pytest
 
-from helpy._communication.settings import CommunicationSettings
-from helpy._interfaces.settings_holder import SharedSettingsHolder, UniqueSettingsHolder
+from beekeepy._communication.settings import CommunicationSettings
+from beekeepy._interface.settings_holder import SharedSettingsHolder, UniqueSettingsHolder
 
 TestSharedSettingsHolder = SharedSettingsHolder[CommunicationSettings]
 TestUniqueSettingsHolder = UniqueSettingsHolder[CommunicationSettings]

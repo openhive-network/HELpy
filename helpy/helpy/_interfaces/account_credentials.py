@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from helpy._interfaces.key_pair import KeyPair
+from beekeepy._interface.key_pair import KeyPair
 from helpy._interfaces.wax import calculate_public_key, generate_private_key
 
 

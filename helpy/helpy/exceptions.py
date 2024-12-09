@@ -4,10 +4,8 @@ import json
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from helpy._interfaces.url import Url
-
-JsonT = dict[str, Any]
-CommunicationResponseT = str | JsonT | list[JsonT]
+    from beekeepy._interface.url import Url
+    from beekeepy.exceptions.common import CommunicationResponseT, JsonT
 
 
 class HelpyError(Exception):

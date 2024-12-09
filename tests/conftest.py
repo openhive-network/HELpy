@@ -3,11 +3,15 @@ from __future__ import annotations
 import re
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 import helpy
-from helpy._handles.abc.api import AbstractApi, RegisteredApisT
+from beekeepy._handle.abc.api import AbstractApi, RegisteredApisT
+
+if TYPE_CHECKING:
+    from beekeepy._interface.url import HttpUrl
 
 
 def _convert_test_name_to_directory_name(test_name: str) -> str:
@@ -51,7 +55,7 @@ def registered_apis() -> RegisteredApisT:
 
 
 @pytest.fixture()
-def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
+def hived_http_endpoint(request: pytest.FixtureRequest) -> HttpUrl:
     raw_url = request.config.getoption("--hived-http-endpoint")
     assert raw_url is not None
     assert isinstance(raw_url, str)
@@ -59,10 +63,10 @@ def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
 
 
 @pytest.fixture()
-def sync_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.Hived:
+def sync_node(hived_http_endpoint: HttpUrl) -> helpy.Hived:
     return helpy.Hived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))
 
 
 @pytest.fixture()
-def async_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.AsyncHived:
+def async_node(hived_http_endpoint: HttpUrl) -> helpy.AsyncHived:
     return helpy.AsyncHived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))
