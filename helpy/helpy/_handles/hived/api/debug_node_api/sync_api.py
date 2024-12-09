@@ -19,7 +19,7 @@ class DebugNodeApi(AbstractSyncApi):
 
     @api
     def debug_generate_blocks(
-        self, *, debug_key: str, count: int = 0, skip: int = 0, miss_blocks: int = 0, edit_if_needed: bool = True
+        self, *, debug_key: str, count: int = 0, skip: int = 0, miss_blocks: int = 0
     ) -> debug_node_api.DebugGenerateBlocks:
         raise NotImplementedError
 
