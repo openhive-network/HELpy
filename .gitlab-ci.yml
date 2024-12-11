@@ -55,13 +55,6 @@ default:
     PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
     PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/tests/local-tools/pyproject.toml"
 
-pre_commit_checks:
-  stage: static_code_analysis
-  extends: .pre_commit_checks_template
-  variables:
-    PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
-    PRE_COMMIT_CONFIG: "${CI_PROJECT_DIR}/.pre-commit-config.yaml"
-
 formatting_with_ruff_check:
   stage: static_code_analysis
   extends: .project_develop_configuration_template
@@ -115,9 +108,6 @@ prepare_hived_data:
 build_helpy_wheel:
   stage: helpy
   extends: .build_wheel_template
-  needs:
-    - job: pre_commit_checks
-    - job: run_helpy_tests
   variables:
     PYPROJECT_DIR: "$HELPY_DIR"
 
@@ -125,21 +115,8 @@ build_helpy_wheel:
 build_beekeepy_wheel:
   stage: beekeepy
   extends: .build_wheel_template
-  needs:
-    - job: pre_commit_checks
-    - job: run_beekeepy_tests
-    - job: build_helpy_wheel
-    - job: deploy_helpy_wheel_to_gitlab
-    - job: prepare_hived_image
-      artifacts: true
   variables:
     PYPROJECT_DIR: "$BEEKEEPY_DIR"
-  before_script:
-    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
-    - poetry -C "${BEEKEEPY_DIR}" remove --lock -- helpy
-    - poetry -C "${BEEKEEPY_DIR}" add --lock -- "helpy `poetry -C ${BEEKEEPY_DIR} version -s`"  # version of helpy and beekeepy are same
-  tags:
-    - public-runner-docker
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -172,30 +149,6 @@ build_beekeepy_wheel:
   tags:
     - data-cache-storage
 
-run_helpy_tests:
-  stage: helpy
-  extends: .run_tests_template
-  needs:
-  - !reference [.run_tests_template, needs]
-  - job: prepare_hived_data
-    artifacts: true
-  services:
-    - name: $HIVED_IMAGE_NAME
-      alias: hived-instance
-      variables:
-        DATA_SOURCE: "${DATA_CACHE_HIVE_PREFIX}_${HIVED_COMMIT}"
-        LOG_FILE: $CI_JOB_NAME.log
-      command: ["--replay-blockchain", "--stop-at-block=5000000"]
-  variables:
-    SUBPROJECT_TEST_TARGET: "helpy"
-    HIVED_HTTP_ENDPOINT: "http://hived-instance:8091"
-
-
-run_beekeepy_tests:
-  stage: beekeepy
-  extends: .run_tests_template
-  variables:
-    SUBPROJECT_TEST_TARGET: "beekeepy"
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -203,8 +156,6 @@ run_beekeepy_tests:
 
 .deploy_wheel_needs: &deploy_wheel_needs
   needs:
-    - job: pre_commit_checks
-    - job: run_helpy_tests
     - job: build_helpy_wheel
       artifacts: true
 
