@@ -115,8 +115,15 @@ build_helpy_wheel:
 build_beekeepy_wheel:
   stage: beekeepy
   extends: .build_wheel_template
+  needs:
+    - job: prepare_hived_image
+      artifacts: true
   variables:
     PYPROJECT_DIR: "$BEEKEEPY_DIR"
+  before_script:
+    - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+  tags:
+    - public-runner-docker
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
