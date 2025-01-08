@@ -19,7 +19,7 @@ class NoWalletWithSuchNameError(DetectableError):
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return (
             isinstance(ex, RequestError)
-            and "Assert Exception:wallet->load_wallet_file(): Unable to open file: " in ex.error
+            and "Assert Exception:_new_item->load_wallet_file(): Unable to open file: " in ex.error
             and f"{self.wallet_name}.wallet" in ex.error
         )
 
