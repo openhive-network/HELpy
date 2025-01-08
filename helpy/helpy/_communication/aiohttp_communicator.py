@@ -20,6 +20,7 @@ class AioHttpCommunicator(AbstractCommunicator):
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
+            amount_of_retries += 1
             async with aiohttp.ClientSession(
                 timeout=aiohttp.ClientTimeout(total=self.settings.timeout.total_seconds())
             ) as session:
