@@ -136,6 +136,19 @@ def calculate_hp_apr(
     return __cpp_to_python_string(result.result)
 
 
+def calculate_hp_to_vests(
+    hive: Hf26Asset.HiveT,
+    total_vesting_fund_hive: Hf26Asset.HiveT,
+    total_vesting_shares: Hf26Asset.VestT,
+) -> Hf26Asset.VestsT:
+    result = wax.calculate_hp_to_vests(
+        hive=__schema_asset_to_wax(hive),
+        total_vesting_fund_hive=__schema_asset_to_wax(total_vesting_fund_hive),
+        total_vesting_shares=__schema_asset_to_wax(total_vesting_shares),
+    )
+    return assure_asset_type(__wax_asset_to_schema(result), Hf26Asset.VestsT)
+
+
 def calculate_account_hp(
     vests: Hf26Asset.VestT, total_vesting_fund_hive: Hf26Asset.HiveT, total_vesting_shares: Hf26Asset.VestT
 ) -> Hf26Asset.AnyT:
