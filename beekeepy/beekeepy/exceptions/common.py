@@ -4,6 +4,7 @@ from typing import Final
 
 from beekeepy.exceptions.base import (
     BeekeeperExecutableError,
+    BeekeeperFailedToStartError,
     BeekeeperHandleError,
     BeekeepyError,
     InvalidatedStateError,
@@ -14,8 +15,12 @@ class BeekeeperIsNotRunningError(BeekeeperExecutableError):
     """Raises if after user tries to access options available only when process is running."""
 
 
-class BeekeeperFailedToStartError(BeekeeperExecutableError):
-    """Raises if beekeeper exited with non-0 exit code."""
+class BeekeeperFailedToStartDuringProcessSpawnError(BeekeeperFailedToStartError):
+    """Raises if beekeeper exited with non-0 exit code during startup."""
+
+
+class BeekeeperFailedToStartNotReadyOnTimeError(BeekeeperFailedToStartError):
+    """Raises if beekeeper didn't start on time."""
 
 
 class WalletIsLockedError(BeekeepyError):
