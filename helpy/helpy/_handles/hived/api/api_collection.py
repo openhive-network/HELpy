@@ -27,9 +27,15 @@ from helpy._handles.hived.api.network_broadcast_api import (
     AsyncNetworkBroadcastApi,
     SyncNetworkBroadcastApi,
 )
-from helpy._handles.hived.api.network_node_api import AsyncNetworkNodeApi, SyncNetworkNodeApi
+from helpy._handles.hived.api.network_node_api import (
+    AsyncNetworkNodeApi,
+    SyncNetworkNodeApi,
+)
 from helpy._handles.hived.api.rc_api import AsyncRcApi, SyncRcApi
-from helpy._handles.hived.api.reputation_api import AsyncReputationApi, SyncReputationApi
+from helpy._handles.hived.api.reputation_api import (
+    AsyncReputationApi,
+    SyncReputationApi,
+)
 from helpy._handles.hived.api.transaction_status_api import (
     AsyncTransactionStatusApi,
     SyncTransactionStatusApi,
@@ -61,6 +67,21 @@ class HivedAsyncApiCollection(AbstractAsyncApiCollection):
         self.transaction_status = AsyncTransactionStatusApi(owner=self._owner)
         self.wallet_bridge = AsyncWalletBridgeApi(owner=self._owner)
 
+        self.account_by_key_api = self.account_by_key
+        self.account_history_api = self.account_history
+        self.block_api = self.block
+        self.condenser_api = self.condenser
+        self.database_api = self.database
+        self.debug_node_api = self.debug_node
+        self.jsonrpc_api = self.jsonrpc
+        self.market_history_api = self.market_history
+        self.network_broadcast_api = self.network_broadcast
+        self.network_node_api = self.network_node
+        self.rc_api = self.rc
+        self.reputation_api = self.reputation
+        self.transaction_status_api = self.transaction_status
+        self.wallet_bridge_api = self.wallet_bridge
+
 
 class HivedSyncApiCollection(AbstractSyncApiCollection):
     def __init__(self, owner: SyncHandleT) -> None:
@@ -79,3 +100,18 @@ class HivedSyncApiCollection(AbstractSyncApiCollection):
         self.reputation = SyncReputationApi(owner=self._owner)
         self.transaction_status = SyncTransactionStatusApi(owner=self._owner)
         self.wallet_bridge = SyncWalletBridgeApi(owner=self._owner)
+
+        self.account_by_key_api = self.account_by_key
+        self.account_history_api = self.account_history
+        self.block_api = self.block
+        self.condenser_api = self.condenser
+        self.database_api = self.database
+        self.debug_node_api = self.debug_node
+        self.jsonrpc_api = self.jsonrpc
+        self.market_history_api = self.market_history
+        self.network_broadcast_api = self.network_broadcast
+        self.network_node_api = self.network_node
+        self.rc_api = self.rc
+        self.reputation_api = self.reputation
+        self.transaction_status_api = self.transaction_status
+        self.wallet_bridge_api = self.wallet_bridge

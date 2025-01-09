@@ -25,6 +25,7 @@ class BeekeeperAsyncApiCollection(AbstractAsyncApiCollection):
     def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = AsyncBeekeeperApi(owner=self._owner)
+        self.beekeeper_api = self.beekeeper
 
 
 class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
@@ -35,3 +36,4 @@ class BeekeeperSyncApiCollection(AbstractSyncApiCollection):
     def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
         super().__init__(owner)
         self.beekeeper = SyncBeekeeperApi(owner=self._owner)
+        self.beekeeper_api = self.beekeeper
