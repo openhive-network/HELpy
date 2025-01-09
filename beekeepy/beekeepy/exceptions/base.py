@@ -88,3 +88,7 @@ class InvalidatedStateError(BeekeeperInterfaceError):
             + (f"It was invalidated by {invalidated_by}." if invalidated_by else "")
             + (f"To gain access again, you have to {how_to}." if how_to else "")
         )
+
+
+class BeekeeperFailedToStartError(BeekeeperExecutableError):
+    """Base class for errors while launching beekeeper."""

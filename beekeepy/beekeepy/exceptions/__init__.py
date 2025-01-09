@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from beekeepy.exceptions.base import (
     BeekeeperExecutableError,
+    BeekeeperFailedToStartError,
     BeekeeperHandleError,
     BeekeepyError,
     DetectableError,
@@ -9,7 +10,8 @@ from beekeepy.exceptions.base import (
     SchemaDetectableError,
 )
 from beekeepy.exceptions.common import (
-    BeekeeperFailedToStartError,
+    BeekeeperFailedToStartDuringProcessSpawnError,
+    BeekeeperFailedToStartNotReadyOnTimeError,
     BeekeeperIsNotRunningError,
     DetachRemoteBeekeeperError,
     InvalidatedStateByClosingBeekeeperError,
@@ -39,6 +41,8 @@ from beekeepy.exceptions.detectable import (
 __all__ = [
     "BeekeeperExecutableError",
     "BeekeeperFailedToStartError",
+    "BeekeeperFailedToStartDuringProcessSpawnError",
+    "BeekeeperFailedToStartNotReadyOnTimeError",
     "BeekeeperHandleError",
     "BeekeeperIsNotRunningError",
     "BeekeepyError",

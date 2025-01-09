@@ -6,11 +6,17 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import helpy
 from beekeepy._executable import BeekeeperArguments, BeekeeperExecutable
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgumentsDefaults
+from beekeepy._executable.arguments.beekeeper_arguments import (
+    BeekeeperArgumentsDefaults,
+)
 from beekeepy._handle.beekeeper_callbacks import BeekeeperNotificationCallbacks
 from beekeepy._handle.beekeeper_notification_handler import NotificationHandler
 from beekeepy._interface.settings import Settings
-from beekeepy.exceptions import BeekeeperFailedToStartError, BeekeeperIsNotRunningError
+from beekeepy.exceptions import (
+    BeekeeperFailedToStartDuringProcessSpawnError,
+    BeekeeperFailedToStartNotReadyOnTimeError,
+    BeekeeperIsNotRunningError,
+)
 from helpy import ContextAsync, ContextSync, HttpUrl
 from helpy._communication.universal_notification_server import (
     UniversalNotificationServer,
@@ -110,7 +116,11 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
     def _handle_status_change(self, status: Status) -> None:
         self.__logger.info(f"Beekeeper status change to: `{status.current_status}`")
 
-    def _run(self, settings: Settings, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
+    def _run(
+        self,
+        settings: Settings,
+        additional_cli_arguments: BeekeeperArguments | None = None,
+    ) -> None:
         aca = additional_cli_arguments or BeekeeperArguments()
         self.__setup_notification_server(address_from_cli_arguments=aca.notifications_endpoint)
         assert self.__notification_server is not None, "Creation of notification server failed"
@@ -126,12 +136,12 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         try:
             self._run_application(settings=settings, additional_cli_arguments=aca)
         except CalledProcessError as e:
-            raise BeekeeperFailedToStartError from e
+            raise BeekeeperFailedToStartDuringProcessSpawnError from e
         try:
             self.__wait_till_ready()
         except (AssertionError, TimeoutError) as e:
             self.close()
-            raise BeekeeperFailedToStartError from e
+            raise BeekeeperFailedToStartNotReadyOnTimeError from e
 
     def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
         assert settings.notification_endpoint is not None
@@ -176,7 +186,9 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         self, wallet_name: str, wallet_password: str, extract_to: Path | None = None
     ) -> list[KeyPair]:
         return self.__exec.export_keys_wallet(
-            wallet_name=wallet_name, wallet_password=wallet_password, extract_to=extract_to
+            wallet_name=wallet_name,
+            wallet_password=wallet_password,
+            extract_to=extract_to,
         )
 
     @abstractmethod
@@ -187,7 +199,10 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
+            self._run(
+                settings=cast(Settings, settings),
+                additional_cli_arguments=additional_cli_arguments,
+            )
         self.http_endpoint = self._get_http_endpoint_from_event()
 
     def _get_settings(self) -> Settings:
@@ -210,7 +225,10 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
-            self._run(settings=cast(Settings, settings), additional_cli_arguments=additional_cli_arguments)
+            self._run(
+                settings=cast(Settings, settings),
+                additional_cli_arguments=additional_cli_arguments,
+            )
         self.http_endpoint = self._get_http_endpoint_from_event()
 
     def _get_settings(self) -> Settings:
