@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
-import warnings
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -151,19 +150,12 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             return_code = self.__process.wait(timeout=timeout_secs)
             self._logger.debug(f"Closed with {return_code} return code")
         except subprocess.TimeoutExpired:
-            self.__raise_exception_if_timeout_on_close()
             self.__process.kill()
             self.__process.wait()
-        self.__process = None
-        self.__files.close()
-        self.__warn_if_pid_files_exists()
-
-    def __warn_if_pid_files_exists(self) -> None:
-        if self.__pid_files_exists():
-            warnings.warn(
-                f"PID file has not been removed, malfunction may occur. Working directory: {self.working_directory}",
-                stacklevel=2,
-            )
+            self.__raise_exception_if_timeout_on_close()
+        finally:
+            self.__process = None
+            self.__files.close()
 
     def __pid_files_exists(self) -> bool:
         return len(list(self.working_directory.glob("*.pid"))) > 0
