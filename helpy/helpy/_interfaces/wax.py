@@ -362,8 +362,6 @@ def suggest_brain_key() -> dict[str, str]:
     }
 
 
-def get_hive_protocol_config(treasury_name: str, chain_id: str) -> dict[str, str]:
-    hive_protocol_config = wax.get_hive_protocol_config(
-        __python_to_cpp_string(treasury_name), __python_to_cpp_string(chain_id)
-    )
+def get_hive_protocol_config(chain_id: str) -> dict[str, str]:
+    hive_protocol_config = wax.get_hive_protocol_config(__python_to_cpp_string(chain_id))
     return {__cpp_to_python_string(k): __cpp_to_python_string(v) for k, v in hive_protocol_config.items()}
