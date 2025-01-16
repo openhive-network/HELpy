@@ -31,7 +31,7 @@ python = "^3.10"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
 schemas = "0.0.1.dev323+e5a1ba1"
-wax = "0.3.10.dev227+a000255"
+wax = "0.3.10.dev321+1384595"
 
 [tool.poetry-dynamic-versioning]
 enable = true
