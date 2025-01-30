@@ -113,6 +113,9 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
     def __configure_logger(self) -> Logger:
         return logger.bind(**self._logger_extras())
 
+    def teardown(self) -> None:
+        self._overseer.teardown()
+
 
 class AbstractAsyncHandle(AbstractHandle[ApiT], ABC):
     """Base class for service handlers that uses asynchronous communication."""

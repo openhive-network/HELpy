@@ -29,7 +29,7 @@ def beekeeper_not_started(settings_with_logger: SettingsLoggerFactory) -> Iterat
     yield bk
 
     if bk.is_running:
-        bk.close()
+        bk.teardown()
 
 
 @pytest.fixture()

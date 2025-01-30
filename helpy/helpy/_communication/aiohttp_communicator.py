@@ -54,3 +54,6 @@ class AioHttpCommunicator(AbstractCommunicator):
 
     def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         raise NotImplementedError
+
+    def teardown(self) -> None:
+        self._asyncio_run(self.session.close())

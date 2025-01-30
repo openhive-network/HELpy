@@ -140,7 +140,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         try:
             self.__wait_till_ready()
         except (AssertionError, TimeoutError) as e:
-            self.close()
+            self._close()
             raise BeekeeperFailedToStartNotReadyOnTimeError from e
 
     def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
@@ -163,7 +163,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         self.__close_notification_server()
         return pid
 
-    def close(self) -> None:
+    def _close(self) -> None:
         self._close_application()
         self.__close_notification_server()
 
@@ -218,7 +218,11 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
         return self
 
     def _finally(self) -> None:
-        self.close()
+        self.teardown()
+
+    def teardown(self) -> None:
+        self._close()
+        super().teardown()
 
 
 class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncBeekeeper"]):
@@ -244,4 +248,8 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
         return self
 
     async def _afinally(self) -> None:
-        self.close()
+        self.teardown()
+
+    def teardown(self) -> None:
+        self._close()
+        super().teardown()

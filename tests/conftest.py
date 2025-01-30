@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import shutil
 from pathlib import Path
+from typing import AsyncIterator, Iterator
 
 import pytest
 
@@ -59,10 +60,12 @@ def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
 
 
 @pytest.fixture()
-def sync_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.Hived:
-    return helpy.Hived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))
+def sync_node(hived_http_endpoint: helpy.HttpUrl) -> Iterator[helpy.Hived]:
+    with helpy.Hived(settings=helpy.Settings(http_endpoint=hived_http_endpoint)) as hived:
+        yield hived
 
 
 @pytest.fixture()
-def async_node(hived_http_endpoint: helpy.HttpUrl) -> helpy.AsyncHived:
-    return helpy.AsyncHived(settings=helpy.Settings(http_endpoint=hived_http_endpoint))
+async def async_node(hived_http_endpoint: helpy.HttpUrl) -> AsyncIterator[helpy.AsyncHived]:
+    async with helpy.AsyncHived(settings=helpy.Settings(http_endpoint=hived_http_endpoint)) as hived:
+        yield hived

@@ -57,3 +57,6 @@ class RequestCommunicator(AbstractCommunicator):
         if last_exception is None:
             raise ValueError("Retry loop finished, but last_exception was not set")
         raise last_exception
+
+    def teardown(self) -> None:
+        self.session.close()

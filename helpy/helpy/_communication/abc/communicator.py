@@ -3,7 +3,8 @@ from __future__ import annotations
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from threading import Thread
+from typing import TYPE_CHECKING, Any, Awaitable
 
 from helpy._communication.settings import CommunicationSettings
 from helpy._interfaces.settings_holder import SharedSettingsHolder
@@ -25,6 +26,10 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
     @abstractmethod
     async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         """Sends to given url given data asynchronously."""
+
+    @abstractmethod
+    def teardown(self) -> None:
+        """Called when work with communicator is over."""
 
     async def _async_sleep_for_retry(self) -> None:
         """Sleeps using asyncio.sleep (for asynchronous implementations)."""
@@ -70,3 +75,8 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
         return TimeoutExceededError(
             url=url, request=data, timeout_secs=self.settings.timeout.total_seconds(), total_wait_time=total_time_secs
         )
+
+    def _asyncio_run(self, coro: Awaitable[Any]) -> None:
+        thread = Thread(target=asyncio.run, args=(coro,))
+        thread.start()
+        thread.join()
