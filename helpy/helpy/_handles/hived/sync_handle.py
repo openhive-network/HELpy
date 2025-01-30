@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from helpy._handles.abc.handle import AbstractSyncHandle
 from helpy._handles.batch_handle import SyncBatchHandle
@@ -18,16 +18,12 @@ if TYPE_CHECKING:
     from schemas.fields.basic import AccountName
 
 
-class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
+class Hived(AbstractSyncHandle[HivedSyncApiCollection], HiveHandleCommonHelpers):
     def _construct_api(self) -> HivedSyncApiCollection:
         return HivedSyncApiCollection(owner=self)
 
     def _target_service(self) -> str:
         return self._hived_target_service_name()
-
-    @property
-    def api(self) -> HivedSyncApiCollection:
-        return cast(HivedSyncApiCollection, super().api)
 
     def get_dynamic_global_properties(self) -> HiveHandleCommonHelpers.GetDynamicGlobalPropertiesT:
         return self.api.database.get_dynamic_global_properties()

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, Any, NoReturn, cast
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from helpy._handles.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
 from helpy._handles.batch_handle import ApiFactory, AsyncBatchHandle, SyncBatchHandle
@@ -65,7 +65,7 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], As
         _raise_acquire_not_possible()
 
 
-class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
+class Beekeeper(AbstractSyncHandle[BeekeeperSyncApiCollection], SyncSessionHolder):
     """Synchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperSyncApiCollection:
@@ -73,7 +73,7 @@ class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
 
     @property
     def api(self) -> SyncBeekeeperApi:  # type: ignore[override]
-        return cast(BeekeeperSyncApiCollection, super().api).beekeeper
+        return super().api.beekeeper
 
     def _target_service(self) -> str:
         return _handle_target_service_name
@@ -94,7 +94,7 @@ class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
         return _random_string()
 
 
-class AsyncBeekeeper(AbstractAsyncHandle, AsyncSessionHolder):
+class AsyncBeekeeper(AbstractAsyncHandle[BeekeeperAsyncApiCollection], AsyncSessionHolder):
     """Asynchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:
@@ -102,7 +102,7 @@ class AsyncBeekeeper(AbstractAsyncHandle, AsyncSessionHolder):
 
     @property
     def api(self) -> AsyncBeekeeperApi:  # type: ignore[override]
-        return cast(BeekeeperAsyncApiCollection, super().api).beekeeper
+        return super().api.beekeeper
 
     def _target_service(self) -> str:
         return _handle_target_service_name
