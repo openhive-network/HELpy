@@ -14,6 +14,10 @@ class HelpyError(Exception):
     """Base class for all helpy Errors."""
 
 
+class UnknownDecisionPathError(HelpyError):
+    """Error created to suppress mypy error: `Missing return statement  [return]`."""
+
+
 class ParseError(HelpyError):
     """Raised if cannot parse given str, e.x. url, date, asset."""
 

@@ -12,12 +12,13 @@ from beekeepy._interface.asynchronous.wallet import (
 from beekeepy._interface.state_invalidator import StateInvalidator
 from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout, validate_wallet_name
 from beekeepy.exceptions import (
+    InvalidatedStateByClosingSessionError,
     InvalidWalletError,
+    NotExistingKeyError,
     NoWalletWithSuchNameError,
+    UnknownDecisionPathError,
     WalletWithSuchNameAlreadyExistsError,
 )
-from beekeepy.exceptions.common import InvalidatedStateByClosingSessionError, UnknownDecisionPathError
-from beekeepy.exceptions.detectable import NotExistingKeyError
 
 if TYPE_CHECKING:
     from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper as AsynchronousRemoteBeekeeperHandle
