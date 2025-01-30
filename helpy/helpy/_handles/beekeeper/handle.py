@@ -14,7 +14,7 @@ from helpy._handles.beekeeper.api.session_holder import AsyncSessionHolder, Sync
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-    from helpy._communication.abc.communicator import AbstractCommunicator
+    from helpy._communication.abc.overseer import AbstractOverseer
     from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
     from helpy._interfaces.url import HttpUrl
 
@@ -33,14 +33,14 @@ class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncS
     def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
-        communicator: AbstractCommunicator,
+        overseer: AbstractOverseer,
         api: ApiFactory[Self, BeekeeperSyncApiCollection],
         *args: Any,
         session_token: str,
         delay_error_on_data_access: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, communicator, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(url, overseer, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.set_session_token(session_token)
 
     def _acquire_session_token(self) -> str:
@@ -51,14 +51,14 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], As
     def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
-        communicator: AbstractCommunicator,
+        overseer: AbstractOverseer,
         api: ApiFactory[Self, BeekeeperAsyncApiCollection],
         *args: Any,
         session_token: str,
         delay_error_on_data_access: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, communicator, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(url, overseer, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.set_session_token(session_token)
 
     async def _acquire_session_token(self) -> str:
@@ -81,7 +81,7 @@ class Beekeeper(AbstractSyncHandle, SyncSessionHolder):
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[BeekeeperSyncApiCollection]:
         return _SyncSessionBatchHandle(
             url=self.http_endpoint,
-            communicator=self._communicator,
+            overseer=self._overseer,
             api=lambda o: BeekeeperSyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
             session_token=self.session.token,
@@ -110,7 +110,7 @@ class AsyncBeekeeper(AbstractAsyncHandle, AsyncSessionHolder):
     async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[BeekeeperAsyncApiCollection]:
         return _AsyncSessionBatchHandle(
             url=self.http_endpoint,
-            communicator=self._communicator,
+            overseer=self._overseer,
             api=lambda o: BeekeeperAsyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
             session_token=(await self.session).token,

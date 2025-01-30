@@ -99,7 +99,7 @@ class Hived(AbstractSyncHandle, HiveHandleCommonHelpers):
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[HivedSyncApiCollection]:
         return SyncBatchHandle(
             url=self.http_endpoint,
-            communicator=self._communicator,
+            overseer=self._overseer,
             api=lambda o: HivedSyncApiCollection(o),
             delay_error_on_data_access=delay_error_on_data_access,
         )

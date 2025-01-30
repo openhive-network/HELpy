@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import json
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from loguru import logger
 
@@ -12,28 +11,26 @@ from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._handles.settings import Settings
 from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
-from helpy.exceptions import CommunicationError, HelpyError, RequestError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-
     from loguru import Logger
 
     from helpy._communication.abc.communicator import AbstractCommunicator
+    from helpy._communication.abc.overseer import AbstractOverseer
     from helpy._handles.abc.api_collection import (
         AbstractAsyncApiCollection,
         AbstractSyncApiCollection,
     )
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
+    from helpy.exceptions import Json
 
 
-class MissingResultError(HelpyError):
-    """Raised if response does not have any response."""
+ApiT = TypeVar("ApiT")
 
 
-class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
+class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
     """Provides basic interface for all network handles."""
 
     def __init__(
@@ -50,7 +47,9 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         """
         super().__init__(*args, settings=settings, **kwargs)
         self.__logger = self.__configure_logger()
-        self.__communicator = self.settings.try_get_communicator_instance() or self._get_recommended_communicator()
+        self.__overseer = self.settings.get_overseer(
+            communicator=(self.settings.try_get_communicator_instance() or self._get_recommended_communicator())
+        )
         self.__api = self._construct_api()
 
     @property
@@ -70,9 +69,9 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         return self.__api
 
     @property
-    def _communicator(self) -> AbstractCommunicator:
+    def _overseer(self) -> AbstractOverseer:
         """Return communicator. Internal only."""
-        return self.__communicator
+        return self.__overseer
 
     @property
     def logger(self) -> Logger:
@@ -107,18 +106,11 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
 
     @classmethod
     def _response_handle(
-        cls, params: str, response: str, expected_type: type[ExpectResultT]
+        cls, response: Json | list[Json], expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
-        parsed_response = json.loads(response)
-
-        if "error" in parsed_response:
-            raise RequestError(send=params, error=parsed_response["error"])
-
-        if "result" not in parsed_response:
-            raise MissingResultError
-
-        serialized_data = get_response_model(expected_type, **parsed_response)
+        assert isinstance(response, dict), f"Expected dict as response, got: {response=}"
+        serialized_data = get_response_model(expected_type, **response)
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
@@ -126,68 +118,9 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC):
         return logger.bind(**self._logger_extras())
 
 
-class _SyncCall(Protocol):
-    def __call__(
-        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
-    ) -> JSONRPCResult[ExpectResultT]: ...
-
-
-class _AsyncCall(Protocol):
-    async def __call__(
-        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
-    ) -> JSONRPCResult[ExpectResultT]: ...
-
-
-def _retry_on_unable_to_acquire_database_lock(  # noqa: C901
-    *,
-    async_version: bool,
-) -> Callable[
-    [_SyncCall | _AsyncCall],
-    Callable[..., JSONRPCResult[Any] | Awaitable[JSONRPCResult[Any]]],
-]:
-    # inspired by: https://gitlab.syncad.com/hive/test-tools/-/blob/a8290d47ec3638fb31573182a3311137542a6637/package/test_tools/__private/communication.py#L33
-    def __workaround_communication_problem_with_node(  # noqa: C901
-        send_request: _SyncCall | _AsyncCall,
-    ) -> Callable[..., JSONRPCResult[Any]]:
-        def __handle_exception(this: AbstractHandle, exception: RequestError | CommunicationError) -> None:
-            ignored_messages = [
-                "Unable to acquire database lock",
-                "Unable to acquire forkdb lock",
-            ]
-            message = exception.error if isinstance(exception, RequestError) else str(exception.args)
-            for ignored_msg in ignored_messages:
-                if ignored_msg in message:
-                    logger.debug(f"Ignored for {this.http_endpoint}: '{ignored_msg}'")
-                    return
-            raise exception
-
-        def sync_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
-            while True:
-                try:
-                    return send_request(*[this, *args], **kwargs)  # type: ignore[return-value]
-                except CommunicationError as exception:  # noqa: PERF203
-                    __handle_exception(this, exception)
-                except RequestError as exception:
-                    __handle_exception(this, exception)
-
-        async def async_impl(this: AbstractHandle, *args: Any, **kwargs: Any) -> JSONRPCResult[Any]:
-            while True:
-                try:
-                    return await send_request(*[this, *args], **kwargs)  # type: ignore[no-any-return, misc]
-                except CommunicationError as exception:  # noqa: PERF203
-                    __handle_exception(this, exception)
-                except RequestError as exception:
-                    __handle_exception(this, exception)
-
-        return async_impl if async_version else sync_impl  # type: ignore[return-value]
-
-    return __workaround_communication_problem_with_node
-
-
 class AbstractAsyncHandle(AbstractHandle, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
-    @_retry_on_unable_to_acquire_database_lock(async_version=True)  # type: ignore[arg-type]
     async def _async_send(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
@@ -195,11 +128,11 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
         request = build_json_rpc_call(method=endpoint, params=params)
         self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
-            response = await self._communicator.async_send(self.http_endpoint, data=request)
+            response = await self._overseer.async_send(self.http_endpoint, data=request)
         self.logger.trace(
             f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
-        return self._response_handle(params=params, response=response, expected_type=expected_type)
+        return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
         return True
@@ -215,17 +148,16 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
 class AbstractSyncHandle(AbstractHandle, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
-    @_retry_on_unable_to_acquire_database_lock(async_version=False)  # type: ignore[arg-type]
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = build_json_rpc_call(method=endpoint, params=params)
         self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
         with Stopwatch() as record:
-            response = self._communicator.send(self.http_endpoint, data=request)
+            response = self._overseer.send(self.http_endpoint, data=request)
         self.logger.trace(
             f"got response in {record.seconds_delta:.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
         )
-        return self._response_handle(params=params, response=response, expected_type=expected_type)
+        return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
         return False
