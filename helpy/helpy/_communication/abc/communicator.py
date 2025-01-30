@@ -7,9 +7,11 @@ from typing import TYPE_CHECKING
 
 from helpy._communication.settings import CommunicationSettings
 from helpy._interfaces.settings_holder import SharedSettingsHolder
-from helpy.exceptions import CommunicationError
+from helpy._interfaces.stopwatch import Stopwatch
+from helpy.exceptions import CommunicationError, TimeoutExceededError, UnknownDecisionPathError
 
 if TYPE_CHECKING:
+    from helpy._interfaces.stopwatch import StopwatchResult
     from helpy._interfaces.url import HttpUrl
 
 
@@ -17,11 +19,11 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
     """Provides basic interface for communicators, which can implement communications using different way."""
 
     @abstractmethod
-    def _send(self, url: HttpUrl, data: bytes) -> str:
+    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         """Sends to given url given data synchronously."""
 
     @abstractmethod
-    async def _async_send(self, url: HttpUrl, data: bytes) -> str:
+    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         """Sends to given url given data asynchronously."""
 
     async def _async_sleep_for_retry(self) -> None:
@@ -55,7 +57,16 @@ class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):
             raise CommunicationError(f"{status_code=}", f"{sent=}", f"{received=}")
 
     def send(self, url: HttpUrl, data: str) -> str:
-        return self._send(url, self._encode_data(data))
+        with Stopwatch() as sp:
+            return self._send(url, self._encode_data(data), sp)
+        raise UnknownDecisionPathError
 
     async def async_send(self, url: HttpUrl, data: str) -> str:
-        return await self._async_send(url, self._encode_data(data))
+        with Stopwatch() as sp:
+            return await self._async_send(url, self._encode_data(data), sp)
+        raise UnknownDecisionPathError
+
+    def _construct_timeout_exception(self, url: HttpUrl, data: bytes, total_time_secs: float) -> TimeoutExceededError:
+        return TimeoutExceededError(
+            url=url, request=data, timeout_secs=self.settings.timeout.total_seconds(), total_wait_time=total_time_secs
+        )
