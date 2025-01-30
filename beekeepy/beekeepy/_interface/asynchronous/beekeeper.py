@@ -51,7 +51,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     @StateInvalidator.empty_call_after_invalidation(None)
     def teardown(self) -> None:
         if isinstance(self.__instance, AsynchronousBeekeeperHandle):
-            self.__instance.close()
+            self.__instance.teardown()
         self.invalidate(InvalidatedStateByClosingBeekeeperError())
 
     def detach(self) -> int:

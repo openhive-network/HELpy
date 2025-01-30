@@ -43,7 +43,7 @@ def test_invalid_wallet_names(beekeeper: Beekeeper, invalid_wallet_name: str) ->
 
 def test_wallet_open(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     # ARRANGE
-    beekeeper.close()
+    beekeeper.teardown()
     beekeeper.run()
 
     # ACT & ASSERT

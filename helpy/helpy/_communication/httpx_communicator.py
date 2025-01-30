@@ -25,9 +25,9 @@ class HttpxCommunicator(AbstractCommunicator):
         self.__async_client: httpx.AsyncClient | None = None
         self.__sync_client: httpx.Client | None = None
 
-    async def close(self) -> None:
+    def teardown(self) -> None:
         if self.__async_client is not None:
-            await self.__async_client.aclose()
+            self._asyncio_run(self.__async_client.aclose())
             self.__async_client = None
 
         if self.__sync_client is not None:
