@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import requests
 
@@ -10,6 +10,7 @@ from helpy._communication.abc.communicator import (
 from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from helpy._communication.settings import CommunicationSettings
     from helpy._interfaces.stopwatch import StopwatchResult
     from helpy._interfaces.url import HttpUrl
 
@@ -17,8 +18,18 @@ if TYPE_CHECKING:
 class RequestCommunicator(AbstractCommunicator):
     """Provides support for requests library (only synchronous)."""
 
+    def __init__(self, *args: Any, settings: CommunicationSettings, **kwargs: Any) -> None:
+        super().__init__(*args, settings=settings, **kwargs)
+        self.__session: requests.Session | None = None
+
     async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         raise NotImplementedError
+
+    @property
+    def session(self) -> requests.Session:
+        if self.__session is None:
+            self.__session = requests.Session()
+        return self.__session
 
     def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         last_exception: BaseException | None = None
@@ -26,7 +37,7 @@ class RequestCommunicator(AbstractCommunicator):
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
-                response: requests.Response = requests.post(
+                response: requests.Response = self.session.post(
                     url.as_string(),
                     data=data,
                     headers=self._json_headers(),
