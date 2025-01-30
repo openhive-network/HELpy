@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 
@@ -10,32 +10,38 @@ from helpy._communication.abc.communicator import (
 from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from helpy._communication.settings import CommunicationSettings
     from helpy._interfaces.url import HttpUrl
 
 
 class AioHttpCommunicator(AbstractCommunicator):
     """Provides support for aiohttp library."""
 
+    def __init__(self, *args: Any, settings: CommunicationSettings, **kwargs: Any) -> None:
+        super().__init__(*args, settings=settings, **kwargs)
+        self.__session: aiohttp.ClientSession | None = None
+
+    @property
+    def session(self) -> aiohttp.ClientSession:
+        if self.__session is None:
+            self.__session = aiohttp.ClientSession(
+                headers=self._json_headers(), timeout=aiohttp.ClientTimeout(total=self.settings.timeout.total_seconds())
+            )
+        return self.__session
+
     async def _async_send(self, url: HttpUrl, data: bytes) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
-            async with aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=self.settings.timeout.total_seconds())
-            ) as session:
-                try:
-                    response = await session.post(
-                        url.as_string(),
-                        data=data,
-                        headers=self._json_headers(),
-                    )
+            try:
+                async with self.session.post(url.as_string(), data=data) as response:
                     return await response.text()
-                except aiohttp.ClientConnectorError as error:
-                    raise CommunicationError(url=url.as_string(), request=data) from error
-                except aiohttp.ClientError as error:
-                    last_exception = error
-                await self._async_sleep_for_retry()
+            except aiohttp.ClientConnectorError as error:
+                raise CommunicationError(url=url.as_string(), request=data) from error
+            except aiohttp.ClientError as error:
+                last_exception = error
+            await self._async_sleep_for_retry()
 
         if last_exception is None:
             raise ValueError("Retry loop finished, but last_exception was not set")
