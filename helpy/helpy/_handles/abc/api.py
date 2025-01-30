@@ -13,6 +13,7 @@ from typing import (
     ClassVar,
     Generic,
     ParamSpec,
+    TypeAlias,
     TypeVar,
     get_type_hints,
 )
@@ -33,8 +34,8 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-SyncHandleT = AbstractSyncHandle | SyncBatchHandle[Any]
-AsyncHandleT = AbstractAsyncHandle | AsyncBatchHandle[Any]
+SyncHandleT: TypeAlias = AbstractSyncHandle | SyncBatchHandle[Any]
+AsyncHandleT: TypeAlias = AbstractAsyncHandle | AsyncBatchHandle[Any]
 HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
@@ -143,7 +144,7 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
-            return this._owner._send(  # type: ignore[no-any-return, union-attr]
+            return this._owner._send(  # type: ignore[no-any-return]
                 endpoint=endpoint,
                 params=this._serialize_params((args_, kwargs_)),
                 expected_type=get_type_hints(wrapped_function)["return"],
@@ -178,7 +179,7 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = await this._additional_arguments_actions(endpoint, (args, kwargs))
             return (  # type: ignore[no-any-return]
-                await this._owner._async_send(  # type: ignore[misc]
+                await this._owner._async_send(
                     endpoint=endpoint,
                     params=this._serialize_params((args_, kwargs_)),
                     expected_type=get_type_hints(wrapped_function)["return"],

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
+from helpy import exceptions
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._interfaces.context import ContextAsync, ContextSync, EnterReturnT
-from helpy.exceptions import CommunicationError, JsonT, NothingToSendError, ResponseNotReadyError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self
 
-    from helpy._communication.abc.communicator import AbstractCommunicator
+    from helpy._communication.abc.overseer import AbstractOverseer
     from helpy._interfaces.url import HttpUrl
 
 
@@ -32,7 +31,7 @@ class _DelayedResponseWrapper:
         if (exception := super().__getattribute__("_exception")) is not None:
             raise exception
         if self.__get_data() is None:
-            raise ResponseNotReadyError
+            raise exceptions.ResponseNotReadyError
 
     def __get_data(self) -> Any:
         response = super().__getattribute__("_response")
@@ -68,65 +67,56 @@ class _BatchRequestResponseItem:
 
 
 class _PostRequestManager(ContextSync["_PostRequestManager"]):
-    def __init__(self, owner: _BatchHandle[Any], batch_objs: list[_BatchRequestResponseItem]) -> None:
-        self.__batch = batch_objs
+    def __init__(self, owner: _BatchHandle[Any]) -> None:
         self.__owner = owner
         self.__responses: list[dict[str, Any]] = []
 
-    def set_responses(self, responses: str) -> None:
-        self.__responses = json.loads(responses)
+    def set_responses(self, responses: exceptions.Json | list[exceptions.Json]) -> None:
+        assert isinstance(responses, list), f"Expected list of dictionaries, got: {responses=}"
+        self.__responses = responses
 
     def _enter(self) -> _PostRequestManager:
         return self
 
-    def __set_response_or_exception(self, request_id: int, response: dict[str, Any], exception_url: str = "") -> None:
-        if "error" in response:
-            # creating a new instance so other responses won't be included in the error
-            new_error = CommunicationError(
-                url=exception_url,
-                request=self.__batch[request_id].request,
-                response=response,
-            )
-            self.__owner._get_batch_delayed_result(request_id)._set_exception(new_error)
+    def __set_response_or_exception(
+        self, request_id: int, response: exceptions.OverseerError | exceptions.Json
+    ) -> None:
+        if isinstance(response, exceptions.OverseerError):
+            self.__owner._get_batch_delayed_result(request_id)._set_exception(response)
             if not self.__owner._delay_error_on_data_access:
-                raise new_error
+                raise response
         else:
             self.__owner._get_batch_delayed_result(request_id)._set_response(**response)
 
     def __handle_no_exception_case(self) -> None:
-        self.__validate_response_count(self.__responses)
         for response in self.__responses:
             self.__set_response_or_exception(request_id=int(response["id"]), response=response)
 
-    def __handle_exception_and_no_responses_exists(self, exception: BaseException) -> bool:
-        for request_id in range(len(self.__batch)):
-            self.__owner._get_batch_delayed_result(request_id)._set_exception(exception)
-
-        if not self.__owner._delay_error_on_data_access:
-            return False
-        return True
-
-    def __handle_exception_and_responses_exists(self, responses: list[JsonT], url: str) -> bool:
-        for response in responses:
-            self.__set_response_or_exception(request_id=int(response["id"]), response=response, exception_url=url)
-        return not self.__owner._delay_error_on_data_access
-
-    def __validate_response_count(self, response: list[JsonT]) -> None:
-        message = "Invalid amount of responses_from_error"
-        assert len(response) == len(self.__batch), message
-
     def __handle_exception_case(self, exception: BaseException) -> bool:
-        if not isinstance(exception, CommunicationError) and isinstance(exception, BaseException):
+        if (not isinstance(exception, exceptions.OverseerError)) or isinstance(
+            exception,
+            (
+                exceptions.DifferenceBetweenAmountOfRequestsAndResponsesError,
+                exceptions.JussiResponseError,
+                exceptions.UnparsableResponseError,
+            ),
+        ):
             return False
 
-        responses_from_error = exception.get_response()
-        if responses_from_error is None:
-            return self.__handle_exception_and_no_responses_exists(exception)
+        assert isinstance(
+            exception.whole_response, list
+        ), f"response has to be list, but is: `{type(exception.response)}`, content: '{exception.response=}'"
+        all_exceptions = exception.cause
+        assert all_exceptions is not None, "Cause is set to None"
+        assert isinstance(
+            all_exceptions, exceptions.GroupedErrorsError
+        ), f"Cause (after from clause) have to be GroupedErrorsError, but is: {type(all_exceptions)}"
 
-        message = f"Invalid error response format: expected list, got {type(responses_from_error)}"
-        assert isinstance(responses_from_error, list), message
-        self.__validate_response_count(responses_from_error)
-        return self.__handle_exception_and_responses_exists(responses_from_error, exception.url)
+        for response in exception.whole_response:
+            request_id = response["id"]
+            specific_exception = all_exceptions.get_exception_for(request_id=request_id)
+            self.__set_response_or_exception(request_id=int(request_id), response=specific_exception or response)
+        return self.__owner._delay_error_on_data_access
 
     def _handle_exception(self, exception: BaseException, __: TracebackType | None) -> bool:
         return self.__handle_exception_case(exception)
@@ -142,14 +132,14 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
     def __init__(
         self,
         url: HttpUrl,
-        communicator: AbstractCommunicator,
+        overseer: AbstractOverseer,
         *args: Any,
         delay_error_on_data_access: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.__url = url
-        self.__communicator = communicator
+        self.__overseer = overseer
         self._delay_error_on_data_access = delay_error_on_data_access
 
         self.__batch: list[_BatchRequestResponseItem] = []
@@ -167,14 +157,14 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
     def __sync_evaluate(self) -> None:
         query = self.__prepare_request()
 
-        with _PostRequestManager(self, self.__batch) as mgr:
-            mgr.set_responses(self.__communicator.send(url=self.__url, data=query))
+        with _PostRequestManager(self) as mgr:
+            mgr.set_responses(self.__overseer.send(url=self.__url, data=query))
 
     async def __async_evaluate(self) -> None:
         query = self.__prepare_request()
 
-        with _PostRequestManager(self, self.__batch) as mgr:
-            mgr.set_responses(await self.__communicator.async_send(url=self.__url, data=query))
+        with _PostRequestManager(self) as mgr:
+            mgr.set_responses(await self.__overseer.async_send(url=self.__url, data=query))
 
     def __prepare_request(self) -> str:
         return "[" + ",".join([x.request for x in self.__batch]) + "]"
@@ -193,13 +183,13 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
 
     async def _ahandle_no_exception(self) -> None:
         if not self.__is_anything_to_send():
-            raise NothingToSendError
+            raise exceptions.NothingToSendError
 
         await self.__async_evaluate()
 
     def _handle_no_exception(self) -> None:
         if not self.__is_anything_to_send():
-            raise NothingToSendError
+            raise exceptions.NothingToSendError
 
         self.__sync_evaluate()
 
@@ -221,13 +211,13 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: 
     def __init__(
         self,
         url: HttpUrl,
-        communicator: AbstractCommunicator,
+        overseer: AbstractOverseer,
         api: ApiFactory[Self, ApiT],
         *args: Any,
         delay_error_on_data_access: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, communicator, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.api: ApiT = api(self)
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
@@ -238,13 +228,13 @@ class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type
     def __init__(
         self,
         url: HttpUrl,
-        communicator: AbstractCommunicator,
+        overseer: AbstractOverseer,
         api: ApiFactory[Self, ApiT],
         *args: Any,
         delay_error_on_data_access: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, communicator, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.api: ApiT = api(self)
 
     async def _async_send(

@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from typing import ClassVar
+
 from helpy._communication.abc.communicator import AbstractCommunicator  # noqa: TCH001
+from helpy._communication.abc.overseer import AbstractOverseer
+from helpy._communication.overseers import CommonOverseer
 from helpy._communication.settings import CommunicationSettings
 from helpy._interfaces.url import HttpUrl  # noqa: TCH001
 
 
 class Settings(CommunicationSettings):
+    class Defaults(CommunicationSettings.Defaults):
+        OVERSEER: ClassVar[type[AbstractOverseer]] = CommonOverseer
+
     http_endpoint: HttpUrl
     """
     Endpoint exposed by service to be connect to by handle.
@@ -16,6 +23,12 @@ class Settings(CommunicationSettings):
     Defines class to be used for network handling. Can be given as class or instance.
 
     Note: If set to none, handles will use preferred communicators
+    """
+
+    overseer: type[AbstractOverseer] | AbstractOverseer = Defaults.OVERSEER
+    """
+    Defines class to be used for response validation and handling basic turbulence
+    during communication
     """
 
     def try_get_communicator_instance(
@@ -41,3 +54,19 @@ class Settings(CommunicationSettings):
             return self.communicator(settings=(settings or self))
 
         return self.communicator
+
+    def get_overseer(self, *, communicator: AbstractCommunicator) -> AbstractOverseer:
+        """Obtains overseer instance, by returning it (if exists) or by creating new instance.
+
+        Args:
+            communicator: will be passed to overseer.
+
+        Notes:
+            If settings.overseer is not a type, then communicator argument is not used.
+
+        Returns:
+            Overseer
+        """
+        if isinstance(self.overseer, AbstractOverseer):
+            return self.overseer
+        return self.overseer(communicator=communicator)

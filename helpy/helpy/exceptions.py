@@ -1,17 +1,21 @@
 from __future__ import annotations
 
-import json
-from typing import TYPE_CHECKING, Any
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:
     from helpy._interfaces.url import Url
 
-JsonT = dict[str, Any]
-CommunicationResponseT = str | JsonT | list[JsonT]
+Json = dict[str, Any]
+CommunicationResponseT = str | Json | list[Json]
 
 
 class HelpyError(Exception):
     """Base class for all helpy Errors."""
+
+    @property
+    def cause(self) -> BaseException | None:
+        return self.__cause__
 
 
 class UnknownDecisionPathError(HelpyError):
@@ -25,7 +29,12 @@ class ParseError(HelpyError):
 class BlockWaitTimeoutError(HelpyError):
     """Raised if reached not expected block number."""
 
-    def __init__(self, last_block_number: int, block_number: int, last_irreversible_block_number: int) -> None:
+    def __init__(
+        self,
+        last_block_number: int,
+        block_number: int,
+        last_irreversible_block_number: int,
+    ) -> None:
         """Creates exception.
 
         Args:
@@ -96,7 +105,7 @@ class CommunicationError(HelpyError):
     def __init__(
         self,
         url: str | Url[Any],
-        request: str | bytes,
+        request: CommunicationResponseT | bytes,
         response: CommunicationResponseT | None = None,
         *,
         message: str = "",
@@ -154,5 +163,121 @@ class ExceededAmountOfRetriesError(CommunicationError):
     """Raised if exceeded amount of retries."""
 
 
+class TimeoutExceededError(CommunicationError):
+    """Raised if exceeded time for response."""
+
+
 class InvalidOptionError(HelpyError):
     """Raised if invalid expression is given in config."""
+
+
+class OverseerError(CommunicationError, ABC):
+    """Base class for exceptions dedicated to be raised on invalid content in response."""
+
+    def __init__(  # noqa: PLR0913
+        self,
+        url: str | Url[Any],
+        request: CommunicationResponseT | bytes,
+        response: CommunicationResponseT | None = None,
+        whole_response: CommunicationResponseT | None = None,
+        *,
+        message: str = "",
+        request_id: int | None,
+    ) -> None:
+        super().__init__(url, request, response, message=message)
+        self.request_id = request_id
+        self.whole_response = whole_response
+
+    @abstractmethod
+    def retry(self) -> bool: ...
+
+
+class UnableToAcquireDatabaseLockError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class UnableToAcquireForkdbLockError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class NullResultError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class ApiNotFoundError(OverseerError):
+    def retry(self) -> bool:
+        return False
+
+
+class JussiResponseError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class UnparsableResponseError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class DifferenceBetweenAmountOfRequestsAndResponsesError(OverseerError):
+    def retry(self) -> bool:
+        return True
+
+
+class UnlockIsNotAccessibleError(OverseerError):
+    def retry(self) -> bool:
+        return False
+
+
+class WalletIsAlreadyUnlockedError(OverseerError):
+    def retry(self) -> bool:
+        return False
+
+
+class UnableToOpenWalletError(OverseerError):
+    def retry(self) -> bool:
+        return False
+
+
+class InvalidPasswordError(OverseerError):
+    def retry(self) -> bool:
+        return False
+
+
+class ErrorInResponseError(OverseerError):
+    def __init__(  # noqa: PLR0913
+        self,
+        url: str | Url[Any],
+        request: CommunicationResponseT | bytes,
+        response: CommunicationResponseT | None = None,
+        whole_response: CommunicationResponseT | None = None,
+        *,
+        message: str = "",
+        request_id: int | None,
+    ) -> None:
+        super().__init__(
+            url,
+            request,
+            response,
+            message=message,
+            request_id=request_id,
+            whole_response=whole_response,
+        )
+        self.__error: str | None = None
+
+    def retry(self) -> bool:
+        return False
+
+
+class GroupedErrorsError(HelpyError):
+    def __init__(self, exceptions: Sequence[Exception]) -> None:
+        self.exceptions = list(exceptions)
+
+    def get_exception_for(self, *, request_id: int) -> OverseerError | None:
+        for exception in self.exceptions:
+            if isinstance(exception, OverseerError) and exception.request_id == request_id:
+                return exception
+        return None
