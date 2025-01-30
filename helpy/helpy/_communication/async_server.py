@@ -41,16 +41,18 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
 
     def __init__(self, observer: HttpServerObserver, notification_endpoint: HttpUrl | None) -> None:
         self.__observer = observer
-        self.__app = web.Application()
+        self._app = web.Application()
         self.__site: web.TCPSite | None = None
         self.__running: bool = False
         self.__notification_endpoint = notification_endpoint
+        self._setup_routes()
 
+    def _setup_routes(self) -> None:
         async def handle_put_method(request: web.Request) -> web.Response:
             await self.__observer.data_received(await request.json())
             return web.Response(status=HTTPStatus.NO_CONTENT)
 
-        self.__app.router.add_route("PUT", "/", handle_put_method)
+        self._app.router.add_route("PUT", "/", handle_put_method)
 
     @property
     def port(self) -> int:
@@ -76,7 +78,7 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
 
         time_between_checks_is_server_running = 0.5
 
-        runner = web.AppRunner(self.__app, access_log=False)
+        runner = web.AppRunner(self._app, access_log=False)
         await runner.setup()
         address = self.__notification_endpoint or self.__ADDRESS
         self.__site = web.TCPSite(runner, address.address, address.port)
