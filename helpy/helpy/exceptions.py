@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Sequence
 
+from helpy._interfaces.url import Url
+
 if TYPE_CHECKING:
     from helpy._interfaces.url import Url
 
@@ -166,6 +168,22 @@ class ExceededAmountOfRetriesError(CommunicationError):
 class TimeoutExceededError(CommunicationError):
     """Raised if exceeded time for response."""
 
+    def __init__(  # noqa: PLR0913
+        self,
+        url: str | Url[Any],
+        request: str | bytes,
+        response: str | dict[str, Any] | list[dict[str, Any]] | None = None,
+        *,
+        message: str = "",
+        timeout_secs: float | None = None,
+        total_wait_time: float | None = None,
+    ) -> None:
+        message += f"\ntimeout was set to: {timeout_secs}s" if timeout_secs is not None else ""
+        message += f"\ntotal wait time: {total_wait_time}s" if total_wait_time is not None else ""
+        super().__init__(url, request, response, message=message)
+        self.timeout_secs = timeout_secs
+        self.total_wait_time = total_wait_time
+
 
 class InvalidOptionError(HelpyError):
     """Raised if invalid expression is given in config."""
@@ -189,7 +207,8 @@ class OverseerError(CommunicationError, ABC):
         self.whole_response = whole_response
 
     @abstractmethod
-    def retry(self) -> bool: ...
+    def retry(self) -> bool:
+        """Used by overseer to determine if retry should be performed if such error occurs."""
 
 
 class UnableToAcquireDatabaseLockError(OverseerError):

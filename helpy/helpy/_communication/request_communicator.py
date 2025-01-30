@@ -10,16 +10,17 @@ from helpy._communication.abc.communicator import (
 from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from helpy._interfaces.stopwatch import StopwatchResult
     from helpy._interfaces.url import HttpUrl
 
 
 class RequestCommunicator(AbstractCommunicator):
     """Provides support for requests library (only synchronous)."""
 
-    async def _async_send(self, url: HttpUrl, data: bytes) -> str:
+    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         raise NotImplementedError
 
-    def _send(self, url: HttpUrl, data: bytes) -> str:
+    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
@@ -34,6 +35,8 @@ class RequestCommunicator(AbstractCommunicator):
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
+            except requests.Timeout:
+                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
             except requests.exceptions.ConnectionError as error:
                 raise CommunicationError(url=url.as_string(), request=data) from error
             except requests.exceptions.RequestException as error:

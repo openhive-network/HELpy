@@ -11,6 +11,7 @@ from helpy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
     from helpy._communication.settings import CommunicationSettings
+    from helpy._interfaces.stopwatch import StopwatchResult
     from helpy._interfaces.url import HttpUrl
 
 ClientTypes = httpx.AsyncClient | httpx.Client
@@ -46,7 +47,7 @@ class HttpxCommunicator(AbstractCommunicator):
             self.__sync_client = cast(httpx.Client, self.__create_client(httpx.Client))
         return self.__sync_client
 
-    async def _async_send(self, url: HttpUrl, data: bytes) -> str:
+    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
@@ -58,6 +59,8 @@ class HttpxCommunicator(AbstractCommunicator):
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
+            except httpx.TimeoutException:
+                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
             except httpx.ConnectError as error:
                 raise CommunicationError(url=url.as_string(), request=data) from error
             except httpx.HTTPError as error:
@@ -68,7 +71,7 @@ class HttpxCommunicator(AbstractCommunicator):
             raise ValueError("Retry loop finished, but last_exception was not set")
         raise last_exception
 
-    def _send(self, url: HttpUrl, data: bytes) -> str:
+    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
         last_exception: BaseException | None = None
         amount_of_retries = 0
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
@@ -80,6 +83,8 @@ class HttpxCommunicator(AbstractCommunicator):
                 data_received = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
+            except httpx.TimeoutException:
+                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
             except httpx.ConnectError as error:
                 raise CommunicationError(url=url.as_string(), request=data) from error
             except httpx.HTTPError as error:
