@@ -20,7 +20,6 @@ from beekeepy.exceptions.common import (
     NotPositiveTimeError,
     TimeoutReachWhileCloseError,
     TimeTooBigError,
-    UnknownDecisionPathError,
     WalletIsLockedError,
 )
 from beekeepy.exceptions.detectable import (
@@ -37,6 +36,7 @@ from beekeepy.exceptions.detectable import (
     NoWalletWithSuchNameError,
     WalletWithSuchNameAlreadyExistsError,
 )
+from helpy.exceptions import UnknownDecisionPathError
 
 __all__ = [
     "BeekeeperExecutableError",

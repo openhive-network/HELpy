@@ -40,10 +40,6 @@ class TimeoutReachWhileCloseError(BeekeepyError):
         super().__init__("Process was force-closed with SIGKILL, because didn't close before timeout")
 
 
-class UnknownDecisionPathError(BeekeepyError):
-    """Error created to suppress mypy error: `Missing return statement  [return]`."""
-
-
 class NotPositiveTimeError(BeekeepyError):
     """Raises when given time value was 0 or negative."""
 
