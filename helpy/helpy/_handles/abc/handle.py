@@ -18,10 +18,6 @@ if TYPE_CHECKING:
 
     from helpy._communication.abc.communicator import AbstractCommunicator
     from helpy._communication.abc.overseer import AbstractOverseer
-    from helpy._handles.abc.api_collection import (
-        AbstractAsyncApiCollection,
-        AbstractSyncApiCollection,
-    )
     from helpy._handles.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from helpy._interfaces.url import HttpUrl
     from helpy.exceptions import Json
@@ -65,7 +61,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
             settings.http_endpoint = value
 
     @property
-    def api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
+    def api(self) -> ApiT:
         return self.__api
 
     @property
@@ -82,7 +78,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         """Return api collection."""
 
     @abstractmethod
-    def _construct_api(self) -> AbstractAsyncApiCollection | AbstractSyncApiCollection:
+    def _construct_api(self) -> ApiT:
         """Return api collection."""
 
     @abstractmethod
@@ -118,7 +114,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         return logger.bind(**self._logger_extras())
 
 
-class AbstractAsyncHandle(AbstractHandle, ABC):
+class AbstractAsyncHandle(AbstractHandle[ApiT], ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     async def _async_send(
@@ -145,7 +141,7 @@ class AbstractAsyncHandle(AbstractHandle, ABC):
         """Returns async batch handle."""
 
 
-class AbstractSyncHandle(AbstractHandle, ABC):
+class AbstractSyncHandle(AbstractHandle[ApiT], ABC):
     """Base class for service handlers that uses synchronous communication."""
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
