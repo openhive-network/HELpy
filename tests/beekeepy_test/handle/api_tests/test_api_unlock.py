@@ -6,6 +6,7 @@ import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 
 from helpy.exceptions import RequestError
+from helpy.exceptions import InvalidPasswordError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -81,3 +82,12 @@ def test_api_unlock_one_wallet_at_the_time(beekeeper: Beekeeper, setup_wallets: 
             assert bk_wallet.unlocked is True, "Target wallet should be unlocked."
         else:
             assert bk_wallet.unlocked is False, "Remaining wallets should be closed."
+
+
+def test_api_unlock_with_invalid_password(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:
+    # ARRANGE & ACT
+    wallet = setup_wallets(1, keys_per_wallet=0)[0]
+
+    # ASSERT
+    with pytest.raises(InvalidPasswordError, match="Invalid password for wallet: wallet-0.wallet"):
+        beekeeper.api.unlock(wallet_name=wallet.name, password="invalid password")  # noqa: S106
