@@ -25,7 +25,7 @@ class AioHttpCommunicator(AbstractCommunicator):
         self.__session: aiohttp.ClientSession | None = None
 
     @property
-    def session(self) -> aiohttp.ClientSession:
+    async def session(self) -> aiohttp.ClientSession:
         if self.__session is None:
             self.__session = aiohttp.ClientSession(
                 headers=self._json_headers(), timeout=aiohttp.ClientTimeout(total=self.settings.timeout.total_seconds())
@@ -38,7 +38,7 @@ class AioHttpCommunicator(AbstractCommunicator):
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
-                async with self.session.post(url.as_string(), data=data) as response:
+                async with (await self.session).post(url.as_string(), data=data) as response:
                     return await response.text()
             except (aiohttp.ServerTimeoutError, asyncio.TimeoutError):
                 last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
@@ -56,4 +56,5 @@ class AioHttpCommunicator(AbstractCommunicator):
         raise NotImplementedError
 
     def teardown(self) -> None:
-        self._asyncio_run(self.session.close())
+        if self.__session is not None:
+            self._asyncio_run(self.__session.close())
