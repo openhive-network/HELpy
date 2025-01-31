@@ -14,25 +14,37 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-def _default_factory(env_name: str, default_factory: Callable[[str | None], Any]) -> Any:
-    env_value = environ.get(env_name)
-    return Field(default_factory=lambda: default_factory(env_value))
-
-
 class CommunicationSettings(BaseModel):
-    DEFAULT_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=5)
+    class EnvironNames:
+        TIMEOUT: ClassVar[str] = "HELPY_COMMUNICATION_MAX_RETRIES"
+        PERIOD_BETWEEN_RETRIES: ClassVar[str] = "HELPY_COMMUNICATION_TIMEOUT_SECS"
+        RETRIES: ClassVar[str] = "HELPY_COMMUNICATION_PERIOD_BETWEEN_RETRIES_SECS"
 
-    max_retries: int = _default_factory("HELPY_COMMUNICATION_MAX_RETRIES", lambda x: int(x or 5))
+    class Defaults:
+        TIMEOUT: ClassVar[timedelta] = timedelta(seconds=5)
+        PERIOD_BETWEEN_RETRIES: ClassVar[timedelta] = timedelta(seconds=0.2)
+        RETRIES: ClassVar[int] = 5
+
+        @staticmethod
+        def default_factory(env_name: str, default_factory: Callable[[str | None], Any]) -> Any:
+            env_value = environ.get(env_name)
+            return Field(default_factory=lambda: default_factory(env_value))
+
+    max_retries: int = Defaults.default_factory(
+        EnvironNames.RETRIES,
+        lambda x: (CommunicationSettings.Defaults.RETRIES if x is None else timedelta(seconds=int(x))),
+    )
     """Amount of retries when sending request to service."""
 
-    timeout: timedelta = _default_factory(
-        "HELPY_COMMUNICATION_TIMEOUT_SECS",
-        lambda x: (CommunicationSettings.DEFAULT_TIMEOUT if x is None else timedelta(seconds=int(x))),
+    timeout: timedelta = Defaults.default_factory(
+        EnvironNames.TIMEOUT,
+        lambda x: (CommunicationSettings.Defaults.TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
-    """Maximum time for request to finish."""
+    """Maximum time for single request to finish."""
 
-    period_between_retries: timedelta = _default_factory(
-        "HELPY_COMMUNICATION_PERIOD_BETWEEN_RETRIES_SECS", lambda x: timedelta(seconds=int(x or 1))
+    period_between_retries: timedelta = Defaults.default_factory(
+        EnvironNames.PERIOD_BETWEEN_RETRIES,
+        lambda x: (CommunicationSettings.Defaults.PERIOD_BETWEEN_RETRIES if x is None else timedelta(seconds=int(x))),
     )
     """Period between failed request and next retry."""
 
