@@ -9,6 +9,7 @@ from helpy._communication.aiohttp_communicator import AioHttpCommunicator
 from helpy._communication.request_communicator import RequestCommunicator
 from helpy._handles.build_json_rpc_call import build_json_rpc_call
 from helpy._handles.settings import Settings
+from helpy._interfaces.context import SelfContextAsync, SelfContextSync
 from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
@@ -117,7 +118,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         self._overseer.teardown()
 
 
-class AbstractAsyncHandle(AbstractHandle[ApiT], ABC):
+class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     async def _async_send(
@@ -143,8 +144,11 @@ class AbstractAsyncHandle(AbstractHandle[ApiT], ABC):
     async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
         """Returns async batch handle."""
 
+    async def _afinally(self) -> None:
+        self.teardown()
 
-class AbstractSyncHandle(AbstractHandle[ApiT], ABC):
+
+class AbstractSyncHandle(AbstractHandle[ApiT], SelfContextSync, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
@@ -167,3 +171,6 @@ class AbstractSyncHandle(AbstractHandle[ApiT], ABC):
     @abstractmethod
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:
         """Returns sync batch handle."""
+
+    def _finally(self) -> None:
+        self.teardown()

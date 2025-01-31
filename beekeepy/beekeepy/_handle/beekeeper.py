@@ -17,7 +17,7 @@ from beekeepy.exceptions import (
     BeekeeperFailedToStartNotReadyOnTimeError,
     BeekeeperIsNotRunningError,
 )
-from helpy import ContextAsync, ContextSync, HttpUrl
+from helpy import HttpUrl
 from helpy._communication.universal_notification_server import (
     UniversalNotificationServer,
 )
@@ -195,7 +195,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
     def _get_settings(self) -> Settings: ...
 
 
-class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
+class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper):
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
@@ -217,15 +217,12 @@ class Beekeeper(BeekeeperCommon, SyncRemoteBeekeeper, ContextSync["Beekeeper"]):
         self.run()
         return self
 
-    def _finally(self) -> None:
-        self.teardown()
-
     def teardown(self) -> None:
         self._close()
         super().teardown()
 
 
-class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncBeekeeper"]):
+class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper):
     def run(self, *, additional_cli_arguments: BeekeeperArguments | None = None) -> None:
         self._clear_session()
         with self.update_settings() as settings:
@@ -246,9 +243,6 @@ class AsyncBeekeeper(BeekeeperCommon, AsyncRemoteBeekeeper, ContextAsync["AsyncB
     async def _aenter(self) -> AsyncBeekeeper:
         self.run()
         return self
-
-    async def _afinally(self) -> None:
-        self.teardown()
 
     def teardown(self) -> None:
         self._close()
