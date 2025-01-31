@@ -3,16 +3,24 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from typing_extensions import Self
+
 if TYPE_CHECKING:
     from types import TracebackType
 
 EnterReturnT = TypeVar("EnterReturnT")
 
+"""
+Distinction on Self and Generic is because passing `typing_extension.Self`
+is forbidden to pass via Generic template argument by mypy and even if
+`# type: ignore[misc]` is applied, IntellijSens have problems with resolving
+during `with` construction.
+"""
 
-class ContextSync(Generic[EnterReturnT]):
-    def __enter__(self) -> EnterReturnT:
-        return self._enter()
+__all__ = ["ContextSync", "ContextAsync", "SelfContextAsync", "SelfContextSync"]
 
+
+class ContextSyncBase:
     def __exit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
     ) -> bool:
@@ -23,10 +31,6 @@ class ContextSync(Generic[EnterReturnT]):
         finally:
             self._finally()
         return exception is None
-
-    @abstractmethod
-    def _enter(self) -> EnterReturnT:
-        """Called when __enter__ is called."""
 
     @abstractmethod
     def _finally(self) -> None:
@@ -49,10 +53,7 @@ class ContextSync(Generic[EnterReturnT]):
         """
 
 
-class ContextAsync(Generic[EnterReturnT]):
-    async def __aenter__(self) -> EnterReturnT:
-        return await self._aenter()
-
+class ContextAsyncBase:
     async def __aexit__(
         self, _: type[BaseException] | None, exception: BaseException | None, traceback: TracebackType | None
     ) -> bool:
@@ -63,10 +64,6 @@ class ContextAsync(Generic[EnterReturnT]):
         finally:
             await self._afinally()
         return exception is None
-
-    @abstractmethod
-    async def _aenter(self) -> EnterReturnT:
-        """Called when __enter__ is called."""
 
     @abstractmethod
     async def _afinally(self) -> None:
@@ -87,3 +84,37 @@ class ContextAsync(Generic[EnterReturnT]):
         Returns:
             Noting.
         """
+
+
+class ContextSync(ContextSyncBase, Generic[EnterReturnT]):
+    def __enter__(self) -> EnterReturnT:
+        return self._enter()
+
+    @abstractmethod
+    def _enter(self) -> EnterReturnT:
+        """Called when __enter__ is called."""
+
+
+class ContextAsync(ContextAsyncBase, Generic[EnterReturnT]):
+    async def __aenter__(self) -> EnterReturnT:
+        return await self._aenter()
+
+    @abstractmethod
+    async def _aenter(self) -> EnterReturnT:
+        """Called when __enter__ is called."""
+
+
+class SelfContextSync(ContextSyncBase):
+    def __enter__(self) -> Self:
+        return self._enter()
+
+    def _enter(self) -> Self:
+        return self
+
+
+class SelfContextAsync(ContextAsyncBase):
+    async def __aenter__(self) -> Self:
+        return await self._aenter()
+
+    async def _aenter(self) -> Self:
+        return self

@@ -13,7 +13,7 @@ from helpy._interfaces import wax
 from helpy._interfaces.account_credentials import AccountCredentials
 from helpy._interfaces.asset import Hf26Asset, LegacyAsset
 from helpy._interfaces.config import Config as AbstractConfig
-from helpy._interfaces.context import ContextAsync, ContextSync
+from helpy._interfaces.context import ContextAsync, ContextSync, SelfContextAsync, SelfContextSync
 from helpy._interfaces.key_pair import KeyPair
 from helpy._interfaces.stopwatch import Stopwatch
 from helpy._interfaces.time import OffsetTimeControl, SpeedUpRateTimeControl, StartTimeControl, Time, TimeFormats
@@ -44,6 +44,8 @@ __all__ = [
     "SpeedUpRateTimeControl",
     "StartTimeControl",
     "Stopwatch",
+    "SelfContextAsync",
+    "SelfContextSync",
     "Time",
     "TimeFormats",
     "Transaction",
