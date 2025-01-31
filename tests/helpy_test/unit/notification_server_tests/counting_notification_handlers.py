@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 async def send_notification(address: HttpUrl, notification: KnownNotificationT) -> None:
     communicator = HttpxCommunicator(settings=helpy._communication.settings.CommunicationSettings())
-    await communicator.get_async_client().put(
+    await (await communicator.get_async_client()).put(
         address.as_string(),
         headers=communicator._json_headers(),
         content=Notification(

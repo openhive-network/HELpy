@@ -37,7 +37,7 @@ class HttpxCommunicator(AbstractCommunicator):
     def __create_client(self, client_type: type[ClientTypes]) -> ClientTypes:
         return client_type(timeout=self.settings.timeout.total_seconds(), http2=True)
 
-    def get_async_client(self) -> httpx.AsyncClient:
+    async def get_async_client(self) -> httpx.AsyncClient:
         if self.__async_client is None:
             self.__async_client = cast(httpx.AsyncClient, self.__create_client(httpx.AsyncClient))
         return self.__async_client
@@ -53,7 +53,7 @@ class HttpxCommunicator(AbstractCommunicator):
         while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
             amount_of_retries += 1
             try:
-                response: httpx.Response = await self.get_async_client().post(
+                response: httpx.Response = await (await self.get_async_client()).post(
                     url.as_string(), content=data, headers=self._json_headers()
                 )
                 data_received = response.content.decode()
