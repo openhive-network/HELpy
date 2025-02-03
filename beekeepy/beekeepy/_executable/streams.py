@@ -51,8 +51,7 @@ class StreamRepresentation(ContextSync[TextIO]):
     def __create_user_friendly_link(self) -> None:
         assert self.dirpath is not None, "dirpath is not set"
         user_friendly_link_dst = self.dirpath / f"{self.filename}.log"
-        if user_friendly_link_dst.is_symlink():
-            user_friendly_link_dst.unlink(missing_ok=True)
+        user_friendly_link_dst.unlink(missing_ok=True)
         user_friendly_link_dst.symlink_to(self.__get_path())
 
     def __next_filename(self) -> str:
