@@ -97,7 +97,7 @@ class Session(SessionInterface, StateInvalidator):
     @property
     async def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
         result = []
-        for wallet in await self.wallets:
+        for wallet in await self.__list_wallets(refresh_timeout=False):
             unlocked_wallet = await wallet.unlocked
             if unlocked_wallet:
                 result.append(unlocked_wallet)
@@ -111,12 +111,7 @@ class Session(SessionInterface, StateInvalidator):
 
     @property
     async def wallets(self) -> list[WalletInterface]:
-        return await asyncio.gather(
-            *[
-                self.__construct_wallet(name=wallet.name)
-                for wallet in (await self.__beekeeper.api.list_wallets(token=await self.token)).wallets
-            ]
-        )
+        return await self.__list_wallets(refresh_timeout=True)
 
     @property
     async def wallets_created(self) -> list[WalletInterface]:
@@ -138,6 +133,16 @@ class Session(SessionInterface, StateInvalidator):
         wallet = Wallet(name=name, beekeeper=self.__beekeeper, session_token=await self.token, guard=self.__guard)
         self.register_invalidable(wallet)
         return wallet
+
+    async def __list_wallets(self, *, refresh_timeout: bool) -> list[WalletInterface]:
+        return await asyncio.gather(
+            *[
+                self.__construct_wallet(name=wallet.name)
+                for wallet in (
+                    await self.__beekeeper.api.list_wallets(token=await self.token, refresh_timeout=refresh_timeout)
+                ).wallets
+            ]
+        )
 
     async def _aenter(self) -> SessionInterface:
         return self
