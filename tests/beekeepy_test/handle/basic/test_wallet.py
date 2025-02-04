@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Final
 
 import pytest
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
@@ -37,7 +37,7 @@ def test_create_wallet(beekeeper: Beekeeper, wallet_name: str) -> None:
 )
 def test_invalid_wallet_names(beekeeper: Beekeeper, invalid_wallet_name: str) -> None:
     # ARRANGE, ACT & ASSERT
-    with pytest.raises(RequestError):
+    with pytest.raises(ErrorInResponseError):
         beekeeper.api.create(wallet_name=invalid_wallet_name)
 
 

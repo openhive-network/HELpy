@@ -6,7 +6,7 @@ import pytest
 from local_tools.beekeepy import checkers
 from local_tools.beekeepy.constants import MAX_BEEKEEPER_SESSION_AMOUNT
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from beekeepy._handle import Beekeeper
@@ -53,7 +53,7 @@ def test_api_create_session_max_sessions(beekeeper: Beekeeper) -> None:
 
     # ASSERT
     with pytest.raises(
-        RequestError,
+        ErrorInResponseError,
         match=f"Number of concurrent sessions reached a limit ==`{MAX_BEEKEEPER_SESSION_AMOUNT}`",
     ):
         create_session(beekeeper, salt)

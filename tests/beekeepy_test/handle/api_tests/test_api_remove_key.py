@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from helpy import AccountCredentials
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
@@ -39,7 +39,7 @@ def test_api_remove_key_from_locked(beekeeper: Beekeeper, wallet: WalletInfo, ac
     beekeeper.api.lock(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(RequestError, match=f"Wallet is locked: {wallet.name}"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet is locked: {wallet.name}"):
         beekeeper.api.remove_key(
             wallet_name=wallet.name,
             public_key=account.public_key,
@@ -52,7 +52,7 @@ def test_api_remove_key_from_closed(beekeeper: Beekeeper, wallet: WalletInfo, ac
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(RequestError, match=f"Wallet not found: {wallet.name}"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet not found: {wallet.name}"):
         beekeeper.api.remove_key(
             wallet_name=wallet.name,
             public_key=account.public_key,

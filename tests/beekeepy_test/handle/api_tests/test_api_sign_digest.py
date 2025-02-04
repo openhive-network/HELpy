@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.beekeepy.constants import DIGEST_TO_SIGN
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
@@ -46,7 +46,7 @@ def test_api_sign_digest_with_different_wallet_name(beekeeper: Beekeeper, wallet
 
     # ACT & ASSERT
     with pytest.raises(
-        RequestError,
+        ErrorInResponseError,
         match=f"Public key {PUBLIC_KEY} not found in {not_existing_wallet_name} wallet",
     ):
         beekeeper.api.sign_digest(
@@ -73,7 +73,7 @@ def test_api_sign_digest_with_deleted_key(beekeeper: Beekeeper, wallet: WalletIn
     )
 
     # ACT & ASSERT
-    with pytest.raises(RequestError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
+    with pytest.raises(ErrorInResponseError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
         beekeeper.api.sign_digest(sig_digest=DIGEST_TO_SIGN, public_key=PUBLIC_KEY)
 
 
@@ -91,7 +91,7 @@ def test_api_sign_digest_with_closed_wallet(beekeeper: Beekeeper, wallet: Wallet
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ACT & ASSERT
-    with pytest.raises(RequestError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
+    with pytest.raises(ErrorInResponseError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
         beekeeper.api.sign_digest(sig_digest=DIGEST_TO_SIGN, public_key=PUBLIC_KEY)
 
 
@@ -131,5 +131,5 @@ def test_api_sign_digest_with_locked_wallet(beekeeper: Beekeeper, wallet: Wallet
     beekeeper.api.lock(wallet_name=wallet.name)
 
     # ACT & ASSERT
-    with pytest.raises(RequestError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
+    with pytest.raises(ErrorInResponseError, match=f"Public key {PUBLIC_KEY} not found in unlocked wallets"):
         beekeeper.api.sign_digest(sig_digest=DIGEST_TO_SIGN, public_key=PUBLIC_KEY)

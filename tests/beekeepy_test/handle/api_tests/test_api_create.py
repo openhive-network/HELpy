@@ -6,7 +6,7 @@ import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 from local_tools.beekeepy.models import WalletInfo
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from beekeepy._handle import Beekeeper
@@ -42,7 +42,7 @@ def test_api_create_double_same_wallet(beekeeper: Beekeeper) -> None:
 
     # ACT & ASSERT
     beekeeper.api.create(wallet_name=wallet.name, password=wallet.password)
-    with pytest.raises(RequestError, match=f"Wallet with name: '{wallet.name}' already exists"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet with name: '{wallet.name}' already exists"):
         beekeeper.api.create(wallet_name=wallet.name, password=wallet.password)
 
     # ASSERT
@@ -80,7 +80,7 @@ def test_api_create_correct_wallet_name(beekeeper: Beekeeper, name: str) -> None
 def test_api_create_verify_not_allowed_chars(beekeeper: Beekeeper, name: str) -> None:
     """Test test_api_create will test beekeeper_api.create will check all not allowed wallet name chars."""
     # ARRANGE & ACT & ASSERT
-    with pytest.raises(RequestError, match="Name of wallet is incorrect."):
+    with pytest.raises(ErrorInResponseError, match="Name of wallet is incorrect."):
         beekeeper.api.create(wallet_name=name)
 
     # ASSERT
@@ -95,7 +95,7 @@ def test_api_create_verify_not_allowed_chars(beekeeper: Beekeeper, name: str) ->
 def test_api_create_not_correct_wallet_name(beekeeper: Beekeeper, name: str) -> None:
     """Test test_api_create will test beekeeper_api.create will try to create wallet with wrong name."""
     # ARRANGE & ACT & ASSERT
-    with pytest.raises(RequestError, match="Name of wallet is incorrect."):
+    with pytest.raises(ErrorInResponseError, match="Name of wallet is incorrect."):
         beekeeper.api.create(wallet_name=name)
 
     # ASSERT

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -36,14 +36,14 @@ def test_api_lock_locked_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> Non
     beekeeper.api.lock(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(RequestError, match="Unable to lock a locked wallet"):
+    with pytest.raises(ErrorInResponseError, match="Unable to lock a locked wallet"):
         beekeeper.api.lock(wallet_name=wallet.name)
 
 
 def test_api_lock_unknown_wallet(beekeeper: Beekeeper) -> None:
     """Test test_api_lock_unknown_wallet will try to lock unknown wallet."""
     # ARRANGE & ACT & ASSERT
-    with pytest.raises(RequestError, match="Wallet not found"):
+    with pytest.raises(ErrorInResponseError, match="Wallet not found"):
         beekeeper.api.lock(wallet_name="name")
 
 
