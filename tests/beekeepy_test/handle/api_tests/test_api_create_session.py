@@ -32,7 +32,7 @@ def create_session(beekeeper: Beekeeper, salt: str) -> None:
     # ASSERT
     assert len(token), "Returned token should not be empty"
     assert checkers.check_for_pattern_in_file(
-        beekeeper.settings.working_directory / "stderr.log", message_to_check
+        beekeeper.settings.ensured_working_directory / "stderr.log", message_to_check
     ), "Log should have information about create_session call."
 
 

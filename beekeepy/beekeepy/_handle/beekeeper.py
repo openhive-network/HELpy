@@ -145,14 +145,13 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
 
     def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
         assert settings.notification_endpoint is not None
-        assert settings.http_endpoint is not None
         self.__exec.run(
             blocking=False,
             arguments=additional_cli_arguments.copy(
                 update={
                     "notifications_endpoint": settings.notification_endpoint,
-                    "webserver_http_endpoint": settings.http_endpoint,
-                    "data_dir": settings.working_directory,
+                    "webserver_http_endpoint": settings.ensured_http_endpoint,
+                    "data_dir": settings.ensured_working_directory,
                 }
             ),
             propagate_sigint=settings.propagate_sigint,

@@ -40,7 +40,7 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
             bk2.run()
 
         assert checkers.check_for_pattern_in_file(
-            bk2.settings.working_directory / "stderr.log",
+            bk2.settings.ensured_working_directory / "stderr.log",
             "Failed to lock access to wallet directory; is another `beekeeper` running?",
         ), "There should be an info about another instance of beekeeper locking wallet directory."
 
@@ -70,7 +70,7 @@ def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
     for bk in bks:
         assert (
             checkers.check_for_pattern_in_file(
-                bk.settings.working_directory / "stderr.log",
+                bk.settings.ensured_working_directory / "stderr.log",
                 "Failed to lock access to wallet directory; is another `beekeeper` running?",
             )
             is False
@@ -90,7 +90,7 @@ def get_remote_address_from_connection_file(working_dir: Path) -> HttpUrl:
 def test_beekeepers_files_generation(beekeeper: Beekeeper) -> None:
     """Test test_beekeepers_files_generation will check if beekeeper files are generated and have same content."""
     # ARRANGE & ACT
-    wallet_dir = beekeeper.settings.working_directory
+    wallet_dir = beekeeper.settings.ensured_working_directory
     beekeeper_connection_file = wallet_dir / "beekeeper.connection"
     beekeeper_pid_file = wallet_dir / "beekeeper.pid"
     beekeeper_wallet_lock_file = wallet_dir / "beekeeper.wallet.lock"

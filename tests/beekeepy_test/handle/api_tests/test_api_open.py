@@ -13,7 +13,7 @@ def test_api_open(beekeeper: Beekeeper) -> None:
     """Test test_api_open will test beekeeper_api.open api call."""
     # ARRANGE
     wallet = WalletInfo(password=generate_wallet_password(), name=generate_wallet_name())
-    wallet_path = beekeeper.settings.working_directory / f"{wallet.name}.wallet"
+    wallet_path = beekeeper.settings.ensured_working_directory / f"{wallet.name}.wallet"
     assert wallet_path.exists() is False, "Before creation there should be no wallet file."
     beekeeper.api.create(wallet_name=wallet.name, password=wallet.password)
 

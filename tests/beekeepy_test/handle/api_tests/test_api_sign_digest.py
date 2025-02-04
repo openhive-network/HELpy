@@ -107,7 +107,7 @@ def test_api_sign_digest_with_deleted_wallet(beekeeper: Beekeeper, wallet: Walle
     assert signature == EXPECTED_SIGNATURE, "Signatures should match."
 
     # ACT
-    wallet_path = beekeeper.settings.working_directory / f"{wallet.name}.wallet"
+    wallet_path = beekeeper.settings.ensured_working_directory / f"{wallet.name}.wallet"
     assert wallet_path.exists() is True, "Wallet should exists."
     wallet_path.unlink()
     assert wallet_path.exists() is False, "Wallet should not exists."

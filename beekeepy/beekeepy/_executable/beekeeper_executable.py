@@ -19,7 +19,9 @@ if TYPE_CHECKING:
 
 class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
     def __init__(self, settings: Settings, logger: Logger) -> None:
-        super().__init__(settings.binary_path or get_beekeeper_binary_path(), settings.working_directory, logger)
+        super().__init__(
+            settings.binary_path or get_beekeeper_binary_path(), settings.ensured_working_directory, logger
+        )
 
     def _construct_config(self) -> BeekeeperConfig:
         return BeekeeperConfig(wallet_dir=self.working_directory)

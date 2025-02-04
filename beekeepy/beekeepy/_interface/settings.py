@@ -22,10 +22,7 @@ class Settings(HandleSettings):
         PROPAGATE_SIGINT: ClassVar[bool] = True
         CLOSE_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=10.0)
 
-    working_directory: Path = Defaults.default_factory(
-        EnvironNames.WORKING_DIRECTORY,
-        lambda x: (Settings.Defaults.WORKING_DIRECTORY if x is None else Path(x)),
-    )
+    working_directory: Path | None = None
     """Path, where beekeeper binary will store all it's data and logs."""
 
     http_endpoint: HttpUrl | None = None  # type: ignore[assignment]
@@ -51,3 +48,19 @@ class Settings(HandleSettings):
         lambda x: (Settings.Defaults.CLOSE_TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
     """Affects time handle waits before beekeepy closes."""
+
+    @property
+    def ensured_working_directory(self) -> Path:
+        """This property should be used to make sure, that path to working dir is returned.
+
+        Note: If Settings.working_directory is not set, Path.cwd() is returned.
+        """
+        return self.working_directory or Settings.Defaults.WORKING_DIRECTORY
+
+    @property
+    def ensured_http_endpoint(self) -> HttpUrl:
+        """Returns Settings.http_endpoint, if set to None, raises Exception."""
+        if self.http_endpoint is None:
+            raise ValueError("Settings.http_endpoint is None")
+
+        return self.http_endpoint

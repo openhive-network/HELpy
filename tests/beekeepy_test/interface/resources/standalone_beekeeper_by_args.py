@@ -6,7 +6,7 @@ from sys import argv
 from beekeepy import Beekeeper, Settings, close_already_running_beekeeper
 
 settings = Settings(working_directory=Path(argv[1]))
-pid_file = settings.working_directory / "pid.txt"
+pid_file = settings.ensured_working_directory / "pid.txt"
 
 if argv[2] == "start":
     bk = Beekeeper.factory(settings=settings)

@@ -22,7 +22,7 @@ def check_log_json_rpc(log_json_rpc_path: Path) -> None:
 def test_log_json_rpc(beekeeper_not_started: Beekeeper) -> None:
     """Test will check command line flag --log-json-rpc."""
     # ARRANGE
-    path_to_jsonrpc_logs = beekeeper_not_started.settings.working_directory
+    path_to_jsonrpc_logs = beekeeper_not_started.settings.ensured_working_directory
 
     # ACT
     beekeeper_not_started.run(additional_cli_arguments=BeekeeperArguments(log_json_rpc=path_to_jsonrpc_logs))
