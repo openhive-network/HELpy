@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -44,7 +44,7 @@ def test_api_get_public_keys_with_different_wallet_name(beekeeper: Beekeeper, wa
     not_existing_wallet_name = "not-existing"
 
     # ACT & ASSERT
-    with pytest.raises(RequestError, match=f"Wallet {not_existing_wallet_name} is locked"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet {not_existing_wallet_name} is locked"):
         beekeeper.api.get_public_keys(wallet_name=not_existing_wallet_name)
 
 
@@ -80,7 +80,7 @@ def test_api_get_public_keys_with_many_wallets(beekeeper: Beekeeper, setup_walle
     # Lock wallet 1
     beekeeper.api.lock(wallet_name=wallet_1.name)
     # Now all wallet are closed, so that no key should be available
-    with pytest.raises(RequestError, match="You don't have any unlocked wallet"):
+    with pytest.raises(ErrorInResponseError, match="You don't have any unlocked wallet"):
         beekeeper.api.get_public_keys()
 
 
@@ -116,5 +116,5 @@ def test_api_get_public_keys_with_many_wallets_closed(beekeeper: Beekeeper, setu
     # Close wallet 1,
     beekeeper.api.close(wallet_name=wallet_1.name)
     # There is no wallet
-    with pytest.raises(RequestError, match="You don't have any wallet"):
+    with pytest.raises(ErrorInResponseError, match="You don't have any wallet"):
         beekeeper.api.get_public_keys()

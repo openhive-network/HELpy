@@ -51,34 +51,6 @@ class BlockWaitTimeoutError(HelpyError):
         )
 
 
-class RequestError(HelpyError):
-    """Raised if error field is in the response."""
-
-    def __init__(self, send: str, error: str | JsonT) -> None:
-        """
-        Initialize a RequestError.
-
-        Parameters:
-        - send (str): The request sent.
-        - error (str | JsonT): The error received in response.
-
-        Returns:
-        None
-        """
-        self.send = send
-        self.error = self.__try_extract_exception_message(error)
-        super().__init__(f"{send=} | {self.error=}")
-
-    def __try_extract_exception_message(self, error: str | JsonT) -> str | JsonT:
-        try:
-            parsed_error = json.loads(error) if isinstance(error, str) else error
-            if not isinstance(error, dict):
-                return error
-            return parsed_error.get("message", error)  # type: ignore[no-any-return]
-        except json.JSONDecodeError:
-            return error
-
-
 class BatchRequestError(HelpyError):
     """Base class for batch related errors."""
 
@@ -289,9 +261,9 @@ class ErrorInResponseError(OverseerError):
         request_id: int | None,
     ) -> None:
         super().__init__(
-            url,
-            request,
-            response,
+            url=url,
+            request=request,
+            response=response,
             message=message,
             request_id=request_id,
             whole_response=whole_response,
@@ -300,6 +272,23 @@ class ErrorInResponseError(OverseerError):
 
     def retry(self) -> bool:
         return False
+
+    @property
+    def error(self) -> str:
+        if self.__error is None:
+            result = self._extract_error_messages(response=self.__get_suitable_response())
+            self.__error = (result or [""])[0]
+        return self.__error
+
+    def __get_suitable_response(self) -> Json | str | None:
+        if isinstance(self.response, list):
+            if self.request_id is None:
+                return None
+            for item in self.response:
+                if item.get("id", {}) == self.request_id:
+                    return item
+            return None
+        return self.response
 
 
 class GroupedErrorsError(HelpyError):

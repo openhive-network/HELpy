@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.beekeepy import checkers, waiters
 
-from helpy.exceptions import CommunicationError, RequestError
+from helpy.exceptions import CommunicationError, ErrorInResponseError
 
 if TYPE_CHECKING:
     from beekeepy._handle import Beekeeper
@@ -24,7 +24,7 @@ def test_api_close_session(beekeeper: Beekeeper) -> None:
         f'"params":{{"token":"{beekeeper.session.token}"}}'
     )
     with pytest.raises(
-        RequestError,
+        ErrorInResponseError,
         match=f"A session attached to {beekeeper.session.token} doesn't exist",
     ):
         beekeeper.api.close_session()
@@ -58,7 +58,7 @@ def test_api_close_session_double(beekeeper: Beekeeper) -> None:
 
     # ASSERT
     with pytest.raises(
-        RequestError,
+        ErrorInResponseError,
         match=f"A session attached to {beekeeper.session.token} doesn't exist",
     ):
         beekeeper.api.close_session()
@@ -77,5 +77,5 @@ def test_api_close_session_not_existing(create_session: bool, beekeeper: Beekeep
 
     # ACT & ASSERT
     beekeeper.set_session_token(WRONG_TOKEN)
-    with pytest.raises(RequestError, match=f"A session attached to {WRONG_TOKEN} doesn't exist"):
+    with pytest.raises(ErrorInResponseError, match=f"A session attached to {WRONG_TOKEN} doesn't exist"):
         beekeeper.api.close_session()

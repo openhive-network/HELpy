@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.exceptions import RequestError
+from helpy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -34,7 +34,7 @@ def test_api_import_key_to_locked(
     beekeeper.api.lock(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(RequestError, match=f"Wallet is locked: {wallet.name}"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet is locked: {wallet.name}"):
         beekeeper.api.import_key(wallet_name=wallet.name, wif_key=keys_to_import[0].private_key)
 
 
@@ -46,5 +46,5 @@ def test_api_import_key_to_closed(
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(RequestError, match=f"Wallet not found: {wallet.name}"):
+    with pytest.raises(ErrorInResponseError, match=f"Wallet not found: {wallet.name}"):
         beekeeper.api.import_key(wallet_name=wallet.name, wif_key=keys_to_import[0].private_key)
