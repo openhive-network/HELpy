@@ -77,6 +77,10 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @classmethod
     def _remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> BeekeeperInterface:
+        if isinstance(url_or_settings, Settings):
+            assert (
+                url_or_settings.http_endpoint is not None
+            ), "Settings.http_endpoint has to be set when passing to remote_factory"
         settings = url_or_settings if isinstance(url_or_settings, Settings) else Settings(http_endpoint=url_or_settings)
         handle = SynchronousRemoteBeekeeperHandle(settings=settings)
         cls.__apply_existing_session_token(settings=settings, handle=handle)

@@ -21,6 +21,6 @@ def test_webserver_thread_pool_size(beekeeper_not_started: Beekeeper, webserver_
 
     # ASSERT
     assert checkers.check_for_pattern_in_file(
-        beekeeper_not_started.settings.working_directory / "stderr.log",
+        beekeeper_not_started.settings.ensured_working_directory / "stderr.log",
         f"configured with {webserver_thread_pool_size} thread pool size",
     )

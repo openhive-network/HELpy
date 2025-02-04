@@ -29,14 +29,14 @@ def test_closing_with_delete(settings: SettingsFactory) -> None:
 
     # ACT & ASSERT (no throw)
     bk.teardown()
-    assert not (sets.working_directory / "beekeeper.pid").exists()
+    assert not (sets.ensured_working_directory / "beekeeper.pid").exists()
 
 
 def test_closing_with_with(settings: SettingsFactory) -> None:
     # ARRANGE, ACT & ASSERT (no throw)
     sets = settings()
     with Beekeeper.factory(settings=sets):
-        assert (sets.working_directory / "beekeeper.pid").exists()
+        assert (sets.ensured_working_directory / "beekeeper.pid").exists()
 
 
 def test_session_tokens(settings: SettingsFactory) -> None:

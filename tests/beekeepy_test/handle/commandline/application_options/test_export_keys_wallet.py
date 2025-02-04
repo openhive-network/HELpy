@@ -50,7 +50,7 @@ def test_export_keys(beekeeper: Beekeeper) -> None:
     wallet_name_keys = f"{wallet_name}.keys"
     nondefault_wallet_name_keys = f"nondefault-{wallet_name_keys}"
 
-    extract_path = beekeeper.settings.working_directory
+    extract_path = beekeeper.settings.ensured_working_directory
 
     create = beekeeper.api.create(wallet_name=wallet_name)
     beekeeper.api.open(wallet_name=wallet_name)

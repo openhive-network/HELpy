@@ -39,7 +39,7 @@ def settings_with_logger(request: pytest.FixtureRequest, settings: SettingsFacto
         log = logger.bind(test_name=test_name)
         handlers_to_remove.append(
             log.add(
-                sets.working_directory / "beekeeper.log",
+                sets.ensured_working_directory / "beekeeper.log",
                 filter=lambda params: params["extra"].get("test_name") == test_name,
             )
         )

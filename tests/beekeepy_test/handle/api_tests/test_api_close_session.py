@@ -30,7 +30,7 @@ def test_api_close_session(beekeeper: Beekeeper) -> None:
         beekeeper.api.close_session()
 
     assert checkers.check_for_pattern_in_file(
-        beekeeper.settings.working_directory / "stderr.log", close_log_entry
+        beekeeper.settings.ensured_working_directory / "stderr.log", close_log_entry
     ), "Log should have information about closing session with specific token created during create_session call."
 
 
@@ -47,7 +47,7 @@ def test_if_beekeeper_closes_after_last_session_termination(
         beekeeper.api.list_wallets()
 
     assert checkers.check_for_pattern_in_file(
-        beekeeper.settings.working_directory / "stderr.log", "exited cleanly"
+        beekeeper.settings.ensured_working_directory / "stderr.log", "exited cleanly"
     ), "Beekeeper should be closed after last session termination."
 
 
