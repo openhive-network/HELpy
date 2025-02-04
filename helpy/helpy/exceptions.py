@@ -123,42 +123,49 @@ class CommunicationError(HelpyError):
         self.url = str(url)
         self.request = request
         self.response = response
-        message = message or self.__create_message()
-        super().__init__(message)
+        self.message_raw = message
+        self.message = self.__create_message(self.message_raw)
+        super().__init__(self.message, self.url, self.request, self.response)
 
     def get_response_error_messages(self) -> list[str]:
+        return CommunicationError._extract_error_messages(self.response)
+
+    @classmethod
+    def _extract_error_messages(cls, response: CommunicationResponseT | None) -> list[str]:
         """Obtains error message from response."""
-        result = self.get_response()
-        if result is None:
+        if response is None:
             return []
 
-        if isinstance(result, dict):
-            message = result.get("error", {}).get("message", None)
+        if isinstance(response, str):
+            """
+            Do not parse, as `str` is passed only in case
+            of unparsable response.
+            """
+            return [response]
+
+        if isinstance(response, dict):
+            message = response.get("error", {}).get("message", None)
             return [str(message)] if message is not None else []
 
-        messages = []
-        for item in result:
-            message = item.get("error", {}).get("message", None)
-            if message is not None:
-                messages.append(str(message))
-        return messages
+        if isinstance(response, list):
+            messages = []
+            for item in response:
+                if messages_recurrence := cls._extract_error_messages(item):
+                    messages.extend(messages_recurrence)
+            return messages
 
-    def get_response(self) -> JsonT | list[JsonT] | None:
-        return self.response if isinstance(self.response, dict | list) else None
+        raise TypeError(f"Unsupported type: {type(response)}")
 
     def _get_reply(self) -> str:
-        if (result := self.get_response()) is not None:
-            return f"response={result}"
-
         if self.response is not None:
-            return f"response={self.response}"
+            return f"{self.response=}"
 
         return "no response available"
 
-    def __create_message(self) -> str:
+    def __create_message(self, message: str) -> str:
         return (
-            f"Problem occurred during communication with: url={self.url}, request={self.request!r}, {self._get_reply()}"
-        )
+            (message + "\n\n") if message else ""
+        ) + f"Problem occurred during communication with: url={self.url}, request={self.request!r}, {self._get_reply()}"
 
 
 class ExceededAmountOfRetriesError(CommunicationError):
@@ -171,8 +178,8 @@ class TimeoutExceededError(CommunicationError):
     def __init__(  # noqa: PLR0913
         self,
         url: str | Url[Any],
-        request: str | bytes,
-        response: str | dict[str, Any] | list[dict[str, Any]] | None = None,
+        request: CommunicationResponseT | bytes,
+        response: CommunicationResponseT | None = None,
         *,
         message: str = "",
         timeout_secs: float | None = None,
@@ -229,6 +236,10 @@ class NullResultError(OverseerError):
 class ApiNotFoundError(OverseerError):
     def retry(self) -> bool:
         return False
+
+    @property
+    def api(self) -> str:
+        return self.message_raw.split(":")[-1].strip()
 
 
 class JussiResponseError(OverseerError):
