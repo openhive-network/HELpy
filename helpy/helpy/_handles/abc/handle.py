@@ -135,7 +135,7 @@ class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
         return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
-        return True
+        return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
         return AioHttpCommunicator(settings=self._settings)
@@ -163,7 +163,7 @@ class AbstractSyncHandle(AbstractHandle[ApiT], SelfContextSync, ABC):
         return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
-        return False
+        return True
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
         return RequestCommunicator(settings=self._settings)
