@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
 
@@ -40,6 +40,10 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
                 await session.get_info()
                 return session
         raise UnknownDecisionPathError
+
+    @property
+    def settings(self) -> Settings:
+        return cast(Settings, self.__instance.settings)
 
     @property
     async def session(self) -> SessionInterface:

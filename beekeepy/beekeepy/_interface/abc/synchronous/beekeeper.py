@@ -16,6 +16,10 @@ class Beekeeper(ContextSync["Beekeeper"], ABC):
     def create_session(self, *, salt: str | None = None) -> Session: ...
 
     @property
+    def settings(self) -> Settings:
+        """Returns read-only settings."""
+
+    @property
     @abstractmethod
     def session(self) -> Session: ...
 
