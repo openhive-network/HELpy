@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
 import pytest
 
+from helpy import SuppressApiNotFound
 from helpy.exceptions import CommunicationError, NothingToSendError, ResponseNotReadyError
 
 if TYPE_CHECKING:
@@ -78,3 +79,17 @@ async def test_batch_node_nothing_to_send(sync_node: Hived) -> None:
     with pytest.raises(NothingToSendError):  # noqa: SIM117
         with sync_node.batch():
             pass
+
+
+def test_batch_node_with_suppress_api_not_found(sync_node: Hived) -> None:
+    # ARRANGE
+    missing_api: Final[str] = "debug_node_api"
+    amount_of_requests: Final[int] = 3
+
+    with SuppressApiNotFound(missing_api) as suppress, sync_node.batch() as bnode:
+        for _ in range(amount_of_requests):
+            bnode.api.debug_node.debug_get_head_block()
+
+    # ASSERT
+    assert len(suppress.errors) == amount_of_requests, "there should be exactly 2 suppressed errors"
+    assert all(item.api == missing_api for item in suppress.errors), f"suppressed for: {suppress.errors}"
