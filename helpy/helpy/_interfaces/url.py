@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generic, Literal, TypeVar
+from typing import Generic, Literal, TypeVar, get_args
 from urllib.parse import urlparse
 
 P2PProtocolT = Literal[""]
@@ -13,12 +13,17 @@ class Url(Generic[ProtocolT]):
     """Wrapper for Url, for handy access to all of it members with serialization."""
 
     def __init__(self, url: str | Url[ProtocolT], *, protocol: ProtocolT | None = None) -> None:
-        target_protocol: str = protocol or ""
+        allowed_proto = self._allowed_protocols()
+
+        if protocol is not None and protocol not in allowed_proto:
+            raise ValueError(f"Unknown protocol: `{protocol}`, allowed: {allowed_proto}")
+
         if isinstance(url, Url):
             self.__protocol: str = url.__protocol
             self.__address: str = url.__address
             self.__port: int | None = url.__port
         elif isinstance(url, str):
+            target_protocol = protocol or allowed_proto[0]
             parsed_url = urlparse(url, scheme=target_protocol)
             if not parsed_url.netloc:
                 parsed_url = urlparse(f"//{url}", scheme=target_protocol)
@@ -65,13 +70,25 @@ class Url(Generic[ProtocolT]):
 
         return f"{protocol_prefix}{self.address}{port_suffix}"
 
+    @classmethod
+    def _allowed_protocols(cls) -> list[str]:
+        """Returns allowed protocols.
+
+        Note: at index 0 should be default protocol.
+        """
+        return [""]
+
 
 class HttpUrl(Url[HttpProtocolT]):
-    pass
+    @classmethod
+    def _allowed_protocols(cls) -> list[str]:
+        return list(get_args(HttpProtocolT))
 
 
 class WsUrl(Url[WsProtocolT]):
-    pass
+    @classmethod
+    def _allowed_protocols(cls) -> list[str]:
+        return list(get_args(WsProtocolT))
 
 
 class P2PUrl(Url[P2PProtocolT]):
