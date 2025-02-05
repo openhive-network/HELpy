@@ -10,6 +10,7 @@ from helpy._handles.beekeeper.api.api_collection import (
     BeekeeperSyncApiCollection,
 )
 from helpy._handles.beekeeper.api.session_holder import AsyncSessionHolder, SyncSessionHolder
+from helpy._sanitize import sanitize
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from helpy._communication.abc.overseer import AbstractOverseer
     from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
     from helpy._interfaces.url import HttpUrl
+    from helpy.exceptions import Json
 
 _handle_target_service_name = "beekeeper"
 
@@ -93,6 +95,9 @@ class Beekeeper(AbstractSyncHandle[BeekeeperSyncApiCollection], SyncSessionHolde
     def _get_salt(self) -> str:
         return _random_string()
 
+    def _sanitize_data(self, data: Json | list[Json] | str) -> Json | list[Json] | str:
+        return sanitize(data)
+
 
 class AsyncBeekeeper(AbstractAsyncHandle[BeekeeperAsyncApiCollection], AsyncSessionHolder):
     """Asynchronous handle for beekeeper service communication."""
@@ -121,3 +126,6 @@ class AsyncBeekeeper(AbstractAsyncHandle[BeekeeperAsyncApiCollection], AsyncSess
 
     def _get_salt(self) -> str:
         return _random_string()
+
+    def _sanitize_data(self, data: Json | list[Json] | str) -> Json | list[Json] | str:
+        return sanitize(data)
