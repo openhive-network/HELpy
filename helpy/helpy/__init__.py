@@ -20,6 +20,7 @@ from helpy._interfaces.time import OffsetTimeControl, SpeedUpRateTimeControl, St
 from helpy._interfaces.transaction_helper import Transaction
 from helpy._interfaces.url import HttpUrl, P2PUrl, WsUrl
 from helpy._sanitize import sanitize
+from helpy._suppress_api_not_found import SuppressApiNotFound
 
 __version__ = "0.0.0"
 
@@ -47,6 +48,7 @@ __all__ = [
     "Stopwatch",
     "SelfContextAsync",
     "SelfContextSync",
+    "SuppressApiNotFound",
     "sanitize",
     "Time",
     "TimeFormats",
