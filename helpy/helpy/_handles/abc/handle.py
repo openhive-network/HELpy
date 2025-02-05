@@ -112,10 +112,28 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         return serialized_data
 
     def __configure_logger(self) -> Logger:
-        return logger.bind(**self._logger_extras())
+        # credit for lazy=True: https://github.com/Delgan/loguru/issues/402#issuecomment-2028011786
+        return logger.opt(lazy=True).bind(**self._logger_extras())
 
     def teardown(self) -> None:
         self._overseer.teardown()
+
+    def _sanitize_data(self, data: Json | list[Json] | str) -> Json | list[Json] | str:
+        return data
+
+    def _log_request(self, request: str) -> None:
+        self.logger.trace(
+            "sending to `{}`: `{}`",
+            self.http_endpoint.as_string,
+            lambda: self._sanitize_data(request),  # to reduce deepcopy
+        )
+
+    def _log_response(self, seconds_delta: float, response: Json | list[Json]) -> None:
+        self.logger.trace(
+            f"got response in {seconds_delta :.5f}s from " + "`{}`: `{}`",
+            self.http_endpoint.as_string,
+            lambda: self._sanitize_data(response),  # to reduce deepcopy
+        )
 
 
 class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
@@ -126,12 +144,10 @@ class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         request = build_json_rpc_call(method=endpoint, params=params)
-        self.logger.trace(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        self._log_request(request)
         with Stopwatch() as record:
             response = await self._overseer.async_send(self.http_endpoint, data=request)
-        self.logger.trace(
-            f"got response in {record.seconds_delta :.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
-        )
+        self._log_response(record.seconds_delta, response)
         return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
@@ -154,12 +170,10 @@ class AbstractSyncHandle(AbstractHandle[ApiT], SelfContextSync, ABC):
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         request = build_json_rpc_call(method=endpoint, params=params)
-        self.logger.debug(f"sending to `{self.http_endpoint.as_string()}`: `{request}`")
+        self._log_request(request)
         with Stopwatch() as record:
             response = self._overseer.send(self.http_endpoint, data=request)
-        self.logger.trace(
-            f"got response in {record.seconds_delta:.5f}s from `{self.http_endpoint.as_string()}`: `{response}`"
-        )
+        self._log_response(record.seconds_delta, response)
         return self._response_handle(response=response, expected_type=expected_type)
 
     def _is_synchronous(self) -> bool:
