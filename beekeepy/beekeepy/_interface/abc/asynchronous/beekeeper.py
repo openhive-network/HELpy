@@ -16,6 +16,10 @@ class Beekeeper(ContextAsync["Beekeeper"], ABC):
     async def create_session(self, *, salt: str | None = None) -> Session: ...
 
     @property
+    def settings(self) -> Settings:
+        """Returns read-only settings."""
+
+    @property
     @abstractmethod
     async def session(self) -> Session: ...
 
