@@ -1,23 +1,26 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
+from beekeepy._interface.settings import Settings
 from helpy import ContextSync, HttpUrl
+from helpy._communication.settings import CommunicationSettings
+from helpy._interfaces.context_settings_updater import ContextSettingsUpdater
 
 if TYPE_CHECKING:
     from beekeepy._interface.abc.packed_object import PackedSyncBeekeeper
     from beekeepy._interface.abc.synchronous.session import Session
-    from beekeepy._interface.settings import Settings
 
 
-class Beekeeper(ContextSync["Beekeeper"], ABC):
+class Beekeeper(ContextSync["Beekeeper"], ContextSettingsUpdater[CommunicationSettings], ABC):
     @abstractmethod
     def create_session(self, *, salt: str | None = None) -> Session: ...
 
     @property
     def settings(self) -> Settings:
         """Returns read-only settings."""
+        return cast(Settings, self._get_copy_of_settings())
 
     @property
     @abstractmethod
