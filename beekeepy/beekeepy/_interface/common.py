@@ -70,7 +70,7 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
     def _last_lock_state(self, value: bool) -> None:
         self.__last_check_is_locked = value
 
-    def _is_wallet_locked(self, *, wallet_name: str, wallets: list[WalletDetails]) -> bool:
+    def _is_wallet_unlocked(self, *, wallet_name: str, wallets: list[WalletDetails]) -> bool:
         """Checks is wallet locked.
 
         Args:
@@ -82,8 +82,10 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
         """
         for wallet in wallets:
             if wallet.name == wallet_name:
-                return not wallet.unlocked
-        return True
+                self._last_lock_state = wallet.unlocked
+                return wallet.unlocked
+        self._last_lock_state = False
+        return False
 
     def _raise_wallet_is_locked_error(self, wallet_name: str) -> NoReturn:
         raise WalletIsLockedError(wallet_name=wallet_name)
@@ -91,7 +93,7 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
     async def _async_call_callback_if_locked(self, *, wallet_name: str, token: str) -> None:
         assert isinstance(self._beekeeper, AsyncRemoteBeekeeper), "invalid beekeeper type, require asynchronous"
         wallets = (await self._beekeeper.api.list_wallets(token=token)).wallets
-        if self._is_wallet_locked(wallet_name=wallet_name, wallets=wallets):
+        if not self._is_wallet_unlocked(wallet_name=wallet_name, wallets=wallets):
             if self._last_lock_state is False:
                 wallet_names = [w.name for w in wallets if w.unlocked is False]
                 await asyncio.gather(
@@ -106,7 +108,7 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
     def _sync_call_callback_if_locked(self, *, wallet_name: str, token: str) -> None:
         assert isinstance(self._beekeeper, SyncRemoteBeekeeper), "invalid beekeeper type, require synchronous"
         wallets = self._beekeeper.api.list_wallets(token=token).wallets
-        if self._is_wallet_locked(wallet_name=wallet_name, wallets=wallets):
+        if not self._is_wallet_unlocked(wallet_name=wallet_name, wallets=wallets):
             if self._last_lock_state is False:
                 wallet_names = [w.name for w in wallets if w.unlocked is False]
                 for callback in self.__wallet_close_callbacks:

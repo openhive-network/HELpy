@@ -23,6 +23,9 @@ class Wallet(ContainsWalletName, ABC):
     async def unlocked(self) -> UnlockedWallet | None: ...
 
     @abstractmethod
+    async def is_unlocked(self) -> bool: ...
+
+    @abstractmethod
     async def unlock(self, password: str) -> UnlockedWallet: ...
 
     @property

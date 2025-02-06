@@ -87,7 +87,7 @@ class Session(SessionInterface, StateInvalidator):
 
     @property
     def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
-        return [wallet.unlocked for wallet in self.__list_wallets(refresh_timeout=False) if wallet.unlocked]
+        return [wallet.unlocked for wallet in self.__list_wallets() if wallet.unlocked]
 
     @property
     def token(self) -> str:
@@ -97,7 +97,7 @@ class Session(SessionInterface, StateInvalidator):
 
     @property
     def wallets(self) -> list[WalletInterface]:
-        return self.__list_wallets(refresh_timeout=True)
+        return self.__list_wallets()
 
     @property
     def wallets_created(self) -> list[WalletInterface]:
@@ -120,10 +120,10 @@ class Session(SessionInterface, StateInvalidator):
         self.register_invalidable(wallet)
         return wallet
 
-    def __list_wallets(self, *, refresh_timeout: bool) -> list[WalletInterface]:
+    def __list_wallets(self) -> list[WalletInterface]:
         return [
             self.__construct_wallet(name=wallet.name)
-            for wallet in self.__beekeeper.api.list_wallets(token=self.token, refresh_timeout=refresh_timeout).wallets
+            for wallet in self.__beekeeper.api.list_wallets(token=self.token).wallets
         ]
 
     def _enter(self) -> SessionInterface:
