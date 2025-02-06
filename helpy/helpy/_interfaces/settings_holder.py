@@ -27,7 +27,7 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
         Note:
             If you want to have shared settings with other instance, use `_settings`, otherwise you will pass copy.
         """
-        return self.__settings if self.__is_in_modify_settings_state else self._get_copy_of_settings()
+        return self._settings if self.__is_in_modify_settings_state else self._get_copy_of_settings()
 
     @property
     def _settings(self) -> SettingsT:
@@ -41,7 +41,7 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
         return self.__settings
 
     def _get_copy_of_settings(self) -> SettingsT:
-        return self.__settings.copy()
+        return self._settings.copy()
 
     @abstractmethod
     def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...
