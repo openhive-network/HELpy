@@ -12,6 +12,7 @@ from helpy._handles.settings import Settings
 from helpy._interfaces.context import SelfContextAsync, SelfContextSync
 from helpy._interfaces.settings_holder import UniqueSettingsHolder
 from helpy._interfaces.stopwatch import Stopwatch
+from helpy.exceptions import CommunicationError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
@@ -143,9 +144,11 @@ class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
+        from helpy._interfaces.error_logger import ErrorLogger
+
         request = build_json_rpc_call(method=endpoint, params=params)
         self._log_request(request)
-        with Stopwatch() as record:
+        with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
             response = await self._overseer.async_send(self.http_endpoint, data=request)
         self._log_response(record.seconds_delta, response)
         return self._response_handle(response=response, expected_type=expected_type)
@@ -169,9 +172,11 @@ class AbstractSyncHandle(AbstractHandle[ApiT], SelfContextSync, ABC):
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
+        from helpy._interfaces.error_logger import ErrorLogger
+
         request = build_json_rpc_call(method=endpoint, params=params)
         self._log_request(request)
-        with Stopwatch() as record:
+        with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
             response = self._overseer.send(self.http_endpoint, data=request)
         self._log_response(record.seconds_delta, response)
         return self._response_handle(response=response, expected_type=expected_type)
