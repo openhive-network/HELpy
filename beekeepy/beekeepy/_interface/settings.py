@@ -28,7 +28,10 @@ class Settings(HandleSettings):
     """Path, where beekeeper binary will store all it's data and logs."""
 
     http_endpoint: HttpUrl | None = None  # type: ignore[assignment]
-    """Endpoint on which python will communicate with beekeeper, required for remote beekeeper."""
+    """
+    Endpoint on which python will communicate with beekeeper, required for remote beekeeper.
+    In case of local beekeeper, this address will be used for beekeeper to start listening on.
+    """
 
     notification_endpoint: HttpUrl | None = None
     """Endpoint to use for reverse communication between beekeeper and python."""
