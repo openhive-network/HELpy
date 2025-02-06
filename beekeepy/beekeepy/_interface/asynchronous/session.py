@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from beekeepy._interface.abc.asynchronous.session import Password
 from beekeepy._interface.abc.asynchronous.session import Session as SessionInterface
@@ -41,12 +41,14 @@ class Session(SessionInterface, StateInvalidator):
         beekeeper: AsynchronousRemoteBeekeeperHandle,
         guard: AsyncDelayGuard,
         use_session_token: str | None = None,
+        default_session_close_callback: Callable[[], None] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.__beekeeper = beekeeper
         self.__session_token = use_session_token or ""
         self.__guard = guard
+        self.__default_session_close_callback = default_session_close_callback
 
     async def get_info(self) -> GetInfo:
         return await self.__beekeeper.api.get_info(token=await self.token)
@@ -71,6 +73,8 @@ class Session(SessionInterface, StateInvalidator):
     async def close_session(self) -> None:
         if self.__beekeeper.is_session_token_set():
             await self.__beekeeper.api.close_session(token=await self.token)
+            if self.__default_session_close_callback is not None:
+                self.__default_session_close_callback()
             self.invalidate(InvalidatedStateByClosingSessionError())
 
     async def lock_all(self) -> list[WalletInterface]:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from beekeepy._interface.abc.synchronous.session import Password
 from beekeepy._interface.abc.synchronous.session import Session as SessionInterface
@@ -40,12 +40,14 @@ class Session(SessionInterface, StateInvalidator):
         beekeeper: SyncRemoteBeekeeper,
         guard: SyncDelayGuard,
         use_session_token: str | None = None,
+        default_session_close_callback: Callable[[], None] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.__beekeeper = beekeeper
         self.__session_token = use_session_token or ""
         self.__guard = guard
+        self.__default_session_close_callback = default_session_close_callback
 
     def get_info(self) -> GetInfo:
         return self.__beekeeper.api.get_info(token=self.token)
@@ -68,6 +70,8 @@ class Session(SessionInterface, StateInvalidator):
     def close_session(self) -> None:
         if self.__session_token != "":
             self.__beekeeper.api.close_session(token=self.token)
+            if self.__default_session_close_callback is not None:
+                self.__default_session_close_callback()
             self.invalidate(InvalidatedStateByClosingSessionError())
 
     def lock_all(self) -> list[WalletInterface]:
