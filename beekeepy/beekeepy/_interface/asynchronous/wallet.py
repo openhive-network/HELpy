@@ -40,12 +40,12 @@ class Wallet(WalletCommons[AsyncRemoteBeekeeper, AsyncWalletLocked, AsyncDelayGu
 
     @property
     async def unlocked(self) -> UnlockedWallet | None:
-        if await self.__is_unlocked():
+        if await self.is_unlocked():
             return self.__construct_unlocked_wallet()
         return None
 
     async def unlock(self, password: str) -> UnlockedWallet:
-        if not (await self.__is_unlocked()):
+        if not (await self.is_unlocked()):
             first_try = True
             while first_try or self._guard.error_occured():
                 first_try = False
@@ -56,13 +56,11 @@ class Wallet(WalletCommons[AsyncRemoteBeekeeper, AsyncWalletLocked, AsyncDelayGu
                         )
         return self.__construct_unlocked_wallet()
 
-    async def __is_unlocked(self) -> bool:
-        for wallet in (await self._beekeeper.api.list_wallets(token=self.session_token)).wallets:
-            if wallet.name == self.name:
-                self._last_lock_state = wallet.unlocked
-                return self._last_lock_state
-        self._last_lock_state = False
-        return self._last_lock_state
+    async def is_unlocked(self) -> bool:
+        return self._is_wallet_unlocked(
+            wallet_name=self.name,
+            wallets=(await self._beekeeper.api.list_wallets(token=self.session_token)).wallets,
+        )
 
     def __construct_unlocked_wallet(self) -> UnlockedWallet:
         wallet = UnlockedWallet(

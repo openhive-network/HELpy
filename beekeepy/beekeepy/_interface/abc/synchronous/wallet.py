@@ -25,6 +25,9 @@ class Wallet(ContainsWalletName, ABC):
     @abstractmethod
     def unlock(self, password: str) -> UnlockedWallet: ...
 
+    @abstractmethod
+    def is_unlocked(self) -> bool: ...
+
     @property
     @abstractmethod
     def name(self) -> str: ...
