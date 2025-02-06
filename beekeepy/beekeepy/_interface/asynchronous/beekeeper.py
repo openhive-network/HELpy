@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
         Session as SessionInterface,
     )
     from helpy import HttpUrl
+    from helpy._communication.settings import CommunicationSettings
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):
@@ -40,10 +41,6 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
                 await session.get_info()
                 return session
         raise UnknownDecisionPathError
-
-    @property
-    def settings(self) -> Settings:
-        return cast(Settings, self.__instance.settings)
 
     @property
     async def session(self) -> SessionInterface:
@@ -100,3 +97,10 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     async def _afinally(self) -> None:
         self.teardown()
+
+    def _get_copy_of_settings(self) -> CommunicationSettings:
+        return self.__instance._get_copy_of_settings()
+
+    @property
+    def _settings(self) -> CommunicationSettings:
+        return self.__instance._settings
