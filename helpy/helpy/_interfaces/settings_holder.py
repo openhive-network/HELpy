@@ -2,19 +2,17 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any
 
-from helpy._communication.settings import CommunicationSettings
+from helpy._interfaces.context_settings_updater import ContextSettingsUpdater, SettingsT
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
 __all__ = ["SettingsT", "UniqueSettingsHolder", "SharedSettingsHolder"]
 
-SettingsT = TypeVar("SettingsT", bound=CommunicationSettings)
 
-
-class _SettingsHolderBase(ABC, Generic[SettingsT]):
+class _SettingsHolderBase(ABC, ContextSettingsUpdater[SettingsT]):
     def __init__(self, *args: Any, settings: SettingsT, **kwargs: Any) -> None:
         self.__settings = self._get_settings_for_storage(settings)
         self.__is_in_modify_settings_state: bool = False
@@ -74,36 +72,6 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
             before = self._get_copy_of_settings()
             yield
         self.__settings = before
-
-    @contextmanager
-    def update_settings(self) -> Iterator[SettingsT]:
-        """
-        Returns settings object, which can be freely modified. On exit saves it.
-
-        Note:
-            Modifying as:
-            ```
-            with handle.update_settings() as settings:
-                handle.settings.some_value = new_value
-            ```
-            Does not affect state of settings, as `handle.settings` will return copy of current state.
-
-        Example:
-            ```
-            with handle.update_settings() as settings:
-                settings.timeout = timedelta(seconds=10)
-                handle.some.api.call() # timeout 3 seconds
-            handle.some.api.call() # timeout 10 seconds
-            ```
-
-        Yields:
-            Iterator[SettingsT]: Stored settings instance
-        """
-        original_settings = self._get_copy_of_settings()
-        settings_to_update = self._get_copy_of_settings()
-        yield settings_to_update
-        for key, value in settings_to_update.dict().items():
-            setattr(self.__settings, key, value)
 
 
 class SharedSettingsHolder(_SettingsHolderBase[SettingsT]):
