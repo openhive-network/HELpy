@@ -151,12 +151,12 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             return_code = self.__process.wait(timeout=timeout_secs)
             self._logger.debug(f"Closed with {return_code} return code")
         except subprocess.TimeoutExpired:
-            self.__raise_exception_if_timeout_on_close()
             self.__process.kill()
             self.__process.wait()
-        self.__process = None
-        self.__files.close()
-        self.__warn_if_pid_files_exists()
+            self.__raise_exception_if_timeout_on_close()
+        finally:
+            self.__process = None
+            self.__files.close()
 
     def __warn_if_pid_files_exists(self) -> None:
         if self.__pid_files_exists():
