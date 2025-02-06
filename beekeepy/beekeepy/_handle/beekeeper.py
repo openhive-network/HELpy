@@ -107,7 +107,9 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
 
     def __wait_till_ready(self) -> None:
         assert self.__notification_event_handler is not None, "Notification event handler hasn't been set"
-        if not self.__notification_event_handler.http_listening_event.wait(timeout=5):
+        if not self.__notification_event_handler.http_listening_event.wait(
+            timeout=self._get_settings().initialization_timeout.total_seconds()
+        ):
             raise TimeoutError("Waiting too long for beekeeper to be up and running")
 
     def _handle_error(self, error: Error) -> None:

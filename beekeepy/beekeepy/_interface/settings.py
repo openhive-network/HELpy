@@ -16,11 +16,13 @@ class Settings(HandleSettings):
         WORKING_DIRECTORY: ClassVar[str] = "BEEKEEPY_WORKING_DIRECTORY"
         PROPAGATE_SIGINT: ClassVar[str] = "BEEKEEPY_PROPAGATE_SIGINT"
         CLOSE_TIMEOUT: ClassVar[str] = "BEEKEEPY_CLOSE_TIMEOUT"
+        INITIALIZATION_TIMEOUT: ClassVar[str] = "BEEKEEPY_INITIALIZATION_TIMEOUT"
 
     class Defaults(HandleSettings.Defaults):
         WORKING_DIRECTORY: ClassVar[Path] = Path.cwd()
         PROPAGATE_SIGINT: ClassVar[bool] = True
         CLOSE_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=10.0)
+        INITIALIZATION_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=5.0)
 
     working_directory: Path | None = None
     """Path, where beekeeper binary will store all it's data and logs."""
@@ -48,6 +50,11 @@ class Settings(HandleSettings):
         lambda x: (Settings.Defaults.CLOSE_TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
     """Affects time handle waits before beekeepy closes."""
+
+    initialization_timeout: timedelta = Defaults.default_factory(
+        EnvironNames.INITIALIZATION_TIMEOUT,
+        lambda x: (Settings.Defaults.INITIALIZATION_TIMEOUT if x is None else timedelta(seconds=int(x))),
+    )
 
     @property
     def ensured_working_directory(self) -> Path:
