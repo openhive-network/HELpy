@@ -32,6 +32,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         super().__init__(*args, **kwargs)
         self.__instance = handle
         self.__guard = SyncDelayGuard()
+        self.__default_session: SessionInterface | None = None
 
     def create_session(self, *, salt: str | None = None) -> SessionInterface:  # noqa: ARG002
         session: SessionInterface | None = None
@@ -44,7 +45,9 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @property
     def session(self) -> SessionInterface:
-        return self.__create_session(self._get_instance().session.token)
+        if self.__default_session is None:
+            self.__default_session = self.__create_session(self._get_instance().session.token, default_session=True)
+        return self.__default_session
 
     def _get_instance(self) -> SyncRemoteBeekeeper:
         return self.__instance
@@ -60,10 +63,19 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             raise DetachRemoteBeekeeperError
         return self.__instance.detach()
 
-    def __create_session(self, token: str | None = None) -> SessionInterface:
-        session = Session(beekeeper=self._get_instance(), use_session_token=token, guard=self.__guard)
+    def __create_session(self, token: str | None = None, *, default_session: bool = False) -> SessionInterface:
+        session = Session(
+            beekeeper=self._get_instance(),
+            use_session_token=token,
+            guard=self.__guard,
+            default_session_close_callback=(self.__manage_closed_default_session if default_session else None),
+        )
         self.register_invalidable(session)
         return session
+
+    def __manage_closed_default_session(self) -> None:
+        self.__default_session = None
+        self._get_instance()._clear_session()
 
     def pack(self) -> PackedSyncBeekeeper:
         return PackedSyncBeekeeper(settings=self._get_instance().settings, unpack_factory=Beekeeper._remote_factory)
