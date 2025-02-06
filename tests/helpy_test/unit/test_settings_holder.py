@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any, cast
-
 import pytest
 
 from helpy._communication.settings import CommunicationSettings
@@ -108,29 +106,6 @@ def test_is_unique_has_different_addresses() -> None:
 
     # ASSERT
     assert id(parent._settings) != id(child._settings)
-
-
-@pytest.mark.parametrize("holder_cls", [SharedSettingsHolder, UniqueSettingsHolder])
-def test_is_update_event_works(holder_cls: type[AnySettingsHolder]) -> None:
-    # ARRANGE
-    class HolderTestClass(holder_cls):  # type: ignore[valid-type, misc]
-        def __init__(self) -> None:
-            super().__init__(settings=CommunicationSettings())
-            self.event_happened = False
-
-        def _settings_updated(self, old_settings: Any, new_settings: Any) -> None:  # noqa: ARG002
-            self.event_happened = True
-
-    test_obj = cast(AnySettingsHolder, HolderTestClass())
-    new_value = test_obj.settings.max_retries + 1
-
-    # ACT
-    with test_obj.update_settings() as settings:
-        settings.max_retries = new_value
-
-    # ASSERT
-    assert test_obj.settings.max_retries == new_value
-    assert cast(HolderTestClass, test_obj).event_happened
 
 
 @pytest.mark.parametrize("holder", [get_shared_settings(), get_unique_settings()])

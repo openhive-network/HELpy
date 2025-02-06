@@ -43,15 +43,6 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
     def _get_copy_of_settings(self) -> SettingsT:
         return self.__settings.copy()
 
-    def _settings_updated(self, old_settings: SettingsT, new_settings: SettingsT) -> None:
-        """
-        Override this method if there are any action required after settings were updated.
-
-        Args:
-            old_settings: settings instance before change
-            new_settings: settings instance after change
-        """
-
     @abstractmethod
     def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...
 
@@ -113,7 +104,6 @@ class _SettingsHolderBase(ABC, Generic[SettingsT]):
         yield settings_to_update
         for key, value in settings_to_update.dict().items():
             setattr(self.__settings, key, value)
-        self._settings_updated(old_settings=original_settings, new_settings=self.__settings)
 
 
 class SharedSettingsHolder(_SettingsHolderBase[SettingsT]):
