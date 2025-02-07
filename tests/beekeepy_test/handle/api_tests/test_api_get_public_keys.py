@@ -18,12 +18,12 @@ def open_and_unlock_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
 
 
 @pytest.mark.parametrize("explicit_wallet_name", [False, True])
-def test_api_get_public_keys(
+def test_api_get_public_keys_xxx(
     beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT, explicit_wallet_name: bool
 ) -> None:
     """Test test_api_get_public_keys will test beekeeper_api.get_public_keys api call."""
     # ARRANGE
-    wallets = setup_wallets(1, import_keys=False, keys_per_wallet=5)
+    wallets = setup_wallets(1, import_keys=False, keys_per_wallet=5, lock=False)
     wallet = wallets[0]
 
     explicit_wallet_name_param = {"wallet_name": wallet.name} if explicit_wallet_name else {}

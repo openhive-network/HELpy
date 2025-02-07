@@ -16,9 +16,10 @@ if TYPE_CHECKING:
 def test_api_unlock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     """Test test_api_unlock will test beekeeper_api.unlock."""
     # ARRANGE
-    beekeeper.api.open(wallet_name=wallet.name)
+    beekeeper.api.lock_all()
 
     # ACT
+    beekeeper.api.open(wallet_name=wallet.name)
     beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
 
     # ASSERT
@@ -26,12 +27,9 @@ def test_api_unlock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 
 
-def test_api_unlock_already_unclocked_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
-    """Test test_api_unlock_already_unclocked_wallet will try to unlock already unlocked wallet."""
+def test_api_unlock_already_unlocked_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
+    """Test test_api_unlock_already_unlocked_wallet will try to unlock already unlocked wallet."""
     # ARRANGE
-    beekeeper.api.open(wallet_name=wallet.name)
-    beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
-
     bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 

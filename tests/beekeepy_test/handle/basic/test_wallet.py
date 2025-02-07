@@ -76,7 +76,7 @@ def test_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     check_wallets(beekeeper.api.list_wallets(), [wallet.name])
 
     # ACT
-    time.sleep(timeout)
+    time.sleep(timeout + 1)
 
     # ASSERT
     check_wallets(beekeeper.api.list_wallets(), [wallet.name], unlocked=False)

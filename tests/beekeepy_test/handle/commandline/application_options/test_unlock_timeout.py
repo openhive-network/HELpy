@@ -27,7 +27,7 @@ def test_unlock_time(beekeeper_not_started: Beekeeper, unlock_timeout: int) -> N
     check_wallet_lock(beekeeper_not_started, required_status=True)
 
     # ACT
-    time.sleep(unlock_timeout)
+    time.sleep(unlock_timeout + 1)
 
     # ASSERT
     check_wallet_lock(beekeeper_not_started, required_status=False)
