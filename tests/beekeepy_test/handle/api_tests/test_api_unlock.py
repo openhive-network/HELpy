@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 
-from helpy.exceptions import InvalidPasswordError, ErrorInResponseError
+from helpy.exceptions import InvalidPasswordError, UnableToOpenWalletError, WalletIsAlreadyUnlockedError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
@@ -36,7 +36,7 @@ def test_api_unlock_already_unclocked_wallet(beekeeper: Beekeeper, wallet: Walle
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 
     # ACT & ASSERT
-    with pytest.raises(ErrorInResponseError, match=f"Wallet is already unlocked: {wallet.name}"):
+    with pytest.raises(WalletIsAlreadyUnlockedError, match=f"Wallet is already unlocked: {wallet.name}"):
         beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
 
 
@@ -57,7 +57,7 @@ def test_api_unlock_created_but_closed_wallet(beekeeper: Beekeeper, wallet: Wall
 def test_api_unlock_unknown_wallet(beekeeper: Beekeeper) -> None:
     """Test test_api_unlock_unknown_wallet will try to unlock unknown wallet."""
     # ARRANGE & ACT & ASSERT
-    with pytest.raises(ErrorInResponseError, match="Unable to open file"):
+    with pytest.raises(UnableToOpenWalletError, match="Unable to open file"):
         beekeeper.api.unlock(password=generate_wallet_password(99), wallet_name=generate_wallet_name(99))
 
 
