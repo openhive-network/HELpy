@@ -62,7 +62,7 @@ def test_api_remove_key_from_closed(beekeeper: Beekeeper, wallet: WalletInfo, ac
 def test_api_remove_key_simple_scenario(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:
     """Test test_api_remove_key_simple_scenario will test simple flow of importing and removing keys."""
     # ARRANGE
-    wallets = setup_wallets(1, import_keys=True, keys_per_wallet=5)
+    wallets = setup_wallets(1, import_keys=True, keys_per_wallet=5, lock=False)
     wallet = wallets[0]
     key_to_remove = wallet.accounts.pop(3)
 

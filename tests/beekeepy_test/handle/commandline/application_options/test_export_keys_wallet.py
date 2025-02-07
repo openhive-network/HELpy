@@ -53,8 +53,6 @@ def test_export_keys(beekeeper: Beekeeper) -> None:
     extract_path = beekeeper.settings.ensured_working_directory
 
     create = beekeeper.api.create(wallet_name=wallet_name)
-    beekeeper.api.open(wallet_name=wallet_name)
-    beekeeper.api.unlock(password=create.password, wallet_name=wallet_name)
 
     for key_pair in PRIVATE_AND_PUBLIC_KEYS:
         beekeeper.api.import_key(wif_key=key_pair.private_key, wallet_name=wallet_name)

@@ -9,11 +9,9 @@ if TYPE_CHECKING:
     from beekeepy._handle import Beekeeper
 
 
-def test_api_set_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
+def test_api_set_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:  # noqa: ARG001
     """Test test_api_set_timeout will test beekeeper_api.set_timeout api call."""
     # ARRANGE
-    beekeeper.api.open(wallet_name=wallet.name)
-    beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
     bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 

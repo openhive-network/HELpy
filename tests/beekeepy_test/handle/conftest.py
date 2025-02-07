@@ -61,7 +61,7 @@ def keys_to_import() -> list[AccountCredentials]:
 def setup_wallets(beekeeper: Beekeeper) -> WalletsGeneratorT:
     @wraps(setup_wallets)
     def __setup_wallets(
-        count: int, *, import_keys: bool = True, keys_per_wallet: int = 1
+        count: int, *, import_keys: bool = True, keys_per_wallet: int = 1, lock: bool = True
     ) -> list[WalletInfoWithImportedAccounts]:
         wallets = [
             WalletInfoWithImportedAccounts(
@@ -83,6 +83,8 @@ def setup_wallets(beekeeper: Beekeeper) -> WalletsGeneratorT:
                 if import_keys:
                     for account in wallet.accounts:
                         bk.api.beekeeper.import_key(wallet_name=wallet.name, wif_key=account.private_key)
+                if lock:
+                    bk.api.beekeeper.close(wallet_name=wallet.name)
         return wallets
 
     return __setup_wallets

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 def test_api_import_key(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:
     """Test test_api_import_key will test beekeeper_api.import_key api call."""
     # ARRANGE
-    wallets = setup_wallets(1, import_keys=False, keys_per_wallet=5)
+    wallets = setup_wallets(1, import_keys=False, keys_per_wallet=5, lock=False)
     wallet = wallets[0]
 
     # ACT & ASSERT

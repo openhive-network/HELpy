@@ -163,6 +163,7 @@ def create_wallets_if_needed(
     bk.api.create(wallet_name=wallet.name, password=wallet.password)
     for keys in wallet.keys:
         bk.api.import_key(wallet_name=wallet.name, wif_key=keys.private_key)
+    bk.api.lock(wallet_name=wallet.name)
 
 
 @pytest.mark.parametrize(
