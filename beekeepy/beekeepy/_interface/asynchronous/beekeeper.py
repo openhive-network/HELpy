@@ -84,7 +84,6 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
     async def _factory(cls, *, settings: Settings | None = None) -> BeekeeperInterface:
         settings = settings or Settings()
         handle = AsynchronousBeekeeperHandle(settings=settings, logger=logger)
-        cls.__apply_existing_session_token(settings=settings, handle=handle)
         handle.run()
         return cls(handle=handle)
 
