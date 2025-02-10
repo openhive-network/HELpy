@@ -15,20 +15,19 @@ WRONG_TOKEN: Final[str] = "104fc637d5c32c271bdfdc366af5bfc8f977e2462b01877454cfd
 
 def test_api_close_session(beekeeper: Beekeeper) -> None:
     """Test test_api_close_session will test beekeeper_api.close_session api call."""
-    # ARRANGE & ACT
-    beekeeper.api.close_session()
+    # ARRANGE
+    token = beekeeper.api.create_session(salt=beekeeper.session.token).token
+
+    # ACT
+    beekeeper.api.close_session(token=token)
 
     # ASSERT
-    close_log_entry = (
-        '"id":0,"jsonrpc":"2.0","method":"beekeeper_api.close_session",'
-        f'"params":{{"token":"{beekeeper.session.token}"}}'
-    )
+    close_log_entry = '"id":0,"jsonrpc":"2.0","method":"beekeeper_api.close_session",' f'"params":{{"token":"{token}"}}'
     with pytest.raises(
         ErrorInResponseError,
-        match=f"A session attached to {beekeeper.session.token} doesn't exist",
+        match=f"A session attached to {token} doesn't exist",
     ):
-        beekeeper.api.close_session()
-
+        beekeeper.api.close_session(token=token)
     assert checkers.check_for_pattern_in_file(
         beekeeper.settings.ensured_working_directory / "stderr.log", close_log_entry
     ), "Log should have information about closing session with specific token created during create_session call."
@@ -49,19 +48,6 @@ def test_if_beekeeper_closes_after_last_session_termination(
     assert checkers.check_for_pattern_in_file(
         beekeeper.settings.ensured_working_directory / "stderr.log", "exited cleanly"
     ), "Beekeeper should be closed after last session termination."
-
-
-def test_api_close_session_double(beekeeper: Beekeeper) -> None:
-    """Test test_api_close_session will test possibility of double closing session."""
-    # ARRANGE & ACT
-    beekeeper.api.close_session()
-
-    # ASSERT
-    with pytest.raises(
-        ErrorInResponseError,
-        match=f"A session attached to {beekeeper.session.token} doesn't exist",
-    ):
-        beekeeper.api.close_session()
 
 
 @pytest.mark.parametrize("create_session", [False, True], ids=["no_session_before", "in_other_session"])
