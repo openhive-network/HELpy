@@ -53,7 +53,7 @@ class DetectableError(ContextSync[None], BeekeeperInterfaceError, ABC):
 
     def _handle_exception(self, ex: BaseException, tb: TracebackType | None) -> bool:
         if self._is_exception_handled(ex):
-            raise self
+            raise self from ex
         return super()._handle_exception(ex, tb)
 
 
