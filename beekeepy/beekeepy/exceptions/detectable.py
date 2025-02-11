@@ -17,11 +17,7 @@ class NoWalletWithSuchNameError(DetectableError):
         super().__init__(f"no such wallet with name: {wallet_name}")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return (
-            isinstance(ex, helpy_errors.ErrorInResponseError)
-            and "Assert Exception:_new_item->load_wallet_file(): Unable to open file: " in ex.error
-            and f"{self.wallet_name}.wallet" in ex.error
-        )
+        return isinstance(ex, helpy_errors.UnableToOpenWalletError)
 
 
 class WalletWithSuchNameAlreadyExistsError(DetectableError):
@@ -135,7 +131,7 @@ class InvalidWalletError(DetectableError):
         """
         self.wallet_name = wallet_name
         super().__init__(
-            f"given wllet name is invalid, only alphanumeric and '._-@' chars are allowed: `{self.wallet_name}`"
+            f"given wallet name is invalid, only alphanumeric and '._-@' chars are allowed: `{self.wallet_name}`"
         )
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
@@ -162,11 +158,7 @@ class InvalidPasswordError(DetectableError):
         super().__init__(f"given password is invalid for {self.wallet_name}")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return (
-            isinstance(ex, helpy_errors.ErrorInResponseError)
-            and "Assert Exception:false: Invalid password for wallet:" in ex.error
-            and f"{self.wallet_name}.walletrethrow" in ex.error
-        )
+        return isinstance(ex, helpy_errors.InvalidPasswordError)
 
 
 class InvalidAccountNameError(SchemaDetectableError):
