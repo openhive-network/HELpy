@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Final
 
 from helpy import ContextAsync, ContextSync
-from helpy.exceptions import ErrorInResponseError
+from helpy.exceptions import UnlockIsNotAccessibleError
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -24,9 +24,9 @@ class DelayGuardBase:
         return self._next_time_unlock is not None and self.__now() < self._next_time_unlock
 
     def _handle_exception_impl(self, ex: BaseException, _: TracebackType | None) -> bool:
-        self._exception_occured = isinstance(ex, ErrorInResponseError)
+        self._exception_occured = isinstance(ex, UnlockIsNotAccessibleError)
         self._next_time_unlock = self.__now() + self.BEEKEEPER_DELAY_TIME
-        return False
+        return self._exception_occured  # suppress to retry after delay
 
     def _handle_no_exception_impl(self) -> None:
         self._exception_occured = False
