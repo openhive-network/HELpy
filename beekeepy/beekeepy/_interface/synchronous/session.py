@@ -9,7 +9,7 @@ from beekeepy._interface.synchronous.wallet import (
     UnlockedWallet,
     Wallet,
 )
-from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout, validate_wallet_name
+from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout
 from beekeepy.exceptions import (
     InvalidatedStateByClosingSessionError,
     InvalidWalletError,
@@ -55,15 +55,13 @@ class Session(SessionInterface, StateInvalidator):
     def create_wallet(  # type: ignore[override]
         self, *, name: str, password: str | None = None
     ) -> UnlockedWalletInterface | tuple[UnlockedWalletInterface, Password]:
-        validate_wallet_name(wallet_name=name)
         with WalletWithSuchNameAlreadyExistsError(wallet_name=name), InvalidWalletError(wallet_name=name):
             create_result = self.__beekeeper.api.create(wallet_name=name, password=password, token=self.token)
         wallet = self.__construct_unlocked_wallet(name)
         return wallet if password is not None else (wallet, create_result.password)
 
     def open_wallet(self, *, name: str) -> WalletInterface:
-        validate_wallet_name(wallet_name=name)
-        with NoWalletWithSuchNameError(name):
+        with NoWalletWithSuchNameError(name), InvalidWalletError(wallet_name=name):
             self.__beekeeper.api.open(wallet_name=name, token=self.token)
         return self.__construct_wallet(name=name)
 
