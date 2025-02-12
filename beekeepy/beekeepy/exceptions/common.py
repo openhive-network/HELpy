@@ -66,20 +66,6 @@ class TimeTooBigError(BeekeepyError):
         super().__init__(f"Given time value is too big: `{time}` >= {TimeTooBigError.MAX_VALUE}.")
 
 
-class InvalidWalletNameError(BeekeepyError):
-    """Raises when specified wallet name was not matching alphanumeric and extra characters conditions."""
-
-    def __init__(self, wallet_name: str) -> None:
-        """Constructor.
-
-        Args:
-            wallet_name (str): invalid wallet name
-        """
-        super().__init__(
-            f"Given wallet name is invalid: `{wallet_name}`. Can be only alphanumeric or contain `._-@` characters."
-        )
-
-
 class DetachRemoteBeekeeperError(BeekeeperHandleError):
     """Raises when user tries to detach beekeeper that is remote."""
 

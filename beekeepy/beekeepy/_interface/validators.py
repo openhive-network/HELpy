@@ -9,7 +9,6 @@ from beekeepy.exceptions import (
     InvalidSchemaHexError,
     InvalidSchemaPrivateKeyError,
     InvalidSchemaPublicKeyError,
-    InvalidWalletNameError,
     NotPositiveTimeError,
     SchemaDetectableError,
     TimeTooBigError,
@@ -25,7 +24,6 @@ __all__ = [
     "validate_private_keys",
     "validate_public_keys",
     "validate_timeout",
-    "validate_wallet_name",
     "validate_digest",
 ]
 
@@ -62,8 +60,3 @@ def validate_timeout(time: int) -> None:
 
     if time >= TimeTooBigError.MAX_VALUE:
         raise TimeTooBigError(time=time)
-
-
-def validate_wallet_name(wallet_name: str) -> None:
-    if wallet_name_regex.match(wallet_name) is None:
-        raise InvalidWalletNameError(wallet_name=wallet_name)
