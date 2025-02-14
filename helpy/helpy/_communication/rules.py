@@ -27,6 +27,9 @@ if TYPE_CHECKING:
     from helpy.exceptions import OverseerError
 
 
+REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME: Final[str] = r"\/(?:(?:[^\/]+\/)+)([^\/]+)\.wallet"
+
+
 class UnableToAcquireDatabaseLock(OverseerRule):
     LOOKUP_MESSAGE: ClassVar[str] = "Unable to acquire database lock"
 
@@ -236,7 +239,7 @@ class WalletIsAlreadyUnlocked(OverseerRule):
 class UnableToOpenWallet(OverseerRule):
     _UNABLE_TO_OPEN_WALLET_REGEX: ClassVar[re.Pattern[str]] = re.compile(
         r"Assert Exception:_new_item->load_wallet_file\(\): "
-        r"Unable to open file: (?:\/[\w-]+)+\/([\w-]+\.wallet)(?:rethrow)?"
+        r"Unable to open file: " + REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME + r"(?:rethrow)?"
     )
 
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
@@ -253,12 +256,11 @@ class UnableToOpenWallet(OverseerRule):
         return []
 
 
-#
-
-
 class InvalidPassword(OverseerRule):
     _INVALID_PASSWORD_REGEX: ClassVar[re.Pattern[str]] = re.compile(
-        r"Assert Exception:false: Invalid password for wallet: (?:\/[\w-]+)+\/([\w-]+\.wallet)(?:rethrow)?"
+        r"Assert Exception:false: Invalid password for wallet: "
+        + REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME
+        + r"(?:rethrow)?"
     )
 
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
