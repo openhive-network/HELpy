@@ -8,14 +8,12 @@ from beekeepy._handle.beekeeper import Beekeeper as SynchronousBeekeeperHandle
 from beekeepy._handle.beekeeper import SyncRemoteBeekeeper as SynchronousRemoteBeekeeperHandle
 from beekeepy._interface.abc.packed_object import PackedSyncBeekeeper
 from beekeepy._interface.abc.synchronous.beekeeper import Beekeeper as BeekeeperInterface
+from beekeepy._interface.close_sessions_sync import close_sessions
 from beekeepy._interface.delay_guard import SyncDelayGuard
 from beekeepy._interface.settings import Settings
 from beekeepy._interface.state_invalidator import StateInvalidator
 from beekeepy._interface.synchronous.session import Session
-from beekeepy.exceptions import (
-    DetachRemoteBeekeeperError,
-    UnknownDecisionPathError,
-)
+from beekeepy.exceptions import DetachRemoteBeekeeperError, UnknownDecisionPathError
 from beekeepy.exceptions.common import InvalidatedStateByClosingBeekeeperError
 
 if TYPE_CHECKING:
@@ -33,20 +31,23 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         self.__instance = handle
         self.__guard = SyncDelayGuard()
         self.__default_session: SessionInterface | None = None
+        self.__owned_session_tokens: list[str] = []
 
     def create_session(self, *, salt: str | None = None) -> SessionInterface:  # noqa: ARG002
         session: SessionInterface | None = None
         while session is None or self.__guard.error_occured():
             with self.__guard:
-                session = self.__create_session()
-                session.get_info()
-                return session
+                return self.__create_session()
         raise UnknownDecisionPathError
 
     @property
     def session(self) -> SessionInterface:
         if self.__default_session is None:
-            self.__default_session = self.__create_session(self._get_instance().session.token, default_session=True)
+            session_token_from_handle = self._get_instance().session.token
+            self.__default_session = self.__create_session(
+                token=session_token_from_handle,
+                default_session=(session_token_from_handle == self.settings.use_existing_session),
+            )
         return self.__default_session
 
     def _get_instance(self) -> SyncRemoteBeekeeper:
@@ -54,6 +55,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @StateInvalidator.empty_call_after_invalidation(None)
     def teardown(self) -> None:
+        close_sessions(self.__instance.http_endpoint, self.__owned_session_tokens)
         if isinstance(self.__instance, SynchronousBeekeeperHandle):
             self.__instance.teardown()
         self.invalidate(InvalidatedStateByClosingBeekeeperError())
@@ -70,7 +72,10 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             guard=self.__guard,
             default_session_close_callback=(self.__manage_closed_default_session if default_session else None),
         )
+        session.get_info()
         self.register_invalidable(session)
+        if not default_session:
+            self.__owned_session_tokens.append(session.token)
         return session
 
     def __manage_closed_default_session(self) -> None:

@@ -9,6 +9,7 @@ from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper as AsynchronousRemot
 from beekeepy._interface.abc.asynchronous.beekeeper import Beekeeper as BeekeeperInterface
 from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
 from beekeepy._interface.asynchronous.session import Session
+from beekeepy._interface.close_sessions_sync import close_sessions
 from beekeepy._interface.delay_guard import AsyncDelayGuard
 from beekeepy._interface.settings import Settings
 from beekeepy._interface.state_invalidator import StateInvalidator
@@ -33,20 +34,23 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         self.__instance = handle
         self.__guard = AsyncDelayGuard()
         self.__default_session: None | SessionInterface = None
+        self.__owned_session_tokens: list[str] = []
 
     async def create_session(self, *, salt: str | None = None) -> SessionInterface:  # noqa: ARG002
         session: SessionInterface | None = None
         while session is None or self.__guard.error_occured():
             async with self.__guard:
-                session = self.__create_session()
-                await session.get_info()
-                return session
+                return await self.__create_session()
         raise UnknownDecisionPathError
 
     @property
     async def session(self) -> SessionInterface:
         if self.__default_session is None:
-            self.__default_session = self.__create_session((await self._get_instance().session).token)
+            session_token_from_handle = (await self._get_instance().session).token
+            self.__default_session = await self.__create_session(
+                token=session_token_from_handle,
+                default_session=(session_token_from_handle == self.settings.use_existing_session),
+            )
         return self.__default_session
 
     def _get_instance(self) -> AsyncRemoteBeekeeper:
@@ -54,6 +58,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @StateInvalidator.empty_call_after_invalidation(None)
     def teardown(self) -> None:
+        close_sessions(self.__instance.http_endpoint, self.__owned_session_tokens)
         if isinstance(self.__instance, AsynchronousBeekeeperHandle):
             self.__instance.teardown()
         self.invalidate(InvalidatedStateByClosingBeekeeperError())
@@ -63,14 +68,17 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             raise DetachRemoteBeekeeperError
         return self.__instance.detach()
 
-    def __create_session(self, token: str | None = None, *, default_session: bool = False) -> SessionInterface:
+    async def __create_session(self, token: str | None = None, *, default_session: bool = False) -> SessionInterface:
         session = Session(
             beekeeper=self._get_instance(),
             use_session_token=token,
             guard=self.__guard,
             default_session_close_callback=(self.__manage_closed_default_session if default_session else None),
         )
+        await session.get_info()
         self.register_invalidable(session)
+        if not default_session:
+            self.__owned_session_tokens.append(await session.token)
         return session
 
     def __manage_closed_default_session(self) -> None:
