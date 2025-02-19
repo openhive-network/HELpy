@@ -9,8 +9,9 @@ from local_tools.beekeepy.models import WalletInfo
 from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
+    from local_tools.beekeepy.account_credentials import AccountCredentials
+
     from beekeepy.handle.runnable import Beekeeper
-    from beekeepy.interfaces import AccountCredentials
 
 
 def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:

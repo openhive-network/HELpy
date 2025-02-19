@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from beekeepy._interface._sanitize import mask, sanitize
 from beekeepy._interface._suppress_api_not_found import SuppressApiNotFound
-from beekeepy._interface.account_credentials import AccountCredentials
 from beekeepy._interface.context import (
     ContextAsync,
     ContextSync,
@@ -20,7 +19,6 @@ from beekeepy._interface.stopwatch import Stopwatch, StopwatchResult
 from beekeepy._interface.url import HttpUrl, P2PUrl, Url, WsUrl
 
 __all__ = [
-    "AccountCredentials",
     "ContextAsync",
     "ContextSettingsUpdater",
     "ContextSync",

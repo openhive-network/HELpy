@@ -7,10 +7,10 @@ from local_tools.beekeepy.network import raw_http_call
 from schemas.jsonrpc import JSONRPCRequest
 
 if TYPE_CHECKING:
+    from local_tools.beekeepy.account_credentials import AccountCredentials
     from local_tools.beekeepy.models import WalletInfo
 
     from beekeepy.handle.runnable import Beekeeper
-    from beekeepy.interfaces import AccountCredentials
 
 
 def test_sign_digest_response_uniques(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:  # noqa: ARG001

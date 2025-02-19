@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from loguru import Logger
 
     from beekeepy import Settings
-    from beekeepy._interface.account_credentials import AccountCredentials
+    from local_tools.beekeepy.account_credentials import AccountCredentials
 
 
 @dataclass

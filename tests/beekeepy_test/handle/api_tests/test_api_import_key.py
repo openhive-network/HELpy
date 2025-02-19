@@ -7,10 +7,10 @@ import pytest
 from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
+    from local_tools.beekeepy.account_credentials import AccountCredentials
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
     from beekeepy.handle.runnable import Beekeeper
-    from beekeepy.interfaces import AccountCredentials
 
 
 def test_api_import_key(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:

@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+from local_tools.beekeepy.account_credentials import AccountCredentials
 
 from beekeepy.exceptions import ErrorInResponseError
-from beekeepy.interfaces import AccountCredentials
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
