@@ -2,8 +2,8 @@ stages:
   - static_code_analysis
   - build
   - tests
-  - helpy
   - beekeepy
+  - helpy
 
 workflow:
   rules:
@@ -118,8 +118,13 @@ build_helpy_wheel:
   needs:
     - job: pre_commit_checks
     - job: run_helpy_tests
+    - job: build_beekeepy_wheel
+    - job: deploy_beekeepy_wheel_to_gitlab
   variables:
     PYPROJECT_DIR: "$HELPY_DIR"
+  before_script:
+    - poetry -C "${HELPY_DIR}" remove --lock -- beekeepy
+    - poetry -C "${HELPY_DIR}" add --lock -- "beekeepy `poetry -C ${HELPY_DIR} version -s`"  # version of helpy and beekeepy are same
 
 
 build_beekeepy_wheel:
@@ -128,16 +133,12 @@ build_beekeepy_wheel:
   needs:
     - job: pre_commit_checks
     - job: run_beekeepy_tests
-    - job: build_helpy_wheel
-    - job: deploy_helpy_wheel_to_gitlab
     - job: prepare_hived_image
       artifacts: true
   variables:
     PYPROJECT_DIR: "$BEEKEEPY_DIR"
   before_script:
     - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
-    - poetry -C "${BEEKEEPY_DIR}" remove --lock -- helpy
-    - poetry -C "${BEEKEEPY_DIR}" add --lock -- "helpy `poetry -C ${BEEKEEPY_DIR} version -s`"  # version of helpy and beekeepy are same
   tags:
     - public-runner-docker
 

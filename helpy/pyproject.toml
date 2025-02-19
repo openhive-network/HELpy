@@ -20,17 +20,18 @@ source = [
   {name = "PyPI", priority = "primary"},
   {name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental"},
   {name = "gitlab-wax", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental"},
+  {name = "gitlab-beekeepy-helpy", url = "https://gitlab.syncad.com/api/v4/projects/434/packages/pypi/simple", priority = "supplemental"},
 ]
 version = "0.0.0"
 
 [tool.poetry.dependencies]
+beekeepy = { path = "../beekeepy", develop = true }
 aiohttp = "3.9.1"
 httpx = {extras = ["http2"], version = "0.23.3"}
 loguru = "0.7.2"
 python = "^3.10"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev323+e5a1ba1"
 wax = "0.3.10.dev321+1384595"
 
 [tool.poetry-dynamic-versioning]
