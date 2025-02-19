@@ -6,10 +6,10 @@ import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 from local_tools.beekeepy.models import WalletInfo
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 SPECIAL_CASES: Final[list[str]] = [".", "_", "-", "@"]
 ALLOWED_CHARS: Final[list[str]] = [chr(i) for i in range(32, 126) if chr(i).isalnum() or chr(i) in SPECIAL_CASES]

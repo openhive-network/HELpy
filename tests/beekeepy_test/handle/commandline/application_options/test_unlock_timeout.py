@@ -8,7 +8,7 @@ import pytest
 from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
 
 if TYPE_CHECKING:
-    from beekeepy._handle.beekeeper import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def check_wallet_lock(beekeeper: Beekeeper, required_status: bool) -> None:

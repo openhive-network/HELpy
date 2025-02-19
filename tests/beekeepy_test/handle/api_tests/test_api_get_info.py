@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from beekeepy._executable.defaults import BeekeeperDefaults
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_get_info(beekeeper: Beekeeper) -> None:

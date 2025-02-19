@@ -5,7 +5,7 @@ from typing import Any, Callable, Final, TypeVar
 
 from loguru import logger
 
-from beekeepy.exceptions.base import InvalidatedStateError
+from beekeepy.exceptions import InvalidatedStateError
 
 T = TypeVar("T")
 

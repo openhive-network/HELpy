@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletsGeneratorT
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_open(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:

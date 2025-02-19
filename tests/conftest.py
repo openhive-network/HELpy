@@ -7,8 +7,10 @@ from typing import AsyncIterator, Iterator
 
 import pytest
 
-import helpy
-from helpy._handles.abc.api import AbstractApi, RegisteredApisT
+from beekeepy._remote_handle.abc.api import AbstractApi, RegisteredApisT
+from beekeepy.handle.remote import RemoteSettings
+from beekeepy.interfaces import HttpUrl
+from helpy import AsyncHived, Hived
 
 
 def _convert_test_name_to_directory_name(test_name: str) -> str:
@@ -52,20 +54,20 @@ def registered_apis() -> RegisteredApisT:
 
 
 @pytest.fixture()
-def hived_http_endpoint(request: pytest.FixtureRequest) -> helpy.HttpUrl:
+def hived_http_endpoint(request: pytest.FixtureRequest) -> HttpUrl:
     raw_url = request.config.getoption("--hived-http-endpoint")
     assert raw_url is not None
     assert isinstance(raw_url, str)
-    return helpy.HttpUrl(raw_url)
+    return HttpUrl(raw_url)
 
 
 @pytest.fixture()
-def sync_node(hived_http_endpoint: helpy.HttpUrl) -> Iterator[helpy.Hived]:
-    with helpy.Hived(settings=helpy.Settings(http_endpoint=hived_http_endpoint)) as hived:
+def sync_node(hived_http_endpoint: HttpUrl) -> Iterator[Hived]:
+    with Hived(settings=RemoteSettings(http_endpoint=hived_http_endpoint)) as hived:
         yield hived
 
 
 @pytest.fixture()
-async def async_node(hived_http_endpoint: helpy.HttpUrl) -> AsyncIterator[helpy.AsyncHived]:
-    async with helpy.AsyncHived(settings=helpy.Settings(http_endpoint=hived_http_endpoint)) as hived:
+async def async_node(hived_http_endpoint: HttpUrl) -> AsyncIterator[AsyncHived]:
+    async with AsyncHived(settings=RemoteSettings(http_endpoint=hived_http_endpoint)) as hived:
         yield hived

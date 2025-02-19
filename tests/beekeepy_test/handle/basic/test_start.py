@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_proper_closing(beekeeper: Beekeeper) -> None:

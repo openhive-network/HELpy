@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
-from beekeepy._handle.beekeeper import AsyncBeekeeper as AsynchronousBeekeeperHandle
-from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper as AsynchronousRemoteBeekeeperHandle
 from beekeepy._interface.abc.asynchronous.beekeeper import Beekeeper as BeekeeperInterface
 from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
 from beekeepy._interface.asynchronous.session import Session
 from beekeepy._interface.delay_guard import AsyncDelayGuard
-from beekeepy._interface.settings import Settings
 from beekeepy._interface.state_invalidator import StateInvalidator
+from beekeepy._remote_handle.beekeeper import AsyncBeekeeper as AsynchronousRemoteBeekeeperHandle
+from beekeepy._runnable_handle.beekeeper import AsyncBeekeeper as AsynchronousBeekeeperHandle
+from beekeepy._runnable_handle.settings import Settings
 from beekeepy.exceptions import (
     DetachRemoteBeekeeperError,
     InvalidatedStateByClosingBeekeeperError,
@@ -19,16 +19,15 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._handle.beekeeper import AsyncRemoteBeekeeper
+    from beekeepy._communication.settings import CommunicationSettings
     from beekeepy._interface.abc.asynchronous.session import (
         Session as SessionInterface,
     )
-    from helpy import HttpUrl
-    from helpy._communication.settings import CommunicationSettings
+    from beekeepy._interface.url import HttpUrl
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):
-    def __init__(self, *args: Any, handle: AsyncRemoteBeekeeper, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, handle: AsynchronousRemoteBeekeeperHandle, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.__instance = handle
         self.__guard = AsyncDelayGuard()
@@ -49,7 +48,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             self.__default_session = self.__create_session((await self._get_instance().session).token)
         return self.__default_session
 
-    def _get_instance(self) -> AsyncRemoteBeekeeper:
+    def _get_instance(self) -> AsynchronousRemoteBeekeeperHandle:
         return self.__instance
 
     @StateInvalidator.empty_call_after_invalidation(None)
@@ -78,7 +77,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         self._get_instance()._clear_session()
 
     def pack(self) -> PackedAsyncBeekeeper:
-        return PackedAsyncBeekeeper(settings=self._get_instance().settings, unpack_factory=Beekeeper._remote_factory)
+        return PackedAsyncBeekeeper(settings=self.settings, unpack_factory=Beekeeper._remote_factory)
 
     @classmethod
     async def _factory(cls, *, settings: Settings | None = None) -> BeekeeperInterface:

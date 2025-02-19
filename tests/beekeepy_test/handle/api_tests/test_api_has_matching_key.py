@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy import AccountCredentials
+from beekeepy.interfaces import AccountCredentials
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_has_matching_key(beekeeper: Beekeeper, wallet: WalletInfo) -> None:

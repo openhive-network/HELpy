@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy._handles.beekeeper.api import AsyncBeekeeperApi, SyncBeekeeperApi
+from beekeepy._remote_handle.api import AsyncBeekeeperApi, SyncBeekeeperApi
 from helpy._handles.hived.api.account_by_key_api import (
     AsyncAccountByKeyApi,
     SyncAccountByKeyApi,
@@ -40,7 +40,7 @@ from helpy._handles.hived.api.wallet_bridge_api import (
 )
 
 if TYPE_CHECKING:
-    from helpy._handles.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
+    from beekeepy._remote_handle.abc.api import AbstractAsyncApi, AbstractSyncApi, RegisteredApisT
 
 
 @pytest.mark.parametrize(

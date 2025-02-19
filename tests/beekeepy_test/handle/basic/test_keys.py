@@ -11,7 +11,7 @@ from schemas.fields.basic import PrivateKey, PublicKey
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 PRIVATE_AND_PUBLIC_KEYS: Final[list[tuple[str, str]]] = [
     (

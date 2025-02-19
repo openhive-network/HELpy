@@ -172,7 +172,12 @@ files = []
 develop = true
 
 [package.dependencies]
-helpy = {path = "../helpy", develop = true}
+aiohttp = "3.9.1"
+httpx = {version = "0.23.3", extras = ["http2"]}
+loguru = "0.7.2"
+python-dateutil = "2.8.2"
+requests = "2.27.1"
+schemas = "0.0.1.dev320+f4fdcfe"
 
 [package.source]
 type = "directory"
@@ -403,11 +408,11 @@ develop = true
 
 [package.dependencies]
 aiohttp = "3.9.1"
+beekeepy = {path = "../beekeepy", develop = true}
 httpx = {version = "0.23.3", extras = ["http2"]}
 loguru = "0.7.2"
 python-dateutil = "2.8.2"
 requests = "2.27.1"
-schemas = "0.0.1.dev323+e5a1ba1"
 wax = "0.3.10.dev321+1384595"
 
 [package.source]
@@ -1055,12 +1060,12 @@ files = [
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev323+e5a1ba1"
+version = "0.0.1.dev320+f4fdcfe"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "schemas-0.0.1.dev323+e5a1ba1-py3-none-any.whl", hash = "sha256:b97546f24f54f58d71fade176e3fdfa8e113c040d35f56f04e5a567b0fa63d5f"},
+    {file = "schemas-0.0.1.dev320+f4fdcfe-py3-none-any.whl", hash = "sha256:b2106d4f429ca7aa04e723ef1072004f4705344eeeb0737a7eb6ee0248221992"},
 ]
 
 [package.dependencies]
@@ -1338,4 +1343,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4d0029868408c3a0daa442b6dae72b8263627721efd433a5003f3e51fc1e2c4c"
+content-hash = "c8080d496c9c4fca01285daa0e2c5486a61036eff6381c6a3ecef571205afb42"

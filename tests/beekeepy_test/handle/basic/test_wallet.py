@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Final
 
 import pytest
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
     from schemas.apis.beekeeper_api import ListWallets
 
 

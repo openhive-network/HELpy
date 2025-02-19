@@ -1,14 +1,41 @@
 from __future__ import annotations
 
-from typing import Final
+from typing import TYPE_CHECKING, Any, Final
 
 from beekeepy.exceptions.base import (
     BeekeeperExecutableError,
     BeekeeperFailedToStartError,
     BeekeeperHandleError,
     BeekeepyError,
+    CommunicationError,
+    CommunicationResponseT,
     InvalidatedStateError,
 )
+
+if TYPE_CHECKING:
+    from beekeepy._interface.url import Url
+
+
+class BatchRequestError(BeekeepyError):
+    """Base class for batch related errors."""
+
+
+class NothingToSendError(BatchRequestError):
+    """Raised if there is nothing to send, example.
+
+    with node.batch():
+        pass
+        # here on exit NothingToSendError will be raised
+    """
+
+
+class ResponseNotReadyError(BatchRequestError):
+    """Raised on access to response when it's not ready.
+
+    with node.batch() as x:
+        resp = x.api.some_endpoint()
+        assert resp.some_var == 1  # here ResponseNotReadyError will be raised
+    """
 
 
 class BeekeeperIsNotRunningError(BeekeeperExecutableError):
@@ -99,3 +126,31 @@ class InvalidatedStateByClosingSessionError(InvalidatedStateError):
             invalidated_by="calling close_session on session objecct",
             how_to="creating new session again by calling beekeeper.create_session",
         )
+
+
+class InvalidOptionError(BeekeepyError):
+    """Raised if invalid expression is given in config."""
+
+
+class UnknownDecisionPathError(BeekeepyError):
+    """Error created to suppress mypy error: `Missing return statement  [return]`."""
+
+
+class TimeoutExceededError(CommunicationError):
+    """Raised if exceeded time for response."""
+
+    def __init__(  # noqa: PLR0913
+        self,
+        url: str | Url[Any],
+        request: CommunicationResponseT | bytes,
+        response: CommunicationResponseT | None = None,
+        *,
+        message: str = "",
+        timeout_secs: float | None = None,
+        total_wait_time: float | None = None,
+    ) -> None:
+        message += f"\ntimeout was set to: {timeout_secs}s" if timeout_secs is not None else ""
+        message += f"\ntotal wait time: {total_wait_time}s" if total_wait_time is not None else ""
+        super().__init__(url, request, response, message=message)
+        self.timeout_secs = timeout_secs
+        self.total_wait_time = total_wait_time

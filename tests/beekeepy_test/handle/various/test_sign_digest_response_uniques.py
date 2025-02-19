@@ -9,8 +9,8 @@ from schemas.jsonrpc import JSONRPCRequest
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
 
-    from beekeepy._handle import Beekeeper
-    from helpy import AccountCredentials
+    from beekeepy.handle.runnable import Beekeeper
+    from beekeepy.interfaces import AccountCredentials
 
 
 def test_sign_digest_response_uniques(beekeeper: Beekeeper, wallet: WalletInfo, account: AccountCredentials) -> None:  # noqa: ARG001

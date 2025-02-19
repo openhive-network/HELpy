@@ -8,9 +8,9 @@ from typing import Any, Iterator
 
 from aiohttp import web
 
-from helpy import HttpUrl
-from helpy._communication.abc.http_server_observer import HttpServerObserver
-from helpy._communication.async_server import AsyncHttpServer
+from beekeepy._communication.abc.http_server_observer import HttpServerObserver
+from beekeepy.handle.runnable import AsyncHttpServer
+from beekeepy.interfaces import HttpUrl
 
 
 class DummyObserver(HttpServerObserver):

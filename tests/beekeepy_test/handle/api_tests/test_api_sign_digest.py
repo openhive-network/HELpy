@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.beekeepy.constants import DIGEST_TO_SIGN
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 PRIVATE_KEY: Final[str] = "5HwHC7y2WtCL18J9QMqX7awDe1GDsUTg7cfw734m2qFkdMQK92q"
 PUBLIC_KEY: Final[str] = "STM6jACfK3P5xYFJQvavCwz5M8KR5EW3TcmSesArj9LJVGAq85qor"

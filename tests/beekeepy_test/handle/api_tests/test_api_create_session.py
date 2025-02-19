@@ -6,10 +6,10 @@ import pytest
 from local_tools.beekeepy import checkers
 from local_tools.beekeepy.constants import MAX_BEEKEEPER_SESSION_AMOUNT
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def create_session(beekeeper: Beekeeper, salt: str) -> None:

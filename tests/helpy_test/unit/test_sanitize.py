@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Final
 
 import pytest
 
-from helpy._sanitize import mask, sanitize
+from beekeepy.interfaces import mask, sanitize
 
 if TYPE_CHECKING:
-    from helpy.exceptions import Json
+    from beekeepy.exceptions import Json
 
 text_to_remove: Final[str] = "brzeczyszczykiewicz"
 

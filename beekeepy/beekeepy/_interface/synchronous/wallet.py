@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from beekeepy._handle.beekeeper import SyncRemoteBeekeeper
-from beekeepy._handle.callbacks_protocol import SyncWalletLocked
 from beekeepy._interface.abc.synchronous.wallet import (
     UnlockedWallet as UnlockedWalletInterface,
 )
 from beekeepy._interface.abc.synchronous.wallet import (
     Wallet as WalletInterface,
 )
-from beekeepy._interface.common import WalletCommons
 from beekeepy._interface.delay_guard import SyncDelayGuard
 from beekeepy._interface.validators import validate_private_keys, validate_public_keys
+from beekeepy._interface.wallets_common import WalletCommons
+from beekeepy._remote_handle.beekeeper import Beekeeper as SyncRemoteBeekeeper
+from beekeepy._runnable_handle.callbacks_protocol import SyncWalletLocked
 from beekeepy.exceptions import (
     InvalidPasswordError,
     InvalidPrivateKeyError,
@@ -21,7 +21,6 @@ from beekeepy.exceptions import (
     NotExistingKeyError,
     UnknownDecisionPathError,
 )
-from helpy import wax
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -70,10 +69,6 @@ class Wallet(WalletCommons[SyncRemoteBeekeeper, SyncWalletLocked, SyncDelayGuard
 
 class UnlockedWallet(UnlockedWalletInterface, Wallet):
     wallet_unlocked = WalletCommons.check_wallet
-
-    @wallet_unlocked
-    def generate_key(self, *, salt: str | None = None) -> PublicKey:  # noqa: ARG002
-        return self.import_key(private_key=wax.generate_private_key())
 
     @wallet_unlocked
     def import_key(self, *, private_key: str) -> PublicKey:

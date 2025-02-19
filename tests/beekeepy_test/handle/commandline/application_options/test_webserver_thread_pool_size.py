@@ -8,7 +8,7 @@ from local_tools.beekeepy import checkers
 from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
 
 if TYPE_CHECKING:
-    from beekeepy._handle.beekeeper import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 @pytest.mark.parametrize("webserver_thread_pool_size", [1, 2, 4, 8])

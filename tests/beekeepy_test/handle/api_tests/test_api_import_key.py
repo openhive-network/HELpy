@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
-    from beekeepy._handle import Beekeeper
-    from helpy import AccountCredentials
+    from beekeepy.handle.runnable import Beekeeper
+    from beekeepy.interfaces import AccountCredentials
 
 
 def test_api_import_key(beekeeper: Beekeeper, setup_wallets: WalletsGeneratorT) -> None:

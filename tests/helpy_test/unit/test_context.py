@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from helpy import ContextAsync, ContextSync
+from beekeepy.interfaces import ContextAsync, ContextSync
 
 
 class MyCustomError(Exception):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from helpy._handles.abc.api_collection import (
+from beekeepy._remote_handle.abc.api_collection import (
     AbstractAsyncApiCollection,
     AbstractSyncApiCollection,
 )
@@ -46,7 +46,7 @@ from helpy._handles.hived.api.wallet_bridge_api import (
 )
 
 if TYPE_CHECKING:
-    from helpy._handles.abc.api import AsyncHandleT, SyncHandleT
+    from beekeepy._remote_handle.abc.api import AsyncHandleT, SyncHandleT
 
 
 class HivedAsyncApiCollection(AbstractAsyncApiCollection):

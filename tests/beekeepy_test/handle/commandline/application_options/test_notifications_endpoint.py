@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
-from helpy import HttpUrl
+from beekeepy.handle.runnable import BeekeeperArguments
+from beekeepy.interfaces import HttpUrl
 
 if TYPE_CHECKING:
-    from beekeepy._handle.beekeeper import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 @pytest.mark.parametrize(

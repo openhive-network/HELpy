@@ -6,11 +6,11 @@ import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 from local_tools.beekeepy.models import WalletInfo
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
-    from helpy import AccountCredentials
+    from beekeepy.handle.runnable import Beekeeper
+    from beekeepy.interfaces import AccountCredentials
 
 
 def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:

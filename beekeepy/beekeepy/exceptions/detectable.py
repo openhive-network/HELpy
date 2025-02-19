@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from beekeepy.exceptions import overseer as overseer_errors
 from beekeepy.exceptions.base import DetectableError, SchemaDetectableError
-from helpy import exceptions as helpy_errors
 
 
 class NoWalletWithSuchNameError(DetectableError):
@@ -17,7 +17,7 @@ class NoWalletWithSuchNameError(DetectableError):
         super().__init__(f"no such wallet with name: {wallet_name}")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, helpy_errors.UnableToOpenWalletError)
+        return isinstance(ex, overseer_errors.UnableToOpenWalletError)
 
 
 class WalletWithSuchNameAlreadyExistsError(DetectableError):
@@ -34,7 +34,7 @@ class WalletWithSuchNameAlreadyExistsError(DetectableError):
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return (
-            isinstance(ex, helpy_errors.ErrorInResponseError)
+            isinstance(ex, overseer_errors.ErrorInResponseError)
             and f"Assert Exception:!bfs::exists(wallet_filename): Wallet with name: '{self.wallet_name}' already exists"
             in ex.error
         )
@@ -53,7 +53,7 @@ class InvalidPrivateKeyError(DetectableError):
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return (
-            isinstance(ex, helpy_errors.ErrorInResponseError)
+            isinstance(ex, overseer_errors.ErrorInResponseError)
             and "Assert Exception:false: Key can't be constructed" in ex.error
         )
 
@@ -72,7 +72,7 @@ class NotExistingKeyError(DetectableError):
         super().__init__(f"cannot use key that does not exist: `{public_key}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, helpy_errors.ErrorInResponseError) and any(
+        return isinstance(ex, overseer_errors.ErrorInResponseError) and any(
             error_message in ex.error
             for error_message in [
                 "Assert Exception:false: Key not in wallet",
@@ -95,7 +95,7 @@ class MissingSTMPrefixError(DetectableError):
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return (
-            isinstance(ex, helpy_errors.ErrorInResponseError)
+            isinstance(ex, overseer_errors.ErrorInResponseError)
             and (
                 "Assert Exception:source.substr( 0, prefix.size() ) == prefix: "
                 "public key requires STM prefix, but was given "
@@ -117,7 +117,9 @@ class InvalidPublicKeyError(DetectableError):
         super().__init__(f"Given public key or keys are invalid: `{public_keys}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, helpy_errors.ErrorInResponseError) and "Assert Exception:s == sizeof(data):" in ex.error
+        return (
+            isinstance(ex, overseer_errors.ErrorInResponseError) and "Assert Exception:s == sizeof(data):" in ex.error
+        )
 
 
 class InvalidWalletError(DetectableError):
@@ -135,7 +137,7 @@ class InvalidWalletError(DetectableError):
         )
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, helpy_errors.ErrorInResponseError) and any(
+        return isinstance(ex, overseer_errors.ErrorInResponseError) and any(
             error_message in ex.error
             for error_message in [
                 "Name of wallet is incorrect. Is empty."
@@ -158,7 +160,7 @@ class InvalidPasswordError(DetectableError):
         super().__init__(f"given password is invalid for {self.wallet_name}")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, helpy_errors.InvalidPasswordError)
+        return isinstance(ex, overseer_errors.OverseerInvalidPasswordError)
 
 
 class InvalidAccountNameError(SchemaDetectableError):

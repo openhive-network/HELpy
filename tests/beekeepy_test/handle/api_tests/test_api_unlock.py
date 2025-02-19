@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 import pytest
 from local_tools.beekeepy.generators import generate_wallet_name, generate_wallet_password
 
-from helpy.exceptions import InvalidPasswordError, UnableToOpenWalletError, WalletIsAlreadyUnlockedError
+from beekeepy.exceptions import OverseerInvalidPasswordError, UnableToOpenWalletError, WalletIsAlreadyUnlockedError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_unlock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
@@ -86,5 +86,5 @@ def test_api_unlock_with_invalid_password(beekeeper: Beekeeper, setup_wallets: W
     wallet = setup_wallets(1, keys_per_wallet=0)[0]
 
     # ASSERT
-    with pytest.raises(InvalidPasswordError, match="Invalid password for wallet: wallet-0"):
+    with pytest.raises(OverseerInvalidPasswordError, match="Invalid password for wallet: wallet-0"):
         beekeeper.api.unlock(wallet_name=wallet.name, password="invalid password")  # noqa: S106

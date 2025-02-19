@@ -5,9 +5,9 @@ from typing import cast
 
 import pytest
 
-from helpy import HttpUrl, SuppressApiNotFound
-from helpy._communication.rules import ApiNotFound
-from helpy.exceptions import ApiNotFoundError, GroupedErrorsError
+from beekeepy._communication.rules import ApiNotFound
+from beekeepy.exceptions import ApiNotFoundError, GroupedErrorsError
+from beekeepy.interfaces import HttpUrl, SuppressApiNotFound
 
 
 def api_not_found_error(api: str) -> ApiNotFoundError:

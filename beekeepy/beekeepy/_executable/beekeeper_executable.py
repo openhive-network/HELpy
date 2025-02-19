@@ -10,8 +10,9 @@ from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgument
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
 from beekeepy._executable.executable import Executable
-from beekeepy._interface.settings import Settings
-from helpy import HttpUrl, KeyPair
+from beekeepy._interface.key_pair import KeyPair
+from beekeepy._interface.url import HttpUrl
+from beekeepy._runnable_handle.settings import Settings
 
 if TYPE_CHECKING:
     from loguru import Logger

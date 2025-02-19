@@ -7,7 +7,7 @@ from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArgument
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def check_log_json_rpc(log_json_rpc_path: Path) -> None:

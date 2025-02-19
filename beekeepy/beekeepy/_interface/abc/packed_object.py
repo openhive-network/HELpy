@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
 
-from beekeepy._interface.settings import Settings
-from helpy._interfaces.settings_holder import UniqueSettingsHolder
+from beekeepy._interface.settings_holder import UniqueSettingsHolder
+from beekeepy._runnable_handle.settings import Settings
 
 if TYPE_CHECKING:
     from beekeepy._interface.abc.asynchronous.beekeeper import (
@@ -12,8 +12,7 @@ if TYPE_CHECKING:
     from beekeepy._interface.abc.synchronous.beekeeper import (
         Beekeeper as SynchronousBeekeeperInterface,
     )
-    from helpy import HttpUrl
-    from helpy import Settings as HelpySettings
+    from beekeepy._interface.url import HttpUrl
 
 __all__ = [
     "PackedSyncBeekeeper",
@@ -35,8 +34,8 @@ FactoryT = TypeVar("FactoryT", bound=_SyncRemoteFactoryCallable | _AsyncRemoteFa
 class Packed(UniqueSettingsHolder[Settings], Generic[FactoryT]):
     """Allows to transfer beekeeper handle to other process."""
 
-    def __init__(self, settings: HelpySettings, unpack_factory: FactoryT) -> None:
-        super().__init__(settings=cast(Settings, settings))
+    def __init__(self, settings: Settings, unpack_factory: FactoryT) -> None:
+        super().__init__(settings=settings)
         self._unpack_factory = unpack_factory
         self._prepare_settings_for_packing()
 

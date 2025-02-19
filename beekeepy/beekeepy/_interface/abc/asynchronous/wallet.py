@@ -3,8 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from beekeepy._interface.common import ContainsWalletName
-from helpy import ContextAsync
+from beekeepy._interface.context import ContextAsync
+from beekeepy._interface.wallets_common import ContainsWalletName
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -34,9 +34,6 @@ class Wallet(ContainsWalletName, ABC):
 
 
 class UnlockedWallet(Wallet, ContextAsync["UnlockedWallet"], ABC):
-    @abstractmethod
-    async def generate_key(self, *, salt: str | None = None) -> PublicKey: ...
-
     @abstractmethod
     async def import_key(self, *, private_key: str) -> PublicKey: ...
 

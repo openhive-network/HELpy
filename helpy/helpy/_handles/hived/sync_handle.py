@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-from helpy._handles.abc.handle import AbstractSyncHandle
-from helpy._handles.batch_handle import SyncBatchHandle
+from beekeepy._remote_handle.abc.handle import AbstractSyncHandle
+from beekeepy._remote_handle.batch_handle import SyncBatchHandle
 from helpy._handles.hived.api.api_collection import (
     HivedSyncApiCollection,
 )

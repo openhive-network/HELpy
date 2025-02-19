@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
 
-from helpy._handles.abc.api import AbstractAsyncApi
+from beekeepy._remote_handle.abc.api import AbstractAsyncApi
 from helpy._interfaces.asset.asset import Hf26Asset  # noqa: TCH001
 from schemas.apis import market_history_api  # noqa: TCH001
 

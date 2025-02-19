@@ -9,9 +9,9 @@ from local_tools.beekeepy import checkers
 from loguru import logger
 
 from beekeepy import Settings
-from beekeepy._handle import Beekeeper
 from beekeepy.exceptions import BeekeeperFailedToStartError
-from helpy import HttpUrl
+from beekeepy.handle.runnable import Beekeeper
+from beekeepy.interfaces import HttpUrl
 
 
 def prepare_directory(path: Path) -> None:

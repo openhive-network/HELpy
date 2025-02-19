@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy import AccountCredentials
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
+from beekeepy.interfaces import AccountCredentials
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_remove_key(

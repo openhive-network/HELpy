@@ -3,11 +3,9 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-from helpy._handles.abc.handle import AbstractAsyncHandle
-from helpy._handles.batch_handle import AsyncBatchHandle
-from helpy._handles.hived.api.api_collection import (
-    HivedAsyncApiCollection,
-)
+from beekeepy._remote_handle.abc.handle import AbstractAsyncHandle
+from beekeepy._remote_handle.batch_handle import AsyncBatchHandle
+from helpy._handles.hived.api.api_collection import HivedAsyncApiCollection
 from helpy._handles.hived.common_helpers import HiveHandleCommonHelpers
 from helpy._interfaces.time import Time
 from helpy.exceptions import BlockWaitTimeoutError

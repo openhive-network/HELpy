@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Final
 
-from beekeepy._handle import Beekeeper
-from helpy import KeyPair
+from beekeepy._interface.key_pair import KeyPair
+from beekeepy.handle.runnable import Beekeeper
 
 if TYPE_CHECKING:
     from pathlib import Path

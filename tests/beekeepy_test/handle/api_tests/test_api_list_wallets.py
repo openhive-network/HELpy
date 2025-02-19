@@ -6,7 +6,7 @@ from local_tools.beekeepy.generators import generate_wallet_name, generate_walle
 from local_tools.beekeepy.models import WalletInfo
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_list_wallets(beekeeper: Beekeeper, wallet: WalletInfo) -> None:

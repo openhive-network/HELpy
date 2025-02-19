@@ -17,8 +17,8 @@ from local_tools.beekeepy.models import (
     WalletsGeneratorT,
 )
 
-from beekeepy._handle import Beekeeper
-from helpy import AccountCredentials
+from beekeepy.handle.runnable import Beekeeper
+from beekeepy.interfaces import AccountCredentials
 
 
 @pytest.fixture()

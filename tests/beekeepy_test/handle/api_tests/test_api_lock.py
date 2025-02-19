@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from helpy.exceptions import ErrorInResponseError
+from beekeepy.exceptions import ErrorInResponseError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import WalletInfo, WalletsGeneratorT
 
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def test_api_lock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:

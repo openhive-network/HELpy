@@ -20,7 +20,6 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._handle.beekeeper import SyncRemoteBeekeeper
     from beekeepy._interface.abc.synchronous.wallet import (
         UnlockedWallet as UnlockedWalletInterface,
     )
@@ -28,6 +27,7 @@ if TYPE_CHECKING:
         Wallet as WalletInterface,
     )
     from beekeepy._interface.delay_guard import SyncDelayGuard
+    from beekeepy._remote_handle.beekeeper import Beekeeper as SyncRemoteBeekeeper
     from schemas.apis.beekeeper_api import GetInfo
     from schemas.fields.basic import PublicKey
     from schemas.fields.hex import Signature

@@ -5,12 +5,15 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.helpy.testing_server import run_simple_server
 
-from helpy._communication.aiohttp_communicator import AioHttpCommunicator
-from helpy._communication.httpx_communicator import HttpxCommunicator
-from helpy._communication.overseers import CommonOverseer, StrictOverseer
-from helpy._communication.request_communicator import RequestCommunicator
-from helpy._communication.settings import CommunicationSettings
-from helpy.exceptions import (
+from beekeepy.communication import (
+    AioHttpCommunicator,
+    CommonOverseer,
+    CommunicationSettings,
+    HttpxCommunicator,
+    RequestCommunicator,
+    StrictOverseer,
+)
+from beekeepy.exceptions import (
     ApiNotFoundError,
     JussiResponseError,
     NullResultError,
@@ -19,8 +22,7 @@ from helpy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from helpy._communication.abc.communicator import AbstractCommunicator
-    from helpy._communication.abc.overseer import AbstractOverseer
+    from beekeepy.communication import AbstractCommunicator, AbstractOverseer
 
 
 ERRORS_TO_DETECT: Final[list[tuple[type[OverseerError], str]]] = [

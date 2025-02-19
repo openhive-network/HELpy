@@ -10,8 +10,8 @@ from local_tools.beekeepy.models import WalletInfoWithImportedAccounts
 from loguru import logger
 
 from beekeepy import Settings
-from beekeepy._handle import AsyncBeekeeper
-from helpy import AccountCredentials
+from beekeepy.handle.runnable import AsyncBeekeeper
+from beekeepy.interfaces import AccountCredentials
 
 
 async def generate_wallets_and_keys(number_of_wallets: int) -> None:

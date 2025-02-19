@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.beekeepy import checkers, waiters
 
-from helpy.exceptions import CommunicationError, ErrorInResponseError
+from beekeepy.exceptions import CommunicationError, ErrorInResponseError
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 WRONG_TOKEN: Final[str] = "104fc637d5c32c271bdfdc366af5bfc8f977e2462b01877454cfd1643196bcf1"
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from helpy._handles.abc.api import AbstractAsyncApi
+from beekeepy._remote_handle.abc.api import AbstractAsyncApi
 from schemas.apis import network_broadcast_api  # noqa: TCH001
 from schemas.transaction import Transaction  # noqa: TCH001
 

@@ -5,7 +5,7 @@ from typing import Callable
 
 import pytest
 
-from helpy import HttpUrl, P2PUrl, WsUrl
+from beekeepy.interfaces import HttpUrl, P2PUrl, WsUrl
 from tests.helpy_test.unit.constants import DEFAULT_ADDRESS, DEFAULT_PORT, URL_TYPES
 
 

@@ -17,8 +17,9 @@ from local_tools.beekeepy.models import WalletInfo
 from loguru import logger
 
 from beekeepy import Settings
-from beekeepy._handle import Beekeeper
-from helpy import KeyPair, wax
+from beekeepy.handle.runnable import Beekeeper
+from beekeepy.interfaces import KeyPair
+from helpy import wax
 
 if TYPE_CHECKING:
     from schemas.fields.basic import PrivateKey

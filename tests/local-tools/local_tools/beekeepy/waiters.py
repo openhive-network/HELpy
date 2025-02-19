@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from local_tools.beekeepy import checkers
 
 if TYPE_CHECKING:
-    from beekeepy._handle import Beekeeper
+    from beekeepy.handle.runnable import Beekeeper
 
 
 def wait_for_beekeeper_to_close(beekeeper: Beekeeper, timeout_seconds: int = 10) -> None:

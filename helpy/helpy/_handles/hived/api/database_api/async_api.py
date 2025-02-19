@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime  # noqa: TCH003
 from typing import Literal
 
-from helpy._handles.abc.api import AbstractAsyncApi
+from beekeepy._remote_handle.abc.api import AbstractAsyncApi
 from helpy._handles.hived.api.database_api.common import DatabaseApiCommons
 from helpy._interfaces.asset import Hf26Asset  # noqa: TCH001
 from schemas.apis import database_api  # noqa: TCH001

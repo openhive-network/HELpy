@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from helpy import HttpUrl, WsUrl
+from beekeepy.interfaces import HttpUrl, WsUrl
 
 URL_TYPES = type[HttpUrl] | type[WsUrl]
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
 
-from helpy._handles.abc.api import AbstractSyncApi, ApiArgumentSerialization
+from beekeepy._remote_handle.abc.api import AbstractSyncApi, ApiArgumentSerialization
 from helpy._handles.hived.api.condenser_api.common import CondenserApiCommons
 from schemas.apis import condenser_api  # noqa: TCH001
 from schemas.transaction import TransactionLegacy  # noqa: TCH001

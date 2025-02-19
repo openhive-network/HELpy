@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Literal
 
 from beekeepy._executable.arguments.arguments import Arguments
-from helpy import HttpUrl
+from beekeepy._interface.url import HttpUrl
 
 
 class BeekeeperArgumentsDefaults:

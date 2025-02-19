@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TextIO, cast
 
-from helpy import ContextSync
+from beekeepy._interface.context import ContextSync
 
 if TYPE_CHECKING:
     from pathlib import Path

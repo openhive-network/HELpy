@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from helpy._handles.abc.api import AbstractSyncApi
+from beekeepy._remote_handle.abc.api import AbstractSyncApi
 from schemas.apis import account_history_api  # noqa: TCH001
 
 

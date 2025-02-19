@@ -4,11 +4,12 @@ import socket
 from json import loads
 from typing import TYPE_CHECKING, Any
 
-from helpy import Settings
-from helpy.communicators import AioHttpCommunicator, RequestCommunicator
+from beekeepy import Settings
+from beekeepy._communication.aiohttp_communicator import AioHttpCommunicator
+from beekeepy._communication.request_communicator import RequestCommunicator
 
 if TYPE_CHECKING:
-    from helpy import HttpUrl
+    from beekeepy._interface.url import HttpUrl
     from schemas.jsonrpc import JSONRPCRequest
 
 
