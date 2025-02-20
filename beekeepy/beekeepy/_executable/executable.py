@@ -186,7 +186,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
     def generate_default_config(self) -> ConfigT:
         path_to_config = self.working_directory / (Config.DEFAULT_FILE_NAME)
         self.run(blocking=True, arguments=self.__arguments.just_dump_config())
-        temp_path_to_file = path_to_config.rename(Config.DEFAULT_FILE_NAME + ".tmp")
+        temp_path_to_file = path_to_config.rename(self.working_directory / (Config.DEFAULT_FILE_NAME + ".tmp"))
         return self.config.load(temp_path_to_file)
 
     def get_help_text(self) -> str:
