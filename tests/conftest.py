@@ -3,14 +3,11 @@ from __future__ import annotations
 import re
 import shutil
 from pathlib import Path
-from typing import AsyncIterator, Iterator
 
 import pytest
 
 from beekeepy._remote_handle.abc.api import AbstractApi, RegisteredApisT
-from beekeepy.handle.remote import RemoteSettings
 from beekeepy.interfaces import HttpUrl
-from helpy import AsyncHived, Hived
 
 
 def _convert_test_name_to_directory_name(test_name: str) -> str:
@@ -59,15 +56,3 @@ def hived_http_endpoint(request: pytest.FixtureRequest) -> HttpUrl:
     assert raw_url is not None
     assert isinstance(raw_url, str)
     return HttpUrl(raw_url)
-
-
-@pytest.fixture()
-def sync_node(hived_http_endpoint: HttpUrl) -> Iterator[Hived]:
-    with Hived(settings=RemoteSettings(http_endpoint=hived_http_endpoint)) as hived:
-        yield hived
-
-
-@pytest.fixture()
-async def async_node(hived_http_endpoint: HttpUrl) -> AsyncIterator[AsyncHived]:
-    async with AsyncHived(settings=RemoteSettings(http_endpoint=hived_http_endpoint)) as hived:
-        yield hived

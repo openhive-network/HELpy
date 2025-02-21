@@ -12,7 +12,7 @@ pre-commit run --all
 
 ## Projects
 
-1. **HELpy**: Hive Execution Layer. More information in [`helpy/README.md`](helpy/README.md)
+1. **HELpy**: Hive Execution Layer. More information in [`helpy/README.md`](../wax/wax/python/wax/helpy/README.md)
 2. **Beekeepy**: A project that depends on **HELpy**.  More information in [`beekeepy/README.md`](beekeepy/README.md)
 
 ## Installation

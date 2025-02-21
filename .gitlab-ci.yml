@@ -3,7 +3,6 @@ stages:
   - build
   - tests
   - beekeepy
-  - helpy
 
 workflow:
   rules:
@@ -15,7 +14,7 @@ workflow:
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
-  PACKAGES_TO_CHECK: "helpy/ tests/ beekeepy/"
+  PACKAGES_TO_CHECK: "tests/ beekeepy/"
   # colors:
   TXT_BLUE: "\e[1;34m"
   TXT_CLEAR: "\e[0m"
@@ -29,7 +28,6 @@ variables:
   CI_BASE_IMAGE: "registry.gitlab.syncad.com/hive/hive/ci-base-image${CI_BASE_IMAGE_TAG}"
 
   BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
-  HELPY_DIR: ${CI_PROJECT_DIR}/helpy
   LOCAL_TOOLS_DIR: ${CI_PROJECT_DIR}/tests/local-tools
 
 include:
@@ -111,22 +109,6 @@ prepare_hived_data:
   tags:
     - data-cache-storage
 
-
-build_helpy_wheel:
-  stage: helpy
-  extends: .build_wheel_template
-  needs:
-    - job: pre_commit_checks
-    - job: run_helpy_tests
-    - job: build_beekeepy_wheel
-    - job: deploy_beekeepy_wheel_to_gitlab
-  variables:
-    PYPROJECT_DIR: "$HELPY_DIR"
-  before_script:
-    - poetry -C "${HELPY_DIR}" remove --lock -- beekeepy
-    - poetry -C "${HELPY_DIR}" add --lock -- "beekeepy `poetry -C ${HELPY_DIR} version -s`"  # version of helpy and beekeepy are same
-
-
 build_beekeepy_wheel:
   stage: beekeepy
   extends: .build_wheel_template
@@ -141,8 +123,6 @@ build_beekeepy_wheel:
     - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
   tags:
     - public-runner-docker
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| BUILD |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| TESTS |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -173,56 +153,18 @@ build_beekeepy_wheel:
   tags:
     - data-cache-storage
 
-run_helpy_tests:
-  stage: helpy
-  extends: .run_tests_template
-  needs:
-  - !reference [.run_tests_template, needs]
-  - job: prepare_hived_data
-    artifacts: true
-  services:
-    - name: $HIVED_IMAGE_NAME
-      alias: hived-instance
-      variables:
-        DATA_SOURCE: "${DATA_CACHE_HIVE_PREFIX}_${HIVED_COMMIT}"
-        LOG_FILE: $CI_JOB_NAME.log
-      command: ["--replay-blockchain", "--stop-at-block=5000000"]
-  variables:
-    SUBPROJECT_TEST_TARGET: "helpy"
-    HIVED_HTTP_ENDPOINT: "http://hived-instance:8091"
-
-
 run_beekeepy_tests:
   stage: beekeepy
   extends: .run_tests_template
   variables:
     SUBPROJECT_TEST_TARGET: "beekeepy"
 
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| TESTS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| DEPLOY |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-.deploy_wheel_needs: &deploy_wheel_needs
+.deploy_wheel_needs:
   needs:
     - job: pre_commit_checks
-    - job: run_helpy_tests
-    - job: build_helpy_wheel
       artifacts: true
-
-deploy_helpy_wheel_to_gitlab:
-  stage: helpy
-  extends: .deploy_wheel_to_gitlab_template
-  <<: *deploy_wheel_needs
-  variables:
-    PYPROJECT_DIR: "${HELPY_DIR}"
-  when: on_success
-
-deploy_helpy_wheel_to_pypi:
-  extends: .deploy_wheel_to_pypi_template
-  stage: helpy
-  variables:
-    PYPROJECT_DIR: "${HELPY_DIR}"
-  <<: *deploy_wheel_needs
 
 deploy_beekeepy_wheel_to_gitlab:
   stage: beekeepy
@@ -243,5 +185,3 @@ deploy_beekeepy_wheel_to_pypi:
   variables:
     PYPROJECT_DIR: "${BEEKEEPY_DIR}"
   when: on_success
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| DEPLOY |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

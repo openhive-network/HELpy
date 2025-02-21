@@ -19,13 +19,12 @@ repository = "https://gitlab.syncad.com/hive/helpy"
 source = [
   {name = "PyPI", priority = "primary"},
   {name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental"},
-  {name = "gitlab-wax", url = "https://gitlab.syncad.com/api/v4/projects/419/packages/pypi/simple", priority = "supplemental"},
 ]
 version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-helpy = { path = "../../helpy", develop = true }
+beekeepy = { path = "../../beekeepy", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.10.0"
@@ -92,7 +91,7 @@ select = ["ALL"]
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["schemas", "wax"]
+known-first-party = ["schemas"]
 required-imports = ["from __future__ import annotations"]
 
 [tool.pytest.ini_options]
