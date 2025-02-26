@@ -22,7 +22,7 @@ class Settings(HandleSettings):
         WORKING_DIRECTORY: ClassVar[Path] = Path.cwd()
         PROPAGATE_SIGINT: ClassVar[bool] = True
         CLOSE_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=10.0)
-        INITIALIZATION_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=5.0)
+        INITIALIZATION_TIMEOUT: ClassVar[timedelta] = timedelta(seconds=30.0)
 
     working_directory: Path | None = None
     """Path, where beekeeper binary will store all it's data and logs."""
