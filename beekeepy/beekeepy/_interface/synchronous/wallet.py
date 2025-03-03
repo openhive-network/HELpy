@@ -97,9 +97,9 @@ class UnlockedWallet(UnlockedWalletInterface, Wallet):
     @wallet_unlocked
     def remove_key(self, *, key: str) -> None:
         validate_public_keys(key=key)
-        with NotExistingKeyError(public_key=key), MissingSTMPrefixError(public_key=key), InvalidPublicKeyError(
-            public_keys=key
-        ):
+        with NotExistingKeyError(public_key=key, wallet_name=self.name), MissingSTMPrefixError(
+            public_key=key
+        ), InvalidPublicKeyError(public_keys=key):
             self._beekeeper.api.remove_key(wallet_name=self.name, public_key=key, token=self.session_token)
 
     @wallet_unlocked

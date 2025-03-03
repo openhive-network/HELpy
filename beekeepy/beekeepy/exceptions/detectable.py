@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from beekeepy.exceptions.base import DetectableError, SchemaDetectableError
 from helpy import exceptions as helpy_errors
 
@@ -35,7 +37,10 @@ class WalletWithSuchNameAlreadyExistsError(DetectableError):
     def _is_exception_handled(self, ex: BaseException) -> bool:
         return (
             isinstance(ex, helpy_errors.ErrorInResponseError)
-            and f"Assert Exception:!bfs::exists(wallet_filename): Wallet with name: '{self.wallet_name}' already exists"
+            and (
+                "Assert Exception:!fc::exists( wallet_file_name ): "
+                f"Wallet with name: '{self.wallet_name}' already exists at "
+            )
             in ex.error
         )
 
@@ -72,11 +77,15 @@ class NotExistingKeyError(DetectableError):
         super().__init__(f"cannot use key that does not exist: `{public_key}`")
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
+        alternative_wallet_search = r"[\w\-\.]+"
         return isinstance(ex, helpy_errors.ErrorInResponseError) and any(
-            error_message in ex.error
+            re.search(error_message, ex.error) is not None
             for error_message in [
                 "Assert Exception:false: Key not in wallet",
-                f"Assert Exception:false: Public key {self.public_key} not found in {self.wallet_name} wallet",
+                (
+                    f"Assert Exception:false: Public key {self.public_key} not "
+                    f"found in {self.wallet_name or alternative_wallet_search} wallet"
+                ),
             ]
         )
 
@@ -138,9 +147,12 @@ class InvalidWalletError(DetectableError):
         return isinstance(ex, helpy_errors.ErrorInResponseError) and any(
             error_message in ex.error
             for error_message in [
-                "Name of wallet is incorrect. Is empty."
-                f"Name of wallet is incorrect. Name: {self.wallet_name}. Only alphanumeric and '._-@' chars are allowed"
-                f"Name of wallet is incorrect. Name: {self.wallet_name}. File creation with given name is impossible."
+                "Name of wallet is incorrect. Is empty.",
+                (
+                    f"Name of wallet is incorrect. Name: {self.wallet_name}. "
+                    "Only alphanumeric and '._-@' chars are allowed"
+                ),
+                f"Name of wallet is incorrect. Name: {self.wallet_name}. File creation with given name is impossible.",
             ]
         )
 
