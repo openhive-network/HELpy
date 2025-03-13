@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -52,7 +53,7 @@ class _DelayedResponseWrapper:
 
     def _set_response(self, **kwargs: Any) -> None:
         expected_type = super().__getattribute__("_expected_type")
-        response = get_response_model(expected_type, **kwargs)
+        response = get_response_model(expected_type, json.dumps(kwargs), "hf26")
         assert isinstance(response, JSONRPCResult), "Expected JSONRPCResult, model cannot be found."
         super().__setattr__("_response", response.result)
 
@@ -221,7 +222,7 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: 
         self.api: ApiT = api(self)
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[return-value]
 
 
 class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
@@ -240,4 +241,4 @@ class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type
     async def _async_send(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[return-value]

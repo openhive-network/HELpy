@@ -43,7 +43,7 @@ class RequestCommunicator(AbstractCommunicator):
                     headers=self._json_headers(),
                     timeout=self.settings.timeout.total_seconds(),
                 )
-                data_received = response.content.decode()
+                data_received: str = response.content.decode()
                 self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
                 return data_received  # noqa: TRY300
             except requests.Timeout:

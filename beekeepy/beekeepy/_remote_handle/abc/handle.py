@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -54,6 +55,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
     @property
     def http_endpoint(self) -> HttpUrl:  # TODO: RESOLVE APPROPRIATE SETTING HANDLE
         """Return endpoint where handle is connected to."""
+        assert self.settings.http_endpoint is not None, "Http endpoint shouldn't be None"
         return self.settings.http_endpoint
 
     @http_endpoint.setter
@@ -109,7 +111,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
     ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
         assert isinstance(response, dict), f"Expected dict as response, got: {response=}"
-        serialized_data = get_response_model(expected_type, **response)
+        serialized_data = get_response_model(expected_type, json.dumps(response), "hf26")
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 

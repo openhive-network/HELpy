@@ -14,13 +14,14 @@ from beekeepy.exceptions import BeekeepyError
 
 if TYPE_CHECKING:
     from beekeepy._interface.url import HttpUrl
-    from schemas.notifications import KnownNotificationT, Notification
+    from schemas.notifications import KnownNotificationT
 
 
 class UnhandledNotificationError(BeekeepyError):
-    def __init__(self, notification: Notification[KnownNotificationT]) -> None:
+    def __init__(self, notification: KnownNotificationT) -> None:
         super().__init__(
-            f"Notification `{notification.name}` does not have any registered method to be passed to.", notification
+            f"Notification `{notification.value.get_notification_name()}` does not have any registered method to be passed to.",  # noqa: E501
+            notification,
         )
 
 
@@ -35,8 +36,8 @@ class UniversalNotificationHandler(NotificationHandler):
             if isinstance(member_value, _NotificationHandlerWrapper):
                 self.__registered_notifications[member_value.notification_name].append(member_value)
 
-    async def handle_notification(self, notification: Notification[KnownNotificationT]) -> None:
-        if (callbacks := self.__registered_notifications.get(notification.name)) is not None:
+    async def handle_notification(self, notification: KnownNotificationT) -> None:
+        if (callbacks := self.__registered_notifications.get(notification.value.get_notification_name())) is not None:
             for callback in callbacks:
                 if callback.notification_condition(notification):
                     await callback.call(self, notification)

@@ -4,7 +4,6 @@ import json
 import re
 from abc import ABC
 from collections import defaultdict
-from datetime import datetime
 from enum import IntEnum
 from functools import partial, wraps
 from typing import (
@@ -25,15 +24,13 @@ from beekeepy._remote_handle.abc.handle import (
 from beekeepy._remote_handle.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 from schemas.fields.serializable import Serializable
-from schemas.operations.representations.legacy_representation import LegacyRepresentation
+from schemas.operations.representation_types import LegacyRepresentation
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
 
-    from schemas.jsonrpc import ExpectResultT
-
-
 P = ParamSpec("P")
+R = TypeVar("R")
 SyncHandleT: TypeAlias = AbstractSyncHandle[Any] | SyncBatchHandle[Any]
 AsyncHandleT: TypeAlias = AbstractAsyncHandle[Any] | AsyncBatchHandle[Any]
 HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
@@ -54,11 +51,10 @@ def _convert_pascal_case_to_sneak_case(pascal_case_input: str) -> str:
 
 class AbstractApi(ABC, Generic[HandleT]):
     """Base class for apis."""
-
     __registered_apis: ClassVar[RegisteredApisT] = defaultdict(lambda: defaultdict(lambda: set()))
 
     @staticmethod
-    def _get_api_name_from_method(method: Callable[P, ExpectResultT] | Callable[P, Awaitable[ExpectResultT]]) -> str:
+    def _get_api_name_from_method(method: Callable[P, R] | Callable[P, Awaitable[R]]) -> str:
         """Converts __qualname__ to api name."""
         return _convert_pascal_case_to_sneak_case(method.__qualname__.split(".")[0])
 
@@ -67,13 +63,13 @@ class AbstractApi(ABC, Generic[HandleT]):
         class JsonEncoder(json.JSONEncoder):
             def default(self, o: Any) -> Any:
                 if isinstance(o, LegacyRepresentation):
-                    return (o.type, o.value)
+                    return (o.type_, o.value)
                 if isinstance(o, Serializable):
                     return o.serialize()
                 if isinstance(o, PreconfiguredBaseModel):
                     return o.shallow_dict()
-                if isinstance(o, datetime):
-                    return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # type: ignore[no-untyped-call]
+                # if isinstance(o, datetime):
+                #     return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # noqa: ERA001
                 return super().default(o)
 
         return partial(json.dumps, cls=JsonEncoder, ensure_ascii=False)
@@ -132,15 +128,14 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def _endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
+    def _endpoint(cls, wrapped_function: Callable[P, R]) -> Callable[P, R]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)
-
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=True)
 
         @wraps(wrapped_function)
-        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
@@ -164,17 +159,14 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def _endpoint(
-        cls, wrapped_function: Callable[P, Awaitable[ExpectResultT]]
-    ) -> Callable[P, Awaitable[ExpectResultT]]:
+    def _endpoint(cls, wrapped_function: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)  # type: ignore[arg-type]
-
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=False)
 
         @wraps(wrapped_function)
-        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = await this._additional_arguments_actions(endpoint, (args, kwargs))

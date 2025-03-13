@@ -37,7 +37,7 @@ def check_dumped_keys(wallet_path: Path, extracted_keys: list[KeyPair]) -> None:
     """Check if keys has been saved in dumped {wallet_name}.keys file."""
     with wallet_path.open() as keys_file:
         keys = json.load(keys_file)
-        assert extracted_keys == keys
+        assert [key.dict() for key in extracted_keys] == keys
         assert extracted_keys == PRIVATE_AND_PUBLIC_KEYS
 
     wallet_path.unlink()
