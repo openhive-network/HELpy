@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
 import re
 from re import Pattern
-from typing import TYPE_CHECKING, Final
+from typing import Final
+
+import msgspec
 
 from beekeepy.exceptions import (
     InvalidAccountNameError,
@@ -16,9 +19,6 @@ from beekeepy.exceptions import (
 from schemas.fields.basic import AccountName, PrivateKey, PublicKey
 from schemas.fields.hex import Hex
 
-if TYPE_CHECKING:
-    from pydantic import ConstrainedStr
-
 __all__ = [
     "validate_account_names",
     "validate_private_keys",
@@ -31,11 +31,13 @@ wallet_name_regex: Final[Pattern[str]] = re.compile(r"^[a-zA-Z0-9_\._\-\@]+$")
 
 
 def _generic_kwargs_validator(
-    arguments: dict[str, str], exception: type[SchemaDetectableError], validator: type[ConstrainedStr]
+    arguments: dict[str, str], exception: type[SchemaDetectableError], validator: type[str]
 ) -> None:
-    for arg_name, arg_value in arguments.items():
-        with exception(arg_name=arg_name, arg_value=arg_value):
-            validator.validate(arg_value)
+    try:
+        for arg_value in arguments.values():
+            msgspec.json.decode(json.dumps(arg_value), type=validator)
+    except msgspec.ValidationError as error:
+        raise exception from error
 
 
 def validate_account_names(**kwargs: str) -> None:

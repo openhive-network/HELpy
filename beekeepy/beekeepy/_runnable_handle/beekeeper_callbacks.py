@@ -8,22 +8,22 @@ if TYPE_CHECKING:
     from schemas.notifications import (
         AttemptClosingWallets,
         Error,
-        Notification,
+        NotificationBase,
         OpeningBeekeeperFailed,
         Status,
-        WebserverListening,
+        WebserverListeningNotification,
     )
 
 
 class NotificationCallback(Protocol):
-    def __call__(self, notification: Notification[Any]) -> None: ...
+    def __call__(self, notification: NotificationBase) -> None: ...
 
 
 class BeekeeperNotificationCallbacks(ABC):  # noqa: B024
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-    def _http_webserver_ready(self, notification: Notification[WebserverListening]) -> None:
+    def _http_webserver_ready(self, notification: WebserverListeningNotification) -> None:
         self.__empty_handle_message(notification.value)
 
     def _handle_error(self, error: Error) -> None:

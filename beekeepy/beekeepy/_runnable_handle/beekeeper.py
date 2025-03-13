@@ -29,12 +29,13 @@ if TYPE_CHECKING:
 
     from beekeepy._executable.beekeeper_config import BeekeeperConfig
     from beekeepy._interface.key_pair import KeyPair
+
     from schemas.notifications import (
         Error,
-        Notification,
         Status,
-        WebserverListening,
+        WebserverListeningNotification,
     )
+
 
 
 EnterReturnT = TypeVar("EnterReturnT", bound=remote_beekeeper.Beekeeper | remote_beekeeper.AsyncBeekeeper)
@@ -147,15 +148,15 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
 
     def _run_application(self, settings: Settings, additional_cli_arguments: BeekeeperArguments) -> None:
         assert settings.notification_endpoint is not None
+        assert settings.http_endpoint is not None
+        assert settings.working_directory is not None
+        additional_cli_arguments_copy = copy.deepcopy(additional_cli_arguments)
+        additional_cli_arguments_copy.notifications_endpoint = settings.notification_endpoint
+        additional_cli_arguments_copy.webserver_http_endpoint = settings.http_endpoint
+        additional_cli_arguments_copy.data_dir = settings.working_directory
         self.__exec.run(
             blocking=False,
-            arguments=additional_cli_arguments.copy(
-                update={
-                    "notifications_endpoint": settings.notification_endpoint,
-                    "webserver_http_endpoint": settings.ensured_http_endpoint,
-                    "data_dir": settings.ensured_working_directory,
-                }
-            ),
+            arguments=additional_cli_arguments_copy,
             propagate_sigint=settings.propagate_sigint,
         )
 
@@ -172,7 +173,7 @@ class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
         if self.__exec.is_running():
             self.__exec.close(self._get_settings().close_timeout.total_seconds())
 
-    def _http_webserver_ready(self, notification: Notification[WebserverListening]) -> None:
+    def _http_webserver_ready(self, notification: WebserverListeningNotification) -> None:
         """It is converted by _get_http_endpoint_from_event."""
 
     def _get_http_endpoint_from_event(self) -> HttpUrl:

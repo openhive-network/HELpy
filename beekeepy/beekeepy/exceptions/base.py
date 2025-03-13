@@ -80,7 +80,7 @@ class SchemaDetectableError(DetectableError, ABC):
         super().__init__(self._error_message())
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, StrRegexError)
+        return isinstance(ex, ValueError)
 
     @abstractmethod
     def _error_message(self) -> str: ...
