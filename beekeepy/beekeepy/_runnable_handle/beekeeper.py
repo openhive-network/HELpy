@@ -58,7 +58,7 @@ class AsyncRemoteBeekeeper(remote_beekeeper.AsyncBeekeeper):
 
 class BeekeeperCommon(BeekeeperNotificationCallbacks, ABC):
     def __init__(self, *args: Any, settings: Settings, logger: Logger, **kwargs: Any) -> None:
-        super().__init__(*args, settings=settings, **kwargs)
+        super().__init__(*args, settings=settings, logger=logger, **kwargs)
         self.__exec = BeekeeperExecutable(settings, logger)
         self.__notification_server: UniversalNotificationServer | None = None
         self.__notification_event_handler: NotificationHandler | None = None

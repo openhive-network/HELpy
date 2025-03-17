@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from loguru import logger
+from loguru import logger as loguru_logger
 
 from beekeepy._communication.aiohttp_communicator import AioHttpCommunicator
 from beekeepy._communication.request_communicator import RequestCommunicator
@@ -35,6 +35,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         self,
         *args: Any,
         settings: Settings,
+        logger: Logger | None = None,
         **kwargs: Any,
     ) -> None:
         """Constructs handle to network service.
@@ -44,7 +45,7 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
             communicator: communicator class to use for communication
         """
         super().__init__(*args, settings=settings, **kwargs)
-        self.__logger = self.__configure_logger()
+        self.__logger = self.__configure_logger(logger)
         self.__overseer = self.settings.get_overseer(
             communicator=(self.settings.try_get_communicator_instance() or self._get_recommended_communicator())
         )
@@ -112,9 +113,9 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
-    def __configure_logger(self) -> Logger:
+    def __configure_logger(self, logger: Logger | None) -> Logger:
         # credit for lazy=True: https://github.com/Delgan/loguru/issues/402#issuecomment-2028011786
-        return logger.opt(lazy=True).bind(**self._logger_extras())
+        return (logger or loguru_logger).opt(lazy=True).bind(**self._logger_extras())
 
     def teardown(self) -> None:
         self._overseer.teardown()
