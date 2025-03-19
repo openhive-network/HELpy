@@ -3,9 +3,10 @@ from __future__ import annotations
 from threading import Event
 from typing import TYPE_CHECKING, Any
 
+from loguru import logger
+
 from beekeepy._interface.url import HttpUrl
 from beekeepy._runnable_handle.notification_handler_base import BeekeeperNotificationHandler
-from loguru import logger
 
 if TYPE_CHECKING:
     from beekeepy._runnable_handle.beekeeper_callbacks import BeekeeperNotificationCallbacks

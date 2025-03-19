@@ -23,6 +23,10 @@ from beekeepy._remote_handle.abc.handle import (
 )
 from beekeepy._remote_handle.batch_handle import AsyncBatchHandle, SyncBatchHandle
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
+from schemas.fields.assets import AssetBase
+from schemas.fields.hive_datetime import HiveDateTime
+from schemas.fields.hive_int import HiveInt
+from schemas.fields.resolvables import JsonString
 from schemas.fields.serializable import Serializable
 from schemas.operations.representation_types import LegacyRepresentation
 
@@ -51,6 +55,7 @@ def _convert_pascal_case_to_sneak_case(pascal_case_input: str) -> str:
 
 class AbstractApi(ABC, Generic[HandleT]):
     """Base class for apis."""
+
     __registered_apis: ClassVar[RegisteredApisT] = defaultdict(lambda: defaultdict(lambda: set()))
 
     @staticmethod
@@ -61,13 +66,21 @@ class AbstractApi(ABC, Generic[HandleT]):
     @classmethod
     def json_dumps(cls) -> Callable[[Any], str]:
         class JsonEncoder(json.JSONEncoder):
-            def default(self, o: Any) -> Any:
+            def default(self, o: Any) -> Any:  # noqa: PLR0911
                 if isinstance(o, LegacyRepresentation):
                     return (o.type_, o.value)
                 if isinstance(o, Serializable):
                     return o.serialize()
                 if isinstance(o, PreconfiguredBaseModel):
                     return o.shallow_dict()
+                if isinstance(o, HiveInt):
+                    return o.value
+                if isinstance(o, HiveDateTime):
+                    return o.__str__()
+                if isinstance(o, JsonString):
+                    return o.encode()
+                if isinstance(o, AssetBase):
+                    return o.as_serialized_nai()
                 # if isinstance(o, datetime):
                 #     return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # noqa: ERA001
                 return super().default(o)

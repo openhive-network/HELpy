@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from abc import ABC, abstractmethod
 from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any, TypeVar, cast
@@ -29,13 +30,11 @@ if TYPE_CHECKING:
 
     from beekeepy._executable.beekeeper_config import BeekeeperConfig
     from beekeepy._interface.key_pair import KeyPair
-
     from schemas.notifications import (
         Error,
         Status,
         WebserverListeningNotification,
     )
-
 
 
 EnterReturnT = TypeVar("EnterReturnT", bound=remote_beekeeper.Beekeeper | remote_beekeeper.AsyncBeekeeper)

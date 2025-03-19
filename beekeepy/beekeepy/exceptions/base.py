@@ -3,8 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from pydantic import StrRegexError
-
 from beekeepy._interface.context import ContextSync
 
 if TYPE_CHECKING:

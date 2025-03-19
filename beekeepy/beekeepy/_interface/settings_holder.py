@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import copy
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-import copy
 from typing import TYPE_CHECKING, Any
 
 from beekeepy._interface.context_settings_updater import ContextSettingsUpdater, SettingsT
@@ -40,7 +40,7 @@ class _SettingsHolderBase(ABC, ContextSettingsUpdater[SettingsT]):
         return self.__settings
 
     def _get_copy_of_settings(self) -> SettingsT:
-        return copy.deepcopy(self)
+        return copy.deepcopy(self.__settings)
 
     @abstractmethod
     def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...
@@ -86,4 +86,4 @@ class UniqueSettingsHolder(_SettingsHolderBase[SettingsT]):
     """Deriving after this class will perform copy of passed settings (object is not shared)."""
 
     def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT:
-        return copy.deepcopy(settings)
+        return copy.copy(settings)

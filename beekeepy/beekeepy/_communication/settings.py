@@ -12,6 +12,7 @@ from schemas.decoders import get_hf26_decoder
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
     from typing_extensions import Self
 
 
@@ -25,6 +26,7 @@ class CommunicationSettings(PreconfiguredBaseModel):
         TIMEOUT: ClassVar[timedelta] = timedelta(seconds=5)
         PERIOD_BETWEEN_RETRIES: ClassVar[timedelta] = timedelta(seconds=0.2)
         RETRIES: ClassVar[int] = 5
+
         @staticmethod
         def default_factory(env_name: str, default_factory: Callable[[str | None], Any]) -> Any:
             env_value = environ.get(env_name)
