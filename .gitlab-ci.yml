@@ -15,7 +15,10 @@ workflow:
 
 variables:
   GIT_STRATEGY: clone
-  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_DEPTH: 1
+  GIT_SUBMODULE_STRATEGY: none
+  GIT_SUBMODULE_DEPTH: 1
+
   PACKAGES_TO_CHECK: "tests/ beekeepy/"
   # colors:
   TXT_BLUE: "\e[1;34m"
@@ -83,6 +86,7 @@ prepare_hived_image:
   needs: []
   stage: build
   variables:
+    GIT_SUBMODULE_STRATEGY: recursive
     SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
     REGISTRY_USER: "$HIVED_CI_IMGBUILDER_USER"
     REGISTRY_PASS: $HIVED_CI_IMGBUILDER_PASSWORD
@@ -99,6 +103,7 @@ prepare_hived_data:
       artifacts: true
   stage: build
   variables:
+    GIT_SUBMODULE_STRATEGY: normal
     SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
     BLOCK_LOG_SOURCE_DIR: $BLOCK_LOG_SOURCE_DIR_5M
     CONFIG_INI_SOURCE: "$CI_PROJECT_DIR/hive/docker/config_5M.ini"
