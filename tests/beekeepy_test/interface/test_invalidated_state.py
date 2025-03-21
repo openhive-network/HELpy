@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from beekeepy import Session, Wallet
 
 
-@pytest.fixture()
+@pytest.fixture
 def beekeepy_interfaces(settings: SettingsFactory) -> Iterator[tuple[Beekeeper, Session, Wallet]]:
     bk = Beekeeper.factory(settings=settings())
     session = bk.create_session()

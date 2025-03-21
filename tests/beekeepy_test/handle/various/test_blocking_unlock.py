@@ -22,7 +22,7 @@ AES_DECRYPTION_ERROR: Final[str] = "Invalid password for wallet"
 WALLET_UNACCESSIBLE_ERROR: Final[str] = "Assert Exception:false: unlock is not accessible"
 
 
-@pytest.fixture()
+@pytest.fixture
 def beekeeper_not_started(settings_with_logger: SettingsLoggerFactory) -> Iterator[AsyncBeekeeper]:
     incoming_settings, logger = settings_with_logger()
     bk = AsyncBeekeeper(settings=incoming_settings, logger=logger)
@@ -33,13 +33,13 @@ def beekeeper_not_started(settings_with_logger: SettingsLoggerFactory) -> Iterat
         bk.teardown()
 
 
-@pytest.fixture()
+@pytest.fixture
 async def beekeeper(beekeeper_not_started: AsyncBeekeeper) -> AsyncIterator[AsyncBeekeeper]:
     async with beekeeper_not_started as bk:
         yield bk
 
 
-@pytest.fixture()
+@pytest.fixture
 async def wallet(beekeeper: AsyncBeekeeper) -> WalletInfo:
     name, password = default_wallet_credentials()
     await beekeeper.api.create(wallet_name=name, password=password)

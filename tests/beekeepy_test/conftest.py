@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from loguru import Logger
 
 
-@pytest.fixture()
+@pytest.fixture
 def settings(working_directory: Path) -> SettingsFactory:
     @wraps(settings)
     def _factory(settings_update: Settings | None = None) -> Settings:
@@ -28,7 +28,7 @@ def settings(working_directory: Path) -> SettingsFactory:
     return _factory
 
 
-@pytest.fixture()
+@pytest.fixture
 def settings_with_logger(request: pytest.FixtureRequest, settings: SettingsFactory) -> Iterator[SettingsLoggerFactory]:
     handlers_to_remove = []
 

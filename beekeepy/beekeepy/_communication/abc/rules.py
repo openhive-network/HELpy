@@ -76,7 +76,7 @@ class OverseerRule(ABC):
         assert isinstance(self.request, dict), f"self.request is not a dict, nor list, but is `{type(self.request)}`"
         return self.request
 
-    def _construct_exception(  # noqa: PLR0913
+    def _construct_exception(
         self,
         error_cls: type[OverseerError],
         response: Json | list[Json] | Exception,

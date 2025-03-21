@@ -20,7 +20,7 @@ from local_tools.beekeepy.models import (
 from beekeepy.handle.runnable import Beekeeper
 
 
-@pytest.fixture()
+@pytest.fixture
 def beekeeper_not_started(settings_with_logger: SettingsLoggerFactory) -> Iterator[Beekeeper]:
     incoming_settings, logger = settings_with_logger()
     bk = Beekeeper(settings=incoming_settings, logger=logger)
@@ -31,20 +31,20 @@ def beekeeper_not_started(settings_with_logger: SettingsLoggerFactory) -> Iterat
         bk.teardown()
 
 
-@pytest.fixture()
+@pytest.fixture
 def beekeeper(beekeeper_not_started: Beekeeper) -> Iterator[Beekeeper]:
     with beekeeper_not_started as bk:
         yield bk
 
 
-@pytest.fixture()
+@pytest.fixture
 def wallet(beekeeper: Beekeeper) -> WalletInfo:
     name, password = default_wallet_credentials()
     beekeeper.api.create(wallet_name=name, password=password)
     return WalletInfo(name=name, password=password)
 
 
-@pytest.fixture()
+@pytest.fixture
 def account(beekeeper: Beekeeper, wallet: WalletInfo) -> AccountCredentials:
     acc = AccountCredentials.create()
     beekeeper.api.import_key(wallet_name=wallet.name, wif_key=acc.private_key)
@@ -56,7 +56,7 @@ def keys_to_import() -> list[AccountCredentials]:
     return AccountCredentials.create_multiple(10)
 
 
-@pytest.fixture()
+@pytest.fixture
 def setup_wallets(beekeeper: Beekeeper) -> WalletsGeneratorT:
     @wraps(setup_wallets)
     def __setup_wallets(

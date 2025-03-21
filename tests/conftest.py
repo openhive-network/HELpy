@@ -44,13 +44,13 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def registered_apis() -> RegisteredApisT:
     """Return registered methods."""
     return AbstractApi._get_registered_methods()
 
 
-@pytest.fixture()
+@pytest.fixture
 def hived_http_endpoint(request: pytest.FixtureRequest) -> HttpUrl:
     raw_url = request.config.getoption("--hived-http-endpoint")
     assert raw_url is not None

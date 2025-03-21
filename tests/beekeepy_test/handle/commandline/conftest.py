@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from local_tools.beekeepy.models import SettingsLoggerFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def beekeeper_exe(settings_with_logger: SettingsLoggerFactory) -> BeekeeperExecutable:
     incoming_settings, logger = settings_with_logger()
     return BeekeeperExecutable(settings=incoming_settings, logger=logger)
