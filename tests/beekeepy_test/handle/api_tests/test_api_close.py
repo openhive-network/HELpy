@@ -51,8 +51,8 @@ def test_api_close_double_close(
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ASSERT
-    with pytest.raises(ErrorInResponseError, match=f"Wallet not found: {wallet.name}"):
-        beekeeper.api.close(wallet_name=wallet.name)
+    # According to behavior change of Beekeeper, it should not throw
+    beekeeper.api.close(wallet_name=wallet.name)
 
 
 def test_api_close_not_existing_wallet(beekeeper: Beekeeper) -> None:
@@ -61,5 +61,5 @@ def test_api_close_not_existing_wallet(beekeeper: Beekeeper) -> None:
     wallet = WalletInfo(password=generate_wallet_password(), name=generate_wallet_name())
 
     # ACT & ASSERT
-    with pytest.raises(ErrorInResponseError, match=f"Wallet not found: {wallet.name}"):
-        beekeeper.api.close(wallet_name=wallet.name)
+    # According to behavior change of Beekeeper, it should not throw
+    beekeeper.api.close(wallet_name=wallet.name)
