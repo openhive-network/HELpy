@@ -41,7 +41,7 @@ class Config(BaseModel):
                     config_name, config_value = line.split("=")
                     member_name = cls._convert_config_name_to_member_name(config_name)
                     member_type = fields[member_name].annotation
-                    if isinstance(member_type, UnionType) and get_args(member_type)[-1] == type(None):
+                    if isinstance(member_type, UnionType) and get_args(member_type)[-1] is type(None):
                         member_type = get_args(member_type)[0]
                     values_to_write[member_name] = cls._convert_config_value_to_member_value(
                         config_value, expected=member_type
@@ -89,7 +89,7 @@ class Config(BaseModel):
         if expected == Url:
             return Url(config_value)
 
-        if expected == bool:
+        if expected is type(bool):
             cv_lower = config_value.lower()
             if cv_lower == "yes":
                 return True
