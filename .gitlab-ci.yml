@@ -4,6 +4,8 @@ stages:
   - tests
   - beekeepy
 
+
+
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -23,24 +25,18 @@ variables:
   BLOCK_LOG_SOURCE_DIR_5M: /blockchain/block_log_5m
   BLOCK_LOG_SOURCE_DIR_MIRRORNET_5M: /blockchain/block_log_5m_mirrornet
 
-  # uses registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu22.04-10
-  CI_BASE_IMAGE_TAG: "@sha256:080b16fd53013aeb9b89b00a8dfc90fecf886173f46448b05f45cee376c43330"
-  CI_BASE_IMAGE: "registry.gitlab.syncad.com/hive/hive/ci-base-image${CI_BASE_IMAGE_TAG}"
-
   BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
   LOCAL_TOOLS_DIR: ${CI_PROJECT_DIR}/tests/local-tools
 
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
-    ref: ed702f86d3a1ae567b2d2e1d0d7240a187223964
+    ref: 2f66491fa87527714829792959fce84cd94ecde3
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
-  - project: 'hive/common-ci-configuration'
-    # This should be the same version of Common CI defined in /hive/scripts/ci-helpers/prepare_data_image_job.yml
-    ref: 682ba2e16cfc4ef192478d2d21c4b5a52bbd4678
-    file: '/templates/python_projects.gitlab-ci.yml'
+  # DO NOT include ccc here. It will be indirectly included by above yaml file.
+  #- project: 'hive/common-ci-configuration'
 
-image: ${CI_BASE_IMAGE}
+image: ${PYTHON_IMAGE}
 
 default:
   tags:
