@@ -57,7 +57,7 @@ class SyncDelayGuard(DelayGuardBase, ContextSync["SyncDelayGuard"]):
 
 class AsyncDelayGuard(DelayGuardBase, ContextAsync["AsyncDelayGuard"]):
     async def _aenter(self) -> AsyncDelayGuard:
-        while self._waiting_should_continue():
+        while self._waiting_should_continue():  # noqa: ASYNC110
             await asyncio.sleep(self._wait_time)
         return self
 

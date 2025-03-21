@@ -85,7 +85,7 @@ class AsyncHttpServer(ContextAsync[Self]):  # type: ignore[misc]
         await self.__site.start()
         self.__running = True
         try:
-            while self.__running:
+            while self.__running:  # noqa: ASYNC110
                 await asyncio.sleep(time_between_checks_is_server_running)
         finally:
             await self.__site.stop()
