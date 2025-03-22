@@ -1,11 +1,21 @@
 from __future__ import annotations
 
-from beekeepy._remote_handle.abc.api import AbstractAsyncApi, AbstractSyncApi, AsyncHandleT
-from beekeepy._remote_handle.abc.api_collection import AbstractAsyncApiCollection, AbstractSyncApiCollection
-from beekeepy._remote_handle.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
-from beekeepy._remote_handle.batch_handle import AsyncBatchHandle, SyncBatchHandle
-from beekeepy._remote_handle.beekeeper import AsyncBeekeeper, Beekeeper
-from beekeepy._remote_handle.settings import Settings as RemoteSettings
+from beekeepy._apis.abc import (
+    AbstractAsyncApi,
+    AbstractAsyncApiCollection,
+    AbstractSyncApi,
+    AbstractSyncApiCollection,
+    RegisteredApisT,
+)
+from beekeepy._remote_handle import (
+    AbstractAsyncHandle,
+    AbstractSyncHandle,
+    AsyncBatchHandle,
+    AsyncBeekeeper,
+    Beekeeper,
+    RemoteHandleSettings,
+    SyncBatchHandle,
+)
 
 __all__ = [
     "AbstractAsyncApi",
@@ -16,8 +26,8 @@ __all__ = [
     "AbstractSyncHandle",
     "AsyncBatchHandle",
     "AsyncBeekeeper",
-    "AsyncHandleT",
     "Beekeeper",
-    "RemoteSettings",
+    "RegisteredApisT",
+    "RemoteHandleSettings",
     "SyncBatchHandle",
 ]

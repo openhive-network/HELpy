@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Literal
 import pytest
 from local_tools.beekeepy import checkers
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
+from beekeepy.handle.runnable import BeekeeperArguments
 
 if TYPE_CHECKING:
-    from beekeepy._executable.beekeeper_executable import (
+    from beekeepy.handle.runnable import (
         BeekeeperExecutable,
     )
 
@@ -19,9 +19,10 @@ def test_backtrace(backtrace: Literal["yes", "no"], beekeeper_exe: BeekeeperExec
     """Test will check command line flag --backtrace."""
     # ARRAGNE & ACT
 
-    with beekeeper_exe.run(
+    with beekeeper_exe.restore_arguments(
+        BeekeeperArguments(data_dir=beekeeper_exe.working_directory, backtrace=backtrace)
+    ), beekeeper_exe.run(
         blocking=False,
-        arguments=BeekeeperArguments(data_dir=beekeeper_exe.working_directory, backtrace=backtrace),
     ):
         time.sleep(0.1)
         # ASSERT

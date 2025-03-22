@@ -8,12 +8,12 @@ from local_tools.beekeepy.generators import default_wallet_credentials
 from local_tools.beekeepy.models import SettingsLoggerFactory, WalletInfo
 from local_tools.beekeepy.network import async_raw_http_call
 
-from beekeepy._interface.delay_guard import DelayGuardBase
 from beekeepy.handle.runnable import AsyncBeekeeper
+from beekeepy.interfaces import DelayGuardBase
 from schemas.jsonrpc import JSONRPCRequest
 
 if TYPE_CHECKING:
-    from beekeepy._interface.url import HttpUrl as Url
+    from beekeepy.interfaces import HttpUrl as Url
 
 
 # We have 500ms time period protection on ulocking wallet.

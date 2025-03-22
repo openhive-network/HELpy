@@ -6,8 +6,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from beekeepy import exceptions
-from beekeepy._interface.context import ContextAsync, ContextSync, EnterReturnT
-from beekeepy._remote_handle.build_json_rpc_call import build_json_rpc_call
+from beekeepy._apis.abc import AsyncSendable, SyncSendable
+from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
+from beekeepy._utilities.context import ContextAsync, ContextSync, EnterReturnT
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
@@ -15,8 +16,7 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self
 
-    from beekeepy._communication.abc.overseer import AbstractOverseer
-    from beekeepy._interface.url import HttpUrl
+    from beekeepy._communication import AbstractOverseer, HttpUrl
 
 
 class _DelayedResponseWrapper:
@@ -207,7 +207,7 @@ OwnerT = TypeVar("OwnerT")
 ApiFactory = Callable[[OwnerT], ApiT]
 
 
-class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
+class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], SyncSendable, Generic[ApiT]):  # type: ignore[type-arg]
     def __init__(
         self,
         url: HttpUrl,
@@ -224,7 +224,7 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: 
         return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
 
 
-class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
+class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], AsyncSendable, Generic[ApiT]):  # type: ignore[type-arg]
     def __init__(
         self,
         url: HttpUrl,

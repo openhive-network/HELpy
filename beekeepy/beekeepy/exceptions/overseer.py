@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Sequence
 from beekeepy.exceptions.base import BeekeepyError, CommunicationResponseT, Json, OverseerError
 
 if TYPE_CHECKING:
-    from beekeepy._interface.url import Url
+    from beekeepy._communication import Url
 
 
 class UnableToAcquireDatabaseLockError(OverseerError):
@@ -110,7 +110,7 @@ class ErrorInResponseError(OverseerError):
 
 
 class GroupedErrorsError(BeekeepyError):
-    def __init__(self, exceptions: Sequence[Exception]) -> None:
+    def __init__(self, exceptions: Sequence[BaseException]) -> None:
         self.exceptions = list(exceptions)
 
     def get_exception_for(self, *, request_id: int) -> OverseerError | None:

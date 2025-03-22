@@ -3,15 +3,15 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, cast
 
-from beekeepy._communication.settings import CommunicationSettings
+from beekeepy._communication import CommunicationSettings
 from beekeepy._interface.context import ContextAsync
-from beekeepy._interface.context_settings_updater import ContextSettingsUpdater
-from beekeepy._runnable_handle.settings import Settings
+from beekeepy._utilities.context import ContextAsync
+from beekeepy._utilities.context_settings_updater import ContextSettingsUpdater
 
 if TYPE_CHECKING:
+    from beekeepy._communication import HttpUrl
     from beekeepy._interface.abc.asynchronous.session import Session
     from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
-    from beekeepy._interface.url import HttpUrl
 
 
 class Beekeeper(ContextAsync["Beekeeper"], ContextSettingsUpdater[CommunicationSettings], ABC):

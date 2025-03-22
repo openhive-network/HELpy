@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from typing import Final
 
-from beekeepy._interface.key_pair import KeyPair
+from beekeepy.interfaces import KeyPair
 
 ACCOUNTS_DATA: Final[list[dict[str, str]]] = [
     {

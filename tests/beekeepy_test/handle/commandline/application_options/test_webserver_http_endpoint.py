@@ -7,8 +7,8 @@ import pytest
 import requests
 from local_tools.beekeepy.network import get_port
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
-from beekeepy._interface.url import HttpUrl
+from beekeepy.handle.runnable import BeekeeperArguments
+from beekeepy.interfaces import HttpUrl
 from schemas.apis import beekeeper_api
 from schemas.jsonrpc import get_response_model
 

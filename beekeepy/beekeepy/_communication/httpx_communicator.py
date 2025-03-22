@@ -11,8 +11,8 @@ from beekeepy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
     from beekeepy._communication.settings import CommunicationSettings
-    from beekeepy._interface.stopwatch import StopwatchResult
-    from beekeepy._interface.url import HttpUrl
+    from beekeepy._communication.url import HttpUrl
+    from beekeepy._utilities.stopwatch import StopwatchResult
 
 ClientTypes = httpx.AsyncClient | httpx.Client
 

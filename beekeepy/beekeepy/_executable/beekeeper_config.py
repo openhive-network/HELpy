@@ -4,9 +4,9 @@ from pathlib import Path  # noqa: TCH003
 
 from pydantic import Field
 
+from beekeepy._communication import HttpUrl, WsUrl
+from beekeepy._executable.abc.config import Config
 from beekeepy._executable.defaults import BeekeeperDefaults, ExportKeysWalletParams
-from beekeepy._interface.config import Config
-from beekeepy._interface.url import HttpUrl, WsUrl
 
 
 def http_webserver_default() -> HttpUrl:

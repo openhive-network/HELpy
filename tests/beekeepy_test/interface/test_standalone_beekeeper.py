@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import os
 import sys
 import time
@@ -30,8 +29,7 @@ def verify_beekeeper_status(path_or_pid: Path | int, alive: bool) -> int:
     pid: int | None = None
     if isinstance(path_or_pid, Path):
         assert path_or_pid.exists(), f"Beekeeper started too slow, missing file: {path_or_pid.as_posix()}"
-        with path_or_pid.open("r") as rfile:
-            pid = int(json.load(rfile).get("pid", -1))
+        pid = int(path_or_pid.read_text().strip())
     else:
         pid = path_or_pid
 
@@ -45,7 +43,7 @@ def test_standalone_beekeeper(working_directory: Path) -> None:
     path_to_resource_directory = Path(__file__).resolve().parent / "resources"
     path_to_script = path_to_resource_directory / "standalone_beekeeper_by_args.py"
     path_to_working_directory = working_directory / "wdir"
-    path_to_pid_file = path_to_working_directory / "beekeeper.pid"
+    path_to_pid_file = path_to_working_directory / "pid.txt"
 
     # ACT & ASSERT
     run_python_script(

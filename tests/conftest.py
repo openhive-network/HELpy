@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from beekeepy._remote_handle.abc.api import AbstractApi, RegisteredApisT
+from beekeepy.handle.remote import AbstractSyncApi, RegisteredApisT
 from beekeepy.interfaces import HttpUrl
 
 

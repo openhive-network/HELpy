@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
+from beekeepy.handle.runnable import BeekeeperArguments
 
 if TYPE_CHECKING:
     from beekeepy.handle.runnable import Beekeeper

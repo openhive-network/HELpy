@@ -10,8 +10,8 @@ from beekeepy._interface.asynchronous.session import Session
 from beekeepy._interface.delay_guard import AsyncDelayGuard
 from beekeepy._interface.state_invalidator import StateInvalidator
 from beekeepy._remote_handle.beekeeper import AsyncBeekeeper as AsynchronousRemoteBeekeeperHandle
-from beekeepy._runnable_handle.beekeeper import AsyncBeekeeper as AsynchronousBeekeeperHandle
-from beekeepy._runnable_handle.settings import Settings
+from beekeepy._utilities.delay_guard import AsyncDelayGuard
+from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
     DetachRemoteBeekeeperError,
     InvalidatedStateByClosingBeekeeperError,
@@ -19,11 +19,10 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._communication.settings import CommunicationSettings
+    from beekeepy._communication import CommunicationSettings, HttpUrl
     from beekeepy._interface.abc.asynchronous.session import (
         Session as SessionInterface,
     )
-    from beekeepy._interface.url import HttpUrl
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):

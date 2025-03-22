@@ -3,8 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from beekeepy._interface.context import ContextSync
 from beekeepy._interface.wallets_common import ContainsWalletName
+from beekeepy._utilities.context import ContextSync
 from schemas.fields.basic import PublicKey
 
 if TYPE_CHECKING:

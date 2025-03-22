@@ -5,36 +5,40 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from loguru import logger as loguru_logger
 
-from beekeepy._communication.aiohttp_communicator import AioHttpCommunicator
-from beekeepy._communication.request_communicator import RequestCommunicator
-from beekeepy._interface.context import SelfContextAsync, SelfContextSync
-from beekeepy._interface.settings_holder import UniqueSettingsHolder
-from beekeepy._interface.stopwatch import Stopwatch
-from beekeepy._remote_handle.build_json_rpc_call import build_json_rpc_call
-from beekeepy._remote_handle.settings import Settings
+from beekeepy._apis.abc import (
+    AbstractAsyncApiCollection,
+    AbstractSyncApiCollection,
+)
+from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
+from beekeepy._communication import AioHttpCommunicator, RequestCommunicator
+from beekeepy._remote_handle.settings import RemoteHandleSettings
+from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
+from beekeepy._utilities.context import SelfContextAsync, SelfContextSync
+from beekeepy._utilities.settings_holder import UniqueSettingsHolder
+from beekeepy._utilities.stopwatch import Stopwatch
 from beekeepy.exceptions import CommunicationError
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
 if TYPE_CHECKING:
     from loguru import Logger
 
-    from beekeepy._communication.abc.communicator import AbstractCommunicator
-    from beekeepy._communication.abc.overseer import AbstractOverseer
-    from beekeepy._interface.url import HttpUrl
-    from beekeepy._remote_handle.batch_handle import AsyncBatchHandle, SyncBatchHandle
+    from beekeepy._communication import AbstractCommunicator, AbstractOverseer, HttpUrl
+    from beekeepy._remote_handle.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from beekeepy.exceptions import Json
 
+RemoteSettingsT = TypeVar("RemoteSettingsT", bound=RemoteHandleSettings)
 
-ApiT = TypeVar("ApiT")
+
+ApiT = TypeVar("ApiT", bound=AbstractAsyncApiCollection | AbstractSyncApiCollection)
 
 
-class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
+class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteSettingsT, ApiT]):
     """Provides basic interface for all network handles."""
 
     def __init__(
         self,
         *args: Any,
-        settings: Settings,
+        settings: RemoteSettingsT,
         logger: Logger | None = None,
         **kwargs: Any,
     ) -> None:
@@ -62,6 +66,10 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         self.logger.debug(f"setting http endpoint to: {value.as_string()}")
         with self.update_settings() as settings:
             settings.http_endpoint = value
+
+    @property
+    def apis(self) -> ApiT:
+        return self.__api
 
     @property
     def api(self) -> ApiT:
@@ -138,14 +146,14 @@ class AbstractHandle(UniqueSettingsHolder[Settings], ABC, Generic[ApiT]):
         )
 
 
-class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
+class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsync, AsyncSendable, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     async def _async_send(
         self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
-        from beekeepy._interface.error_logger import ErrorLogger
+        from beekeepy._utilities.error_logger import ErrorLogger
 
         request = build_json_rpc_call(method=endpoint, params=params)
         self._log_request(request)
@@ -168,12 +176,12 @@ class AbstractAsyncHandle(AbstractHandle[ApiT], SelfContextAsync, ABC):
         self.teardown()
 
 
-class AbstractSyncHandle(AbstractHandle[ApiT], SelfContextSync, ABC):
+class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync, SyncSendable, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
     def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
-        from beekeepy._interface.error_logger import ErrorLogger
+        from beekeepy._utilities.error_logger import ErrorLogger
 
         request = build_json_rpc_call(method=endpoint, params=params)
         self._log_request(request)

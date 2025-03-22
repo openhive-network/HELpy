@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
+
 from beekeepy import Beekeeper
+from beekeepy.exceptions import InvalidatedStateByClosingBeekeeperError, InvalidatedStateByClosingSessionError
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import SettingsFactory
@@ -10,19 +13,20 @@ if TYPE_CHECKING:
 
 def test_closing_with_delete(settings: SettingsFactory) -> None:
     # ARRANGE
-    sets = settings()
-    bk = Beekeeper.factory(settings=sets)
+    bk = Beekeeper.factory(settings=settings())
 
     # ACT & ASSERT (no throw)
     bk.teardown()
-    assert not (sets.ensured_working_directory / "beekeeper.pid").exists()
+    with pytest.raises(InvalidatedStateByClosingBeekeeperError):
+        bk.create_session()
 
 
 def test_closing_with_with(settings: SettingsFactory) -> None:
     # ARRANGE, ACT & ASSERT (no throw)
-    sets = settings()
-    with Beekeeper.factory(settings=sets):
-        assert (sets.ensured_working_directory / "beekeeper.pid").exists()
+    with Beekeeper.factory(settings=settings()) as bk, bk.create_session() as session:
+        pass
+    with pytest.raises(InvalidatedStateByClosingSessionError):
+        session.wallets  # noqa: B018  # part of test
 
 
 def test_session_tokens(settings: SettingsFactory) -> None:

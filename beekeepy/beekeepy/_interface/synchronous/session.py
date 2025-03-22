@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from beekeepy._interface.abc.synchronous.session import Password
 from beekeepy._interface.abc.synchronous.session import Session as SessionInterface
-from beekeepy._interface.state_invalidator import StateInvalidator
 from beekeepy._interface.synchronous.wallet import (
     UnlockedWallet,
     Wallet,
 )
 from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout
+from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
     InvalidatedStateByClosingSessionError,
     InvalidWalletError,
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     )
     from beekeepy._interface.delay_guard import SyncDelayGuard
     from beekeepy._remote_handle.beekeeper import Beekeeper as SyncRemoteBeekeeper
+    from beekeepy._utilities.delay_guard import SyncDelayGuard
     from schemas.apis.beekeeper_api import GetInfo
     from schemas.fields.basic import PublicKey
     from schemas.fields.hex import Signature

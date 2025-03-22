@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from pydantic import BaseModel, Field
 
-from beekeepy._interface.url import Url
+from beekeepy._communication.url import Url
 
 if TYPE_CHECKING:
     from collections.abc import Callable

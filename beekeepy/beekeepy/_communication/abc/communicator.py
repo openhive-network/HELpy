@@ -7,13 +7,13 @@ from threading import Thread
 from typing import TYPE_CHECKING, Any, Awaitable
 
 from beekeepy._communication.settings import CommunicationSettings
-from beekeepy._interface.settings_holder import SharedSettingsHolder
-from beekeepy._interface.stopwatch import Stopwatch
+from beekeepy._utilities.settings_holder import SharedSettingsHolder
+from beekeepy._utilities.stopwatch import Stopwatch
 from beekeepy.exceptions import CommunicationError, TimeoutExceededError, UnknownDecisionPathError
 
 if TYPE_CHECKING:
-    from beekeepy._interface.stopwatch import StopwatchResult
-    from beekeepy._interface.url import HttpUrl
+    from beekeepy._communication.url import HttpUrl
+    from beekeepy._utilities.stopwatch import StopwatchResult
 
 
 class AbstractCommunicator(SharedSettingsHolder[CommunicationSettings], ABC):

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from beekeepy._remote_handle.beekeeper import Beekeeper
+    from beekeepy.handle.remote import Beekeeper
 
 
 def check_wallets_size(beekeeper: Beekeeper, required_size: int) -> None:

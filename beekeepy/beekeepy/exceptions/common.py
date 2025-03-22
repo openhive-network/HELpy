@@ -13,7 +13,7 @@ from beekeepy.exceptions.base import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._interface.url import Url
+    from beekeepy._communication import Url
 
 
 class BatchRequestError(BeekeepyError):
@@ -57,14 +57,6 @@ class WalletIsLockedError(BeekeepyError):
         """Constructor."""
         self.wallet_name = wallet_name
         super().__init__(f"Wallet `{wallet_name}` is locked.")
-
-
-class TimeoutReachWhileCloseError(BeekeepyError):
-    """Raises when beekeeper did not closed during specified timeout."""
-
-    def __init__(self) -> None:
-        """Constructor."""
-        super().__init__("Process was force-closed with SIGKILL, because didn't close before timeout")
 
 
 class NotPositiveTimeError(BeekeepyError):

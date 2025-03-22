@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from beekeepy._interface.url import HttpUrl
+    from beekeepy._communication.url import HttpUrl
     from beekeepy.exceptions import Json, OverseerError
 
 

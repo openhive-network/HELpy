@@ -4,18 +4,17 @@ import socket
 from json import loads
 from typing import TYPE_CHECKING, Any
 
-from beekeepy import Settings
-from beekeepy._communication.aiohttp_communicator import AioHttpCommunicator
-from beekeepy._communication.request_communicator import RequestCommunicator
+from beekeepy._communication import AioHttpCommunicator, RequestCommunicator
+from beekeepy.handle.remote import RemoteHandleSettings
 
 if TYPE_CHECKING:
-    from beekeepy._interface.url import HttpUrl
+    from beekeepy.interfaces import HttpUrl
     from schemas.jsonrpc import JSONRPCRequest
 
 
 async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
-    communicator = AioHttpCommunicator(settings=Settings(http_endpoint=http_endpoint))
+    communicator = AioHttpCommunicator(settings=RemoteHandleSettings(http_endpoint=http_endpoint))
     response = await communicator.async_send(url=http_endpoint, data=data.json(by_alias=True))
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"
@@ -24,7 +23,7 @@ async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -
 
 def raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
-    communicator = RequestCommunicator(settings=Settings(http_endpoint=http_endpoint))
+    communicator = RequestCommunicator(settings=RemoteHandleSettings(http_endpoint=http_endpoint))
     response = communicator.send(url=http_endpoint, data=data.json(by_alias=True))
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"

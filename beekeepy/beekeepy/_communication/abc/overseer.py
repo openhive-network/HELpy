@@ -5,19 +5,16 @@ from abc import ABC, abstractmethod
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Sequence
 
-from beekeepy._interface.context import SelfContextSync
-from beekeepy.exceptions import (
-    GroupedErrorsError,
-    UnknownDecisionPathError,
-)
+from beekeepy._utilities.context import SelfContextSync
+from beekeepy.exceptions import GroupedErrorsError, Json, UnknownDecisionPathError
 
 if TYPE_CHECKING:
     from types import TracebackType
 
     from beekeepy._communication.abc.communicator import AbstractCommunicator
     from beekeepy._communication.abc.rules import Rules, RulesClassifier
-    from beekeepy._interface.url import HttpUrl
-    from beekeepy.exceptions import Json, OverseerError
+    from beekeepy._communication.url import HttpUrl
+    from beekeepy.exceptions import OverseerError
 
 
 __all__ = ["AbstractOverseer"]

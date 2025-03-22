@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
+from beekeepy.handle.runnable import BeekeeperArguments
 
 if TYPE_CHECKING:
     from pathlib import Path

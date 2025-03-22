@@ -6,11 +6,12 @@ from asyncio import iscoroutinefunction
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Generic, NoReturn, ParamSpec, TypeVar, overload
 
-from beekeepy._interface.delay_guard import AsyncDelayGuard, SyncDelayGuard
-from beekeepy._interface.state_invalidator import StateInvalidator
-from beekeepy._remote_handle.beekeeper import AsyncBeekeeper as AsyncRemoteBeekeeper
-from beekeepy._remote_handle.beekeeper import Beekeeper as SyncRemoteBeekeeper
-from beekeepy._runnable_handle.callbacks_protocol import AsyncWalletLocked, SyncWalletLocked
+from beekeepy._interface.settings import InterfaceSettings
+from beekeepy._remote_handle import AsyncBeekeeperTemplate as AsyncRemoteBeekeeper
+from beekeepy._remote_handle import BeekeeperTemplate as SyncRemoteBeekeeper
+from beekeepy._runnable_handle import AsyncWalletLocked, SyncWalletLocked
+from beekeepy._utilities.delay_guard import AsyncDelayGuard, SyncDelayGuard
+from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import WalletIsLockedError
 
 if TYPE_CHECKING:
@@ -20,7 +21,9 @@ if TYPE_CHECKING:
 
 P = ParamSpec("P")
 ResultT = TypeVar("ResultT")
-BeekeeperT = TypeVar("BeekeeperT", bound=SyncRemoteBeekeeper | AsyncRemoteBeekeeper)
+BeekeeperT = TypeVar(
+    "BeekeeperT", bound=SyncRemoteBeekeeper[InterfaceSettings] | AsyncRemoteBeekeeper[InterfaceSettings]
+)
 CallbackT = TypeVar("CallbackT", bound=AsyncWalletLocked | SyncWalletLocked)
 GuardT = TypeVar("GuardT", bound=SyncDelayGuard | AsyncDelayGuard)
 
@@ -132,7 +135,9 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
 
             @wraps(wrapped_function)
             async def async_impl(*args: P.args, **kwrags: P.kwargs) -> ResultT:
-                this: WalletCommons[AsyncRemoteBeekeeper, AsyncWalletLocked, AsyncDelayGuard] = args[0]  # type: ignore[assignment]
+                this: WalletCommons[AsyncRemoteBeekeeper[InterfaceSettings], AsyncWalletLocked, AsyncDelayGuard] = args[
+                    0
+                ]  # type: ignore[assignment]
                 await this._async_call_callback_if_locked(wallet_name=this.name, token=this.session_token)
                 return await wrapped_function(*args, **kwrags)  # type: ignore[no-any-return]
 
@@ -140,7 +145,7 @@ class WalletCommons(ContainsWalletName, StateInvalidator, Generic[BeekeeperT, Ca
 
         @wraps(wrapped_function)
         def sync_impl(*args: P.args, **kwrags: P.kwargs) -> ResultT:
-            this: WalletCommons[SyncRemoteBeekeeper, SyncWalletLocked, SyncDelayGuard] = args[0]  # type: ignore[assignment]
+            this: WalletCommons[SyncRemoteBeekeeper[InterfaceSettings], SyncWalletLocked, SyncDelayGuard] = args[0]  # type: ignore[assignment]
             this._sync_call_callback_if_locked(wallet_name=this.name, token=this.session_token)
             return wrapped_function(*args, **kwrags)  # type: ignore[return-value]
 

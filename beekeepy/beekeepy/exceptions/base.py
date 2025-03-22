@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import StrRegexError
 
-from beekeepy._interface.context import ContextSync
+from beekeepy._utilities.context import ContextSync
 
 if TYPE_CHECKING:
     from types import TracebackType
 
-    from beekeepy._interface.url import Url
+    from beekeepy._communication import Url
 
 Json = dict[str, Any]
 CommunicationResponseT = str | Json | list[Json]
 
 
-class BeekeepyError(Exception):
+class BeekeepyError(BaseException, ABC):
     """Base class for all exception raised by beekeepy."""
 
     @property

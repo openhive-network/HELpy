@@ -5,9 +5,8 @@ from distutils.util import strtobool
 from pathlib import Path
 from typing import ClassVar
 
-from beekeepy._communication.abc.communicator import AbstractCommunicator  # noqa: TCH001
-from beekeepy._interface.url import HttpUrl  # noqa: TCH001
-from beekeepy._remote_handle.settings import Settings as RemoteHandleSettings
+from beekeepy._communication import HttpUrl  # noqa: TCH001
+from beekeepy._remote_handle import RemoteHandleSettings
 
 
 class Settings(RemoteHandleSettings):

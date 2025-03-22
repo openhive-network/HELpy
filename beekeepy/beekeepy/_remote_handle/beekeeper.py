@@ -3,21 +3,24 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, Any, NoReturn
 
-from beekeepy._interface._sanitize import sanitize
-from beekeepy._remote_handle.abc.handle import AbstractAsyncHandle, AbstractSyncHandle
-from beekeepy._remote_handle.api.api_collection import (
+from beekeepy._apis import (
+    AsyncBeekeeperApi,
     BeekeeperAsyncApiCollection,
     BeekeeperSyncApiCollection,
+    SyncBeekeeperApi,
 )
-from beekeepy._remote_handle.api.session_holder import AsyncSessionHolder, SyncSessionHolder
-from beekeepy._remote_handle.batch_handle import ApiFactory, AsyncBatchHandle, SyncBatchHandle
+from beekeepy._apis.abc import (
+    AsyncSessionHolder,
+    SyncSessionHolder,
+)
+from beekeepy._remote_handle.abc.batch_handle import ApiFactory, AsyncBatchHandle, SyncBatchHandle
+from beekeepy._remote_handle.abc.handle import AbstractAsyncHandle, AbstractSyncHandle, RemoteSettingsT
+from beekeepy._utilities.sanitize import sanitize
 
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-    from beekeepy._communication.abc.overseer import AbstractOverseer
-    from beekeepy._interface.url import HttpUrl
-    from beekeepy._remote_handle.api import AsyncBeekeeperApi, SyncBeekeeperApi
+    from beekeepy._communication import AbstractOverseer, HttpUrl
     from beekeepy.exceptions import Json
 
 _handle_target_service_name = "beekeeper"
@@ -67,15 +70,19 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], As
         _raise_acquire_not_possible()
 
 
-class Beekeeper(AbstractSyncHandle[BeekeeperSyncApiCollection], SyncSessionHolder):
+class Beekeeper(AbstractSyncHandle[RemoteSettingsT, BeekeeperSyncApiCollection], SyncSessionHolder):
     """Synchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperSyncApiCollection:
         return BeekeeperSyncApiCollection(owner=self)
 
     @property
+    def apis(self) -> BeekeeperSyncApiCollection:
+        return super().api
+
+    @property
     def api(self) -> SyncBeekeeperApi:  # type: ignore[override]
-        return super().api.beekeeper
+        return self.apis.beekeeper
 
     def _target_service(self) -> str:
         return _handle_target_service_name
@@ -99,15 +106,19 @@ class Beekeeper(AbstractSyncHandle[BeekeeperSyncApiCollection], SyncSessionHolde
         return sanitize(data)
 
 
-class AsyncBeekeeper(AbstractAsyncHandle[BeekeeperAsyncApiCollection], AsyncSessionHolder):
+class AsyncBeekeeper(AbstractAsyncHandle[RemoteSettingsT, BeekeeperAsyncApiCollection], AsyncSessionHolder):
     """Asynchronous handle for beekeeper service communication."""
 
     def _construct_api(self) -> BeekeeperAsyncApiCollection:
         return BeekeeperAsyncApiCollection(owner=self)
 
     @property
+    def apis(self) -> BeekeeperAsyncApiCollection:
+        return super().api
+
+    @property
     def api(self) -> AsyncBeekeeperApi:  # type: ignore[override]
-        return super().api.beekeeper
+        return self.apis.beekeeper
 
     def _target_service(self) -> str:
         return _handle_target_service_name

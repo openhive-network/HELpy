@@ -9,8 +9,8 @@ from beekeepy._interface.asynchronous.wallet import (
     UnlockedWallet,
     Wallet,
 )
-from beekeepy._interface.state_invalidator import StateInvalidator
 from beekeepy._interface.validators import validate_digest, validate_public_keys, validate_timeout
+from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
     InvalidatedStateByClosingSessionError,
     InvalidWalletError,
@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     )
     from beekeepy._interface.delay_guard import AsyncDelayGuard
     from beekeepy._remote_handle.beekeeper import AsyncBeekeeper as AsynchronousRemoteBeekeeperHandle
+    from beekeepy._utilities.delay_guard import AsyncDelayGuard
     from schemas.apis.beekeeper_api import GetInfo
     from schemas.fields.basic import PublicKey
     from schemas.fields.hex import Signature
