@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Generic, Literal, TypeVar, get_args
 from urllib.parse import urlparse
 
+from typing_extensions import Self
+
 P2PProtocolT = Literal[""]
 HttpProtocolT = Literal["http", "https"]
 WsProtocolT = Literal["ws", "wss"]
@@ -18,6 +20,7 @@ class Url(Generic[ProtocolT]):
         if protocol is not None and protocol not in allowed_proto:
             raise ValueError(f"Unknown protocol: `{protocol}`, allowed: {allowed_proto}")
 
+        target_protocol: str = protocol or self._default_protocol()
         if isinstance(url, Url):
             self.__protocol: str = url.__protocol
             self.__address: str = url.__address
@@ -77,6 +80,14 @@ class Url(Generic[ProtocolT]):
         Note: at index 0 should be default protocol.
         """
         return [""]
+
+    @classmethod
+    def factory(cls, *, port: int = 0, address: str = "127.0.0.1") -> Self:
+        return cls((f"{cls._default_protocol()}://" if cls._default_protocol() else "") + f"{address}:{port}")
+
+    @classmethod
+    def _default_protocol(cls) -> str:
+        return cls._allowed_protocols()[0]
 
 
 class HttpUrl(Url[HttpProtocolT]):
