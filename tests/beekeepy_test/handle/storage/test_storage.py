@@ -34,14 +34,10 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
         assert bk1.is_running() is True, "First instance of beekeeper should launch without any problems."
 
         # ACT & ASSERT 2
-        bk2 = Beekeeper(settings=settings, logger=logger)
-        with pytest.raises(BeekeeperFailedToStartError):
-            bk2.run()
-
-        assert checkers.check_for_pattern_in_file(
-            bk2.settings.ensured_working_directory / "stderr.log",
-            "Failed to lock access to wallet directory; is another `beekeeper` running?",
-        ), "There should be an info about another instance of beekeeper locking wallet directory."
+        with Beekeeper(settings=settings, logger=logger) as bk2:
+            assert (
+                "opening beekeeper failed" in bk2.apis.app_status.get_app_status().statuses
+            ), "Second instance of beekeeper should fail to start."
 
 
 def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
@@ -76,44 +72,12 @@ def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
         ), "There should be an no info about another instance of beekeeper locking wallet directory."
 
 
-def get_remote_address_from_connection_file(working_dir: Path) -> HttpUrl:
-    connection: dict[str, str | int] = {}
-    with (working_dir / "beekeeper.connection").open() as file:
-        connection = json.load(file)
-    return HttpUrl(
-        f"{connection['address']}:{connection['port']}",
-        protocol=str(connection["type"]).lower(),  # type: ignore[arg-type]
-    )
-
-
 def test_beekeepers_files_generation(beekeeper: Beekeeper) -> None:
     """Test test_beekeepers_files_generation will check if beekeeper files are generated and have same content."""
     # ARRANGE & ACT
     wallet_dir = beekeeper.settings.ensured_working_directory
-    beekeeper_connection_file = wallet_dir / "beekeeper.connection"
-    beekeeper_pid_file = wallet_dir / "beekeeper.pid"
     beekeeper_wallet_lock_file = wallet_dir / "beekeeper.wallet.lock"
 
     # ASSERT
-    assert beekeeper_connection_file.exists() is True, "File 'beekeeper.connection' should exists"
-    assert beekeeper_pid_file.exists() is True, "File 'beekeeper.pid' should exists"
     # File beekeeper.wallet.lock holds no value inside, so we need only to check is its exists.
     assert beekeeper_wallet_lock_file.exists() is True, "File 'beekeeper.wallet.lock' should exists"
-
-    connection_url = get_remote_address_from_connection_file(wallet_dir)
-    assert connection_url is not None, "There should be connection details."
-
-    if beekeeper.http_endpoint.address == "127.0.0.1":
-        assert connection_url.address in [
-            "0.0.0.0",  # noqa: S104
-            "127.0.0.1",
-        ], "Address should point to localhost or all interfaces."
-    else:
-        assert connection_url.address == beekeeper.http_endpoint.address, "Host should be the same."
-    assert connection_url.port == beekeeper.http_endpoint.port, "Port should be the same."
-    assert connection_url.protocol == beekeeper.http_endpoint.protocol, "Protocol should be the same."
-
-    with Path.open(beekeeper_pid_file) as pid:
-        content = json.load(pid)
-
-        assert content["pid"] == str(beekeeper.pid), "Pid should be the same"

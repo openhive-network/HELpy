@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from beekeepy.handle.runnable import Beekeeper
 
 
+# NOTE 1: Beekeeper should not raise exception while calling close on already closed wallet or not existing wallet.
+#         It should be treated as a success for UX purposes.
+
+
 def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     """Test test_api_close will test beekeeper_api.close api call."""
     # ARRANGE
@@ -51,7 +55,7 @@ def test_api_close_double_close(
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ASSERT
-    # According to behavior change of Beekeeper, it should not throw
+    # SHOULD NOT RAISE (NOTE 1)
     beekeeper.api.close(wallet_name=wallet.name)
 
 
@@ -61,5 +65,5 @@ def test_api_close_not_existing_wallet(beekeeper: Beekeeper) -> None:
     wallet = WalletInfo(password=generate_wallet_password(), name=generate_wallet_name())
 
     # ACT & ASSERT
-    # According to behavior change of Beekeeper, it should not throw
+    # SHOULD NOT RAISE (NOTE 1)
     beekeeper.api.close(wallet_name=wallet.name)

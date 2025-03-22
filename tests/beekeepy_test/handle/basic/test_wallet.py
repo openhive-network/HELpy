@@ -73,13 +73,13 @@ def test_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     # ASSERT
     info = beekeeper.api.get_info()
     assert timeout - (info.timeout_time - info.now).total_seconds() <= comparison_error_max_delta
-    check_wallets(beekeeper.api.list_wallets(), [wallet.name])
+    check_wallets(beekeeper.api.list_created_wallets(), [wallet.name])
 
     # ACT
     time.sleep(timeout + 1)
 
     # ASSERT
-    check_wallets(beekeeper.api.list_wallets(), [wallet.name], unlocked=False)
+    check_wallets(beekeeper.api.list_created_wallets(), [wallet.name], unlocked=False)
 
 
 @pytest.mark.parametrize("wallet_name", ["test", "123"])

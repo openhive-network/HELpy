@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 def test_api_set_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:  # noqa: ARG001
     """Test test_api_set_timeout will test beekeeper_api.set_timeout api call."""
     # ARRANGE
-    bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
+    bk_wallet = (beekeeper.api.list_created_wallets()).wallets[0]
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 
     # ACT
@@ -20,5 +20,5 @@ def test_api_set_timeout(beekeeper: Beekeeper, wallet: WalletInfo) -> None:  # n
     time.sleep(1.5)
 
     # ASSERT
-    bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
+    bk_wallet = (beekeeper.api.list_created_wallets()).wallets[0]
     assert bk_wallet.unlocked is False, "Wallet after timeout should be locked."

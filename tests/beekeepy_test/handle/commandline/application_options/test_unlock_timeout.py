@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 def check_wallet_lock(beekeeper: Beekeeper, required_status: bool) -> None:
     """Check if wallets are have required unlock status."""
-    response_list_wallets = beekeeper.api.list_wallets()
+    response_list_wallets = beekeeper.api.list_created_wallets()
     for wallet in response_list_wallets.wallets:
         assert wallet.unlocked == required_status
 
