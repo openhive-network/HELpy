@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger as loguru_logger
 
-from beekeepy._interface.context import ContextSync
+from beekeepy._utilities.context import ContextSync
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class ErrorLogger(ContextSync[None]):
-    def __init__(self, logger: Logger | None = None, *exceptions: type[Exception]) -> None:
+    def __init__(self, logger: Logger | None = None, *exceptions: type[BaseException]) -> None:
         super().__init__()
         self.__logger = logger or loguru_logger
         self.__exception_whitelist = list(exceptions)

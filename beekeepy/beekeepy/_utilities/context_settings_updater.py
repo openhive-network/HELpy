@@ -4,12 +4,12 @@ from abc import abstractmethod
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from beekeepy._communication.settings import CommunicationSettings
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-SettingsT = TypeVar("SettingsT", bound=CommunicationSettings)
+SettingsT = TypeVar("SettingsT", bound=BaseModel)
 
 
 class ContextSettingsUpdater(Generic[SettingsT]):

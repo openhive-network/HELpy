@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
-from beekeepy._interface.context_settings_updater import ContextSettingsUpdater, SettingsT
+from beekeepy._utilities.context_settings_updater import ContextSettingsUpdater, SettingsT
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Final
 
-from beekeepy._interface.context import ContextAsync, ContextSync
+from beekeepy._utilities.context import ContextAsync, ContextSync
 from beekeepy.exceptions import UnlockIsNotAccessibleError
 
 if TYPE_CHECKING:

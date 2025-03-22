@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from beekeepy._interface.context import SelfContextSync
+from beekeepy._utilities.context import SelfContextSync
 from beekeepy.exceptions import ApiNotFoundError, GroupedErrorsError
 
 if TYPE_CHECKING:
