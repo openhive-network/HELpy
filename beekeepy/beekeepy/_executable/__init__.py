@@ -1,13 +1,29 @@
 from __future__ import annotations
 
-from beekeepy._executable.arguments.arguments import Arguments
-from beekeepy._executable.arguments.beekeeper_arguments import BeekeeperArguments
+from beekeepy._executable.abc import (
+    Arguments,
+    ArgumentT,
+    Config,
+    ConfigT,
+    Executable,
+    StreamRepresentation,
+    StreamsHolder,
+)
+from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
+from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable import BeekeeperExecutable
-from beekeepy._executable.executable import Executable
+from beekeepy._utilities.key_pair import KeyPair
 
 __all__ = [
-    "Arguments",
+    "BeekeeperConfig",
     "BeekeeperArguments",
     "BeekeeperExecutable",
+    "Arguments",
     "Executable",
+    "Config",
+    "StreamRepresentation",
+    "StreamsHolder",
+    "ArgumentT",
+    "ConfigT",
+    "KeyPair",
 ]
