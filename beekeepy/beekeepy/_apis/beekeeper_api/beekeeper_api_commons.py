@@ -3,10 +3,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Protocol
 
-from beekeepy._remote_handle.abc.api import HandleT
+from beekeepy._apis.abc.api import HandleT
 
 if TYPE_CHECKING:
-    from beekeepy._remote_handle.api.session_holder import AsyncSessionHolder, SyncSessionHolder
+    from beekeepy._apis.abc import AsyncSessionHolder, SyncSessionHolder
 
 
 class CreateSessionActionProtocol(Protocol):

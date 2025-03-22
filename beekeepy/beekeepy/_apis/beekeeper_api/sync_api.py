@@ -1,23 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
-
-from beekeepy._remote_handle.abc.api import AbstractSyncApi, ApiArgumentsToSerialize, SyncHandleT
-from beekeepy._remote_handle.api.apply_session_token import sync_apply_session_token
-from beekeepy._remote_handle.api.beekeeper_api_commons import BeekeeperApiCommons
-from beekeepy._remote_handle.api.session_holder import SyncSessionHolder
+from beekeepy._apis.abc import AbstractSyncApi, ApiArgumentsToSerialize, SyncSendable, SyncSessionHolder
+from beekeepy._apis.apply_session_token import sync_apply_session_token
+from beekeepy._apis.beekeeper_api.beekeeper_api_commons import BeekeeperApiCommons
 from schemas.apis import beekeeper_api  # noqa: TCH001
 
-if TYPE_CHECKING:
-    from beekeepy._remote_handle.beekeeper import Beekeeper, _SyncSessionBatchHandle
 
-
-class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
+class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncSendable]):
     api = AbstractSyncApi.endpoint
 
-    _owner: Beekeeper | _SyncSessionBatchHandle
+    _owner: SyncSessionHolder
 
-    def __init__(self, owner: Beekeeper | _SyncSessionBatchHandle) -> None:
+    def __init__(self, owner: SyncSessionHolder) -> None:
         self._verify_is_owner_can_hold_session_token(owner=owner)
         super().__init__(owner=owner)
 
@@ -26,7 +20,7 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
     ) -> ApiArgumentsToSerialize:
         if not self._token_required(endpoint_name):
             return super()._additional_arguments_actions(endpoint_name, arguments)
-        return sync_apply_session_token(cast(SyncSessionHolder, self._owner), arguments)
+        return sync_apply_session_token(self._owner, arguments)
 
     def _get_requires_session_holder_type(self) -> type[SyncSessionHolder]:
         return SyncSessionHolder
@@ -94,7 +88,7 @@ class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
         raise NotImplementedError
 
     @api
-    def create_session(self, *, notifications_endpoint: str = "", salt: str = "") -> beekeeper_api.CreateSession:
+    def create_session(self, *, salt: str = "") -> beekeeper_api.CreateSession:
         raise NotImplementedError
 
     @api

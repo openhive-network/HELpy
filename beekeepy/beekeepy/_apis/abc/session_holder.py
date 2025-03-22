@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any
 
+from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
 from schemas.apis.beekeeper_api import CreateSession
 
 __all__ = ["SyncSessionHolder", "AsyncSessionHolder"]
@@ -37,7 +38,7 @@ class SessionHolder:
         return self.__session
 
 
-class SyncSessionHolder(SessionHolder):
+class SyncSessionHolder(SyncSendable, SessionHolder, ABC):
     @abstractmethod
     def _acquire_session_token(self) -> str: ...
 
@@ -48,7 +49,7 @@ class SyncSessionHolder(SessionHolder):
         return self._check_and_return_session()
 
 
-class AsyncSessionHolder(SessionHolder):
+class AsyncSessionHolder(AsyncSendable, SessionHolder, ABC):
     @abstractmethod
     async def _acquire_session_token(self) -> str: ...
 

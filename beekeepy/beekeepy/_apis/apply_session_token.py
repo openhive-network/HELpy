@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from beekeepy._remote_handle.abc.api import ApiArgumentsToSerialize
-    from beekeepy._remote_handle.api.session_holder import AsyncSessionHolder, SyncSessionHolder
+    from beekeepy._apis.abc import ApiArgumentsToSerialize, AsyncSessionHolder, SyncSessionHolder
 
 
 def sync_apply_session_token(owner: SyncSessionHolder, arguments: ApiArgumentsToSerialize) -> ApiArgumentsToSerialize:

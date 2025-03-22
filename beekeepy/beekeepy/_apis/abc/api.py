@@ -13,16 +13,11 @@ from typing import (
     ClassVar,
     Generic,
     ParamSpec,
-    TypeAlias,
     TypeVar,
     get_type_hints,
 )
 
-from beekeepy._remote_handle.abc.handle import (
-    AbstractAsyncHandle,
-    AbstractSyncHandle,
-)
-from beekeepy._remote_handle.batch_handle import AsyncBatchHandle, SyncBatchHandle
+from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 from schemas.fields.serializable import Serializable
 from schemas.operations.representations.legacy_representation import LegacyRepresentation
@@ -34,9 +29,7 @@ if TYPE_CHECKING:
 
 
 P = ParamSpec("P")
-SyncHandleT: TypeAlias = AbstractSyncHandle[Any] | SyncBatchHandle[Any]
-AsyncHandleT: TypeAlias = AbstractAsyncHandle[Any] | AsyncBatchHandle[Any]
-HandleT = TypeVar("HandleT", bound=SyncHandleT | AsyncHandleT)
+HandleT = TypeVar("HandleT", bound=SyncSendable | AsyncSendable)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
 ApiArgumentsToSerialize = tuple[tuple[Any, ...], dict[str, Any]]
@@ -121,7 +114,7 @@ class AbstractApi(ABC, Generic[HandleT]):
         self._owner = owner
 
 
-class AbstractSyncApi(AbstractApi[SyncHandleT]):
+class AbstractSyncApi(AbstractApi[SyncSendable]):
     """Base class for all apis, that provides synchronous endpoints."""
 
     def _additional_arguments_actions(
@@ -153,7 +146,7 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
         return impl  # type: ignore[return-value]
 
 
-class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
+class AbstractAsyncApi(AbstractApi[AsyncSendable]):
     """Base class for all apis, that provides asynchronous endpoints."""
 
     async def _additional_arguments_actions(

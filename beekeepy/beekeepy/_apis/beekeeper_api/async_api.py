@@ -1,24 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from beekeepy._remote_handle.abc.api import AbstractAsyncApi, ApiArgumentsToSerialize, AsyncHandleT
-from beekeepy._remote_handle.api.apply_session_token import async_apply_session_token
-from beekeepy._remote_handle.api.beekeeper_api_commons import BeekeeperApiCommons
-from beekeepy._remote_handle.api.session_holder import AsyncSessionHolder
+from beekeepy._apis.abc import AbstractAsyncApi, ApiArgumentsToSerialize, AsyncSendable, AsyncSessionHolder
+from beekeepy._apis.apply_session_token import async_apply_session_token
+from beekeepy._apis.beekeeper_api.beekeeper_api_commons import BeekeeperApiCommons
 from schemas.apis import beekeeper_api  # noqa: TCH001
 
-if TYPE_CHECKING:
-    from beekeepy._remote_handle.beekeeper import AsyncBeekeeper, _AsyncSessionBatchHandle
 
-
-class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
+class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncSendable]):
     """Set of endpoints, that allows asynchronous communication with beekeeper service."""
 
     api = AbstractAsyncApi.endpoint
-    _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
+    _owner: AsyncSessionHolder
 
-    def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:
+    def __init__(self, owner: AsyncSessionHolder) -> None:
         self._verify_is_owner_can_hold_session_token(owner=owner)
         super().__init__(owner=owner)
 
@@ -216,14 +210,13 @@ class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
         raise NotImplementedError
 
     @api
-    async def create_session(self, *, notifications_endpoint: str = "", salt: str = "") -> beekeeper_api.CreateSession:
+    async def create_session(self, *, salt: str = "") -> beekeeper_api.CreateSession:
         """Creates session.
 
         Note:
             This is called automatically when connection with beekeeper is establish, no need to call it explicitly.
 
         Args:
-            notifications_endpoint: endpoint on which notifications of status will be broadcasted. (defaults: "")
             salt: used for generation of session token
 
         Returns:

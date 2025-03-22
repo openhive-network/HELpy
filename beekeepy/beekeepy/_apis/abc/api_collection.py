@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Generic
 
-from beekeepy._remote_handle.abc.api import AsyncHandleT, HandleT, SyncHandleT
+from beekeepy._apis.abc.api import HandleT
+from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
 
 
 class AbstractApiCollection(Generic[HandleT]):
@@ -12,15 +13,15 @@ class AbstractApiCollection(Generic[HandleT]):
         self._owner = owner
 
 
-class AbstractAsyncApiCollection(AbstractApiCollection[AsyncHandleT]):
+class AbstractAsyncApiCollection(AbstractApiCollection[AsyncSendable]):
     """Base class for Async Api Collections."""
 
-    def __init__(self, owner: AsyncHandleT) -> None:
+    def __init__(self, owner: AsyncSendable) -> None:
         super().__init__(owner)
 
 
-class AbstractSyncApiCollection(AbstractApiCollection[SyncHandleT]):
+class AbstractSyncApiCollection(AbstractApiCollection[SyncSendable]):
     """Base class for Sync Api Collections."""
 
-    def __init__(self, owner: SyncHandleT) -> None:
+    def __init__(self, owner: SyncSendable) -> None:
         super().__init__(owner)
