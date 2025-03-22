@@ -31,7 +31,7 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
 
     # ACT & ASSERT 1
     with Beekeeper(settings=settings, logger=logger) as bk1:
-        assert bk1.is_running is True, "First instance of beekeeper should launch without any problems."
+        assert bk1.is_running() is True, "First instance of beekeeper should launch without any problems."
 
         # ACT & ASSERT 2
         bk2 = Beekeeper(settings=settings, logger=logger)
@@ -62,8 +62,8 @@ def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
         settings=Settings(working_directory=bk2_path), logger=logger
     ) as bk2:
         # ASSERT
-        assert bk1.is_running, "First instance of beekeeper should be working."
-        assert bk2.is_running, "Second instance of beekeeper should be working."
+        assert bk1.is_running(), "First instance of beekeeper should be working."
+        assert bk2.is_running(), "Second instance of beekeeper should be working."
         bks.extend((bk1, bk2))
 
     for bk in bks:

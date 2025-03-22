@@ -91,4 +91,4 @@ def test_export_keys(beekeeper: Beekeeper) -> None:
     # ASSERT
     # Check default path of wallet_name.keys
     check_dumped_keys(extract_path / wallet_name_keys, keys1)
-    assert bk.is_running is False
+    assert bk.is_running() is False
