@@ -11,7 +11,7 @@ from beekeepy._remote_handle.settings import Settings as RemoteHandleSettings
 
 
 class Settings(RemoteHandleSettings):
-    """Defines parameters for beekeeper how to start and behave."""
+    """Defines parameters for runnable handles how to start and behave."""
 
     class EnvironNames(RemoteHandleSettings.EnvironNames):
         WORKING_DIRECTORY: ClassVar[str] = "BEEKEEPY_WORKING_DIRECTORY"
@@ -33,16 +33,6 @@ class Settings(RemoteHandleSettings):
     Endpoint on which python will communicate with beekeeper, required for remote beekeeper.
     In case of local beekeeper, this address will be used for beekeeper to start listening on.
     """
-
-    communicator: type[AbstractCommunicator] | AbstractCommunicator | None = None
-    """
-    Defines class to be used for network handling. Can be given as class or instance.
-
-    Note: If set to none, handles will use preferred communicators
-    """
-
-    notification_endpoint: HttpUrl | None = None
-    """Endpoint to use for reverse communication between beekeeper and python."""
 
     binary_path: Path | None = None
     """Alternative path to beekeeper binary."""
@@ -66,6 +56,7 @@ class Settings(RemoteHandleSettings):
         EnvironNames.INITIALIZATION_TIMEOUT,
         lambda x: (Settings.Defaults.INITIALIZATION_TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
+    """Affects time handle waits for beekeeper to start."""
 
     @property
     def ensured_working_directory(self) -> Path:

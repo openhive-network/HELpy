@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from beekeepy._communication.abc.communicator import AbstractCommunicator  # noqa: TCH001
-from beekeepy._communication.abc.overseer import AbstractOverseer
-from beekeepy._communication.overseers import CommonOverseer
-from beekeepy._communication.settings import CommunicationSettings
-from beekeepy._interface.url import HttpUrl  # noqa: TCH001
+from beekeepy._communication import (
+    AbstractCommunicator,
+    AbstractOverseer,
+    CommonOverseer,
+    CommunicationSettings,
+    HttpUrl,
+)
 
 
-class Settings(CommunicationSettings):
+class RemoteHandleSettings(CommunicationSettings):
     class Defaults(CommunicationSettings.Defaults):
         OVERSEER: ClassVar[type[AbstractOverseer]] = CommonOverseer
 

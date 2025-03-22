@@ -25,7 +25,9 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
         )
 
     def _construct_config(self) -> BeekeeperConfig:
-        return BeekeeperConfig(wallet_dir=self.working_directory)
+        config = BeekeeperConfig(wallet_dir=self.working_directory)
+        config.plugin.append("app_status_api")
+        return config
 
     def _construct_arguments(self) -> BeekeeperArguments:
         return BeekeeperArguments(data_dir=self.working_directory)
@@ -45,7 +47,6 @@ class BeekeeperExecutable(Executable[BeekeeperConfig, BeekeeperArguments]):
                 blocking=True,
                 arguments=BeekeeperArguments(
                     data_dir=tempdir_path,
-                    notifications_endpoint=HttpUrl("0.0.0.0:0"),
                     export_keys_wallet=ExportKeysWalletParams(wallet_name=wallet_name, wallet_password=wallet_password),
                 ),
             )

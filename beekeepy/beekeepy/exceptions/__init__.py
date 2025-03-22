@@ -9,6 +9,7 @@ from beekeepy.exceptions.base import (
     CommunicationError,
     CommunicationResponseT,
     DetectableError,
+    ExecutableError,
     InvalidatedStateError,
     Json,
     OverseerError,
@@ -27,7 +28,6 @@ from beekeepy.exceptions.common import (
     NotPositiveTimeError,
     ResponseNotReadyError,
     TimeoutExceededError,
-    TimeoutReachWhileCloseError,
     TimeTooBigError,
     UnknownDecisionPathError,
     WalletIsLockedError,
@@ -45,6 +45,12 @@ from beekeepy.exceptions.detectable import (
     NotExistingKeyError,
     NoWalletWithSuchNameError,
     WalletWithSuchNameAlreadyExistsError,
+)
+from beekeepy.exceptions.executable import (
+    ExecutableIsNotRunningError,
+    FailedToDetectReservedPortsError,
+    FailedToStartExecutableError,
+    TimeoutReachWhileCloseError,
 )
 from beekeepy.exceptions.overseer import (
     ApiNotFoundError,
@@ -79,6 +85,10 @@ __all__ = [
     "DetectableError",
     "DifferenceBetweenAmountOfRequestsAndResponsesError",
     "ErrorInResponseError",
+    "ExecutableError",
+    "ExecutableIsNotRunningError",
+    "FailedToDetectReservedPortsError",
+    "FailedToStartExecutableError",
     "GroupedErrorsError",
     "InvalidAccountNameError",
     "InvalidatedStateByClosingBeekeeperError",

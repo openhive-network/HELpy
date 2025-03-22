@@ -14,17 +14,11 @@ if TYPE_CHECKING:
 
 def create_session(beekeeper: Beekeeper, salt: str) -> None:
     # ARRANGE
-    assert beekeeper.settings.notification_endpoint is not None
-    notification_endpoint = beekeeper.settings.notification_endpoint.as_string(with_protocol=False)
-    message_to_check = (
-        '"id":0,"jsonrpc":"2.0","method":"beekeeper_api.create_session",'
-        f'"params":{{"notifications_endpoint":"{notification_endpoint}","salt":"{salt}"}}'
-    )
+    message_to_check = '"id":0,"jsonrpc":"2.0","method":"beekeeper_api.create_session",' f'"params":{{"salt":"{salt}"}}'
 
     # ACT
     token = (
         beekeeper.api.create_session(
-            notifications_endpoint=notification_endpoint,
             salt=salt,
         )
     ).token

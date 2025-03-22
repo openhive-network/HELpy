@@ -189,3 +189,7 @@ class OverseerError(CommunicationError, ABC):
     @abstractmethod
     def retry(self) -> bool:
         """Used by overseer to determine if retry should be performed if such error occurs."""
+
+
+class ExecutableError(BeekeepyError, ABC):
+    """Base class for errors related to handling executable."""
