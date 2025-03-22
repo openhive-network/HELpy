@@ -5,6 +5,7 @@ from beekeepy._interface.asynchronous.beekeeper import Beekeeper as AsyncBeekepe
 from beekeepy._interface.asynchronous.session import Session as AsyncSession
 from beekeepy._interface.asynchronous.wallet import UnlockedWallet as AsyncUnlockedWallet
 from beekeepy._interface.asynchronous.wallet import Wallet as AsyncWallet
+from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._interface.synchronous.beekeeper import Beekeeper
 from beekeepy._interface.synchronous.session import Session
 from beekeepy._interface.synchronous.wallet import UnlockedWallet, Wallet
@@ -16,6 +17,7 @@ __all__ = [
     "AsyncUnlockedWallet",
     "AsyncWallet",
     "Beekeeper",
+    "InterfaceSettings",
     "Session",
     "UnlockedWallet",
     "Wallet",

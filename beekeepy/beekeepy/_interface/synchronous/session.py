@@ -26,8 +26,8 @@ if TYPE_CHECKING:
     from beekeepy._interface.abc.synchronous.wallet import (
         Wallet as WalletInterface,
     )
-    from beekeepy._interface.delay_guard import SyncDelayGuard
-    from beekeepy._remote_handle.beekeeper import Beekeeper as SyncRemoteBeekeeper
+    from beekeepy._interface.settings import InterfaceSettings
+    from beekeepy._remote_handle import BeekeeperTemplate as SyncRemoteBeekeeper
     from beekeepy._utilities.delay_guard import SyncDelayGuard
     from schemas.apis.beekeeper_api import GetInfo
     from schemas.fields.basic import PublicKey
@@ -38,7 +38,7 @@ class Session(SessionInterface, StateInvalidator):
     def __init__(
         self,
         *args: Any,
-        beekeeper: SyncRemoteBeekeeper,
+        beekeeper: SyncRemoteBeekeeper[InterfaceSettings],
         guard: SyncDelayGuard,
         use_session_token: str | None = None,
         default_session_close_callback: Callable[[], None] | None = None,

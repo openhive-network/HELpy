@@ -6,12 +6,10 @@ from loguru import logger
 
 from beekeepy._interface.abc.packed_object import PackedSyncBeekeeper
 from beekeepy._interface.abc.synchronous.beekeeper import Beekeeper as BeekeeperInterface
-from beekeepy._interface.delay_guard import SyncDelayGuard
-from beekeepy._interface.state_invalidator import StateInvalidator
+from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._interface.synchronous.session import Session
-from beekeepy._remote_handle.beekeeper import Beekeeper as SynchronousRemoteBeekeeperHandle
-from beekeepy._runnable_handle.beekeeper import Beekeeper as SynchronousBeekeeperHandle
-from beekeepy._runnable_handle.settings import Settings
+from beekeepy._remote_handle import BeekeeperTemplate as SynchronousRemoteBeekeeperHandle
+from beekeepy._runnable_handle import BeekeeperTemplate as SynchronousBeekeeperHandle
 from beekeepy._utilities.delay_guard import SyncDelayGuard
 from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
@@ -28,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):
-    def __init__(self, *args: Any, handle: SynchronousRemoteBeekeeperHandle, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, handle: SynchronousRemoteBeekeeperHandle[InterfaceSettings], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.__instance = handle
         self.__guard = SyncDelayGuard()
@@ -49,7 +47,7 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             self.__default_session = self.__create_session(self._get_instance().session.token, default_session=True)
         return self.__default_session
 
-    def _get_instance(self) -> SynchronousRemoteBeekeeperHandle:
+    def _get_instance(self) -> SynchronousRemoteBeekeeperHandle[InterfaceSettings]:
         return self.__instance
 
     @StateInvalidator.empty_call_after_invalidation(None)
@@ -81,27 +79,37 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
         return PackedSyncBeekeeper(settings=self.settings, unpack_factory=Beekeeper._remote_factory)
 
     @classmethod
-    def _factory(cls, *, settings: Settings | None = None) -> BeekeeperInterface:
-        settings = settings or Settings()
-        handle = SynchronousBeekeeperHandle(settings=settings, logger=logger)
+    def _factory(cls, *, settings: InterfaceSettings | None = None) -> BeekeeperInterface:
+        settings = settings or InterfaceSettings()
+        handle = cls.__create_local_handle(settings=settings)
         handle.run()
         return cls(handle=handle)
 
     @classmethod
-    def _remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> BeekeeperInterface:
-        if isinstance(url_or_settings, Settings):
+    def _remote_factory(cls, *, url_or_settings: InterfaceSettings | HttpUrl) -> BeekeeperInterface:
+        if isinstance(url_or_settings, InterfaceSettings):
             assert (
                 url_or_settings.http_endpoint is not None
             ), "Settings.http_endpoint has to be set when passing to remote_factory"
-        settings = url_or_settings if isinstance(url_or_settings, Settings) else Settings(http_endpoint=url_or_settings)
+        settings = (
+            url_or_settings
+            if isinstance(url_or_settings, InterfaceSettings)
+            else InterfaceSettings(http_endpoint=url_or_settings)
+        )
         handle = SynchronousRemoteBeekeeperHandle(settings=settings)
         cls.__apply_existing_session_token(settings=settings, handle=handle)
         return cls(handle=handle)
 
     @classmethod
-    def __apply_existing_session_token(cls, settings: Settings, handle: SynchronousRemoteBeekeeperHandle) -> None:
+    def __apply_existing_session_token(
+        cls, settings: InterfaceSettings, handle: SynchronousRemoteBeekeeperHandle[InterfaceSettings]
+    ) -> None:
         if settings.use_existing_session:
             handle.set_session_token(settings.use_existing_session)
+
+    @classmethod
+    def __create_local_handle(cls, settings: InterfaceSettings) -> SynchronousBeekeeperHandle[InterfaceSettings]:
+        return SynchronousBeekeeperHandle(settings=settings, logger=logger)
 
     def _enter(self) -> BeekeeperInterface:
         return self

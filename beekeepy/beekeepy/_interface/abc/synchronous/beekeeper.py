@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, cast
 
 from beekeepy._communication import CommunicationSettings
-from beekeepy._interface.context import ContextSync
+from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._utilities.context import ContextSync
 from beekeepy._utilities.context_settings_updater import ContextSettingsUpdater
 
@@ -19,9 +19,9 @@ class Beekeeper(ContextSync["Beekeeper"], ContextSettingsUpdater[CommunicationSe
     def create_session(self, *, salt: str | None = None) -> Session: ...
 
     @property
-    def settings(self) -> Settings:
+    def settings(self) -> InterfaceSettings:
         """Returns read-only settings."""
-        return cast(Settings, self._get_copy_of_settings())
+        return cast(InterfaceSettings, self._get_copy_of_settings())
 
     @property
     def http_endpoint(self) -> HttpUrl:
@@ -42,13 +42,13 @@ class Beekeeper(ContextSync["Beekeeper"], ContextSettingsUpdater[CommunicationSe
         """Detaches process and returns PID."""
 
     @classmethod
-    def factory(cls, *, settings: Settings | None = None) -> Beekeeper:
+    def factory(cls, *, settings: InterfaceSettings | None = None) -> Beekeeper:
         from beekeepy._interface.synchronous.beekeeper import Beekeeper as BeekeeperImplementation
 
         return BeekeeperImplementation._factory(settings=settings)
 
     @classmethod
-    def remote_factory(cls, *, url_or_settings: Settings | HttpUrl) -> Beekeeper:
+    def remote_factory(cls, *, url_or_settings: InterfaceSettings | HttpUrl) -> Beekeeper:
         from beekeepy._interface.synchronous.beekeeper import Beekeeper as BeekeeperImplementation
 
         return BeekeeperImplementation._remote_factory(url_or_settings=url_or_settings)

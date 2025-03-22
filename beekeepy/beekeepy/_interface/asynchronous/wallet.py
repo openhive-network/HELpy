@@ -8,11 +8,10 @@ from beekeepy._interface.abc.asynchronous.wallet import (
 from beekeepy._interface.abc.asynchronous.wallet import (
     Wallet as WalletInterface,
 )
-from beekeepy._interface.delay_guard import AsyncDelayGuard
+from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._interface.validators import validate_digest, validate_private_keys, validate_public_keys
 from beekeepy._interface.wallets_common import WalletCommons
-from beekeepy._remote_handle.beekeeper import AsyncBeekeeper as AsyncRemoteBeekeeper
-from beekeepy._runnable_handle.callbacks_protocol import AsyncWalletLocked
+from beekeepy._remote_handle import AsyncBeekeeperTemplate as AsyncRemoteBeekeeper
 from beekeepy._runnable_handle import AsyncWalletLocked
 from beekeepy._utilities.delay_guard import AsyncDelayGuard
 from beekeepy.exceptions import (
@@ -31,7 +30,9 @@ if TYPE_CHECKING:
     from schemas.fields.hex import Signature
 
 
-class Wallet(WalletCommons[AsyncRemoteBeekeeper, AsyncWalletLocked, AsyncDelayGuard], WalletInterface):
+class Wallet(
+    WalletCommons[AsyncRemoteBeekeeper[InterfaceSettings], AsyncWalletLocked, AsyncDelayGuard], WalletInterface
+):
     @property
     async def public_keys(self) -> list[PublicKey]:
         return [
