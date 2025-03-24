@@ -34,7 +34,7 @@ variables:
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
-    ref: 2f66491fa87527714829792959fce84cd94ecde3
+    ref: 18f1d5c753735ddba3ab85baaffc09283d84c652
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   # DO NOT include ccc here. It will be indirectly included by above yaml file.
   #- project: 'hive/common-ci-configuration'
