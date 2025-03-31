@@ -50,7 +50,7 @@ def close_already_running_beekeeper(*, pid: int) -> None:
         _wait_for_pid_to_die(pid, timeout_secs=10)  # check is process actually dead
         logger.debug("Process was closed with SIGINT")
     except TimeoutError:
-        sig = signal.SIGKILL  # in case of no reaction to ^C, kill process hard way
+        sig = signal.SIGKILL  # type: ignore[assignment] # in case of no reaction to ^C, kill process hard way
         os.kill(pid, sig)
         _wait_for_pid_to_die(pid)  # confirm is hard way take effect
         logger.debug("Process was force-closed with SIGKILL")

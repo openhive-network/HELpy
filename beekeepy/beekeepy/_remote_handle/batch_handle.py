@@ -221,8 +221,10 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], Generic[ApiT]):  # type: 
         super().__init__(url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
         self.api: ApiT = api(self)
 
-    def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[return-value]
+    def _send(
+        self, *, endpoint: str, params: str, expected_type: type[JSONRPCResult[ExpectResultT]]
+    ) -> JSONRPCResult[ExpectResultT]:
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)
 
 
 class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type: ignore[type-arg]
@@ -239,6 +241,6 @@ class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], Generic[ApiT]):  # type
         self.api: ApiT = api(self)
 
     async def _async_send(
-        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+        self, *, endpoint: str, params: str, expected_type: type[JSONRPCResult[ExpectResultT]]
     ) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[return-value]
+        return self._impl_handle_request(endpoint, params, expect_type=expected_type)

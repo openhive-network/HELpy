@@ -5,6 +5,7 @@ from os import environ
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from msgspec import field
+from typing_extensions import Self
 
 from beekeepy._interface.url import Url
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
@@ -12,8 +13,6 @@ from schemas.decoders import get_hf26_decoder
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-    from typing_extensions import Self
 
 
 class CommunicationSettings(PreconfiguredBaseModel):
@@ -62,4 +61,4 @@ class CommunicationSettings(PreconfiguredBaseModel):
     @classmethod
     def import_settings(cls, settings: str) -> Self:
         decoder = get_hf26_decoder(cls)
-        return decoder.decode(settings)
+        return cast(Self, decoder.decode(settings))
