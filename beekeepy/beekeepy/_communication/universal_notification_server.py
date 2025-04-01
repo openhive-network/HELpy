@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 from collections import defaultdict
 from threading import Thread
-from time import sleep
 from typing import TYPE_CHECKING, Any, Final
 
 from beekeepy._communication.abc.notification_handler import NotificationHandler
@@ -63,9 +62,12 @@ class UniversalNotificationServer(ContextSync[int]):
         time_to_launch_notification_server: Final[float] = 0.5
         assert self.__server_thread is None, "Server thread is not None; Is server still running?"
 
-        self.__server_thread = Thread(target=asyncio.run, args=(self.__http_server.run(),), name=self.__thread_name)
+        self.__loop = asyncio.new_event_loop()
+        self.__server_thread = Thread(target=self.__http_server.run, args=(self.__loop,), name=self.__thread_name)
         self.__server_thread.start()
-        sleep(time_to_launch_notification_server)
+
+        future = asyncio.run_coroutine_threadsafe(asyncio.sleep(time_to_launch_notification_server), self.__loop)
+        future.result()
         return self.__http_server.port
 
     def close(self) -> None:
