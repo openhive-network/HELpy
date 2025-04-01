@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from datetime import timedelta
 from os import environ
+from pathlib import PosixPath
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from msgspec import field
+import msgspec
 from typing_extensions import Self
 
 from beekeepy._interface.url import Url
@@ -14,6 +16,7 @@ from schemas.decoders import get_hf26_decoder
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+DictStrAny = dict[str, Any]
 
 class CommunicationSettings(PreconfiguredBaseModel):
     class EnvironNames:
@@ -49,12 +52,6 @@ class CommunicationSettings(PreconfiguredBaseModel):
     )
     """Period between failed request and next retry."""
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {  # noqa: RUF012
-            Url: lambda v: cast(Url, v).as_string()  # type: ignore[type-arg]
-        }
-
     def export_settings(self) -> str:
         return self.json()
 
@@ -62,3 +59,21 @@ class CommunicationSettings(PreconfiguredBaseModel):
     def import_settings(cls, settings: str) -> Self:
         decoder = get_hf26_decoder(cls)
         return cast(Self, decoder.decode(settings))
+
+    def dict(  # noqa: A003
+        self,
+        *,
+        exclude_none: bool = False,
+        exclude_defaults: bool = False,
+    ) -> DictStrAny:
+        
+        data: DictStrAny =  msgspec.structs.asdict(self)
+
+        if exclude_none:
+            data = {key: value for key, value in data.items() if value is not None}
+        
+        if exclude_defaults and hasattr(self, "__struct_defaults__"):
+            defaults = dict(zip(self.__struct_fields__, self.__struct_defaults__, strict=False))
+            data = {key: value for key, value in data.items() if key in defaults and value != defaults[key]}
+
+        return data

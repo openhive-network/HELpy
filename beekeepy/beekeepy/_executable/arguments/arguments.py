@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from pathlib import Path, PosixPath
+from typing import TYPE_CHECKING, Any, Iterable, Literal
 
+from beekeepy._interface.url import HttpUrl, Url
 from msgspec import field
 
+import msgspec
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
@@ -16,9 +18,6 @@ class Arguments(PreconfiguredBaseModel):
     help: bool = field(default=False)
     version: bool = False
     dump_config: bool = False
-
-    class Config:
-        arbitrary_types_allowed = True
 
     def __convert_member_name_to_cli_value(self, member_name: str) -> str:
         return member_name.replace("_", "-")

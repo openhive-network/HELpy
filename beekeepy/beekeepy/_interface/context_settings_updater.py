@@ -60,3 +60,4 @@ class ContextSettingsUpdater(Generic[SettingsT]):
         # to original settings will be lost
         for key, value in settings_to_update.dict().items():
             setattr(self._settings, key, value)
+        pass
