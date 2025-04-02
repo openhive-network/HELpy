@@ -30,7 +30,7 @@ python = "^3.10"
 python-dateutil = "2.8.2"
 pydantic="1.10.18"
 requests = "2.27.1"
-schemas = "0.0.1.dev343+1a8a111"
+schemas = "0.0.1.dev346+2855805"
 
 [tool.poetry-dynamic-versioning]
 enable = true

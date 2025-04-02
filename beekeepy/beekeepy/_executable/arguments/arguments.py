@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from pathlib import Path, PosixPath
-from typing import TYPE_CHECKING, Any, Iterable, Literal
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-from beekeepy._interface.url import HttpUrl, Url
 from msgspec import field
 
-import msgspec
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
