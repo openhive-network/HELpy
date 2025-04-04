@@ -23,7 +23,7 @@ source = [
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-aiohttp = "3.11.14"
+aiohttp = "3.11.15"
 httpx = {extras = ["http2"], version = "0.23.3"}
 loguru = "0.7.2"
 python = "^3.12"
@@ -33,7 +33,7 @@ requests = "2.32.3"
 setuptools = "77.0.3"
 types-setuptools = "76.0.0.20250313"
 
-schemas = "0.0.1.dev331+7181389"
+schemas = "0.0.1.dev334+2c4c426"
 
 [tool.poetry-dynamic-versioning]
 enable = true
