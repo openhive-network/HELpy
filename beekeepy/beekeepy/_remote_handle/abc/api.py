@@ -132,7 +132,7 @@ class AbstractSyncApi(AbstractApi[SyncHandleT]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def _endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
+    def endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)
@@ -164,9 +164,7 @@ class AbstractAsyncApi(AbstractApi[AsyncHandleT]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def _endpoint(
-        cls, wrapped_function: Callable[P, Awaitable[ExpectResultT]]
-    ) -> Callable[P, Awaitable[ExpectResultT]]:
+    def endpoint(cls, wrapped_function: Callable[P, Awaitable[ExpectResultT]]) -> Callable[P, Awaitable[ExpectResultT]]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)  # type: ignore[arg-type]

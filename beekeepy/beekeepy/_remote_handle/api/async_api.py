@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncHandleT]):
     """Set of endpoints, that allows asynchronous communication with beekeeper service."""
 
-    api = AbstractAsyncApi._endpoint
+    api = AbstractAsyncApi.endpoint
     _owner: AsyncBeekeeper | _AsyncSessionBatchHandle
 
     def __init__(self, owner: AsyncBeekeeper | _AsyncSessionBatchHandle) -> None:

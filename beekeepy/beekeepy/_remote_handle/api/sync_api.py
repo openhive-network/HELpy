@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncHandleT]):
-    api = AbstractSyncApi._endpoint
+    api = AbstractSyncApi.endpoint
 
     _owner: Beekeeper | _SyncSessionBatchHandle
 
