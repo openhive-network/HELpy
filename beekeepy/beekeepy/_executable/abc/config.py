@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
+from inspect import isclass
 from pathlib import Path
 from types import UnionType
-from typing import TYPE_CHECKING, Any, ClassVar, get_args
+from typing import TYPE_CHECKING, Any, ClassVar, Final, get_args
 
 from loguru import logger
 from pydantic import BaseModel
@@ -12,6 +14,8 @@ from beekeepy.exceptions import InvalidOptionError
 
 if TYPE_CHECKING:
     from typing_extensions import Self
+
+CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z]+)(\-([a-zA-Z0-9]+))*$")
 
 
 class Config(BaseModel):
@@ -68,6 +72,9 @@ class Config(BaseModel):
 
     @classmethod
     def _convert_config_name_to_member_name(cls, config_name: str) -> str:
+        config_name = config_name.strip("""" """)
+        if CONFIG_MEMBER_REGEX.match(config_name) is None:
+            raise KeyError(f"""Unknown config entry name: `{config_name}`.""")
         return config_name.strip().replace("-", "_")
 
     @classmethod
@@ -87,7 +94,7 @@ class Config(BaseModel):
         return str(member_value)
 
     @classmethod
-    def _convert_config_value_to_member_value(  # noqa: PLR0911, C901
+    def _convert_config_value_to_member_value(  # noqa: PLR0911, PLR0912, C901
         cls, config_value: str, *, expected: type[Any], current_value: Any | None
     ) -> Any | None:
         config_value = config_value.strip()
@@ -97,7 +104,11 @@ class Config(BaseModel):
         if expected == Path:
             return Path(config_value.replace('"', ""))
 
-        if issubclass(expected, list) or "list" in str(expected):
+        if (
+            (isclass(expected) and issubclass(expected, list))
+            or isinstance(current_value, list)
+            or "list" in str(expected)
+        ):
             list_arg_t = get_args(expected)[0]
             if len(get_args(list_arg_t)):  # in case of unions
                 list_arg_t = get_args(list_arg_t)[0]
@@ -132,7 +143,11 @@ class Config(BaseModel):
         if isinstance(expected, type) and issubclass(expected, int | str) and hasattr(expected, "validate"):
             return expected.validate(config_value)
 
+        if str(expected).startswith("typing.Union["):
+            expected = get_args(expected)[0]
+
         return expected(config_value) if expected is not None else None
+
     def get_differences_between(self, other: Self) -> dict[str, tuple[Any, Any]]:
         differences = {}
         for member_name in self.__dict__:
