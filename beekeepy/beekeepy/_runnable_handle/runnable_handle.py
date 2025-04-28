@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import time
 import warnings
 from abc import ABC, abstractmethod
@@ -20,6 +21,7 @@ from beekeepy.exceptions import (
     FailedToDetectReservedPortsError,
     FailedToStartExecutableError,
 )
+from beekeepy.interfaces import Stopwatch
 
 if TYPE_CHECKING:
     from loguru import Logger
@@ -120,10 +122,10 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         except SubprocessError as e:
             raise FailedToStartExecutableError from e
         try:
-            self._wait_for_app_to_start()
+            ports = self._wait_for_app_to_start()
         except TimeoutError as e:
             raise FailedToDetectReservedPortsError from e
-        self._setup_ports(self.__discover_ports())
+        self._setup_ports(ports)
 
     @abstractmethod
     def _construct_executable(self) -> ExecutableT:
@@ -177,12 +179,25 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             ports -- list of ports reserved by started application.
         """
 
-    def _wait_for_app_to_start(self) -> None:
+    def _wait_for_app_to_start(self) -> PortMatchingResult:
         """Waits for application to start."""
-        while not self._exec.reserved_ports():
-            if not self._exec.is_running():
-                raise FailedToStartExecutableError
-            time.sleep(0.1)
+
+        def ignore_timeout_error() -> PortMatchingResult | None:
+            with contextlib.suppress(TimeoutError):
+                return self.__discover_ports()
+            return None
+
+        with Stopwatch() as stopwatch:
+            while stopwatch.lap <= self._get_settings().initialization_timeout.total_seconds() and not bool(
+                discovered_ports := ignore_timeout_error()
+            ):
+                if not self._exec.is_running():
+                    raise FailedToStartExecutableError
+                time.sleep(0.1)
+
+        if discovered_ports is not None and bool(discovered_ports):
+            return discovered_ports
+        raise TimeoutError(f"Timeout after {stopwatch.seconds_delta :2f} waiting for application to start")
 
     def __choose_working_directory(self, settings: Settings) -> Path:
         return self.__choose_value(

@@ -20,6 +20,9 @@ class PortMatchingResult:
     websocket: WsUrl | None = None
     p2p: list[P2PUrl] = field(default_factory=list)
 
+    def __bool__(self) -> bool:
+        return self.http is not None
+
 
 def verify_is_http_endpoint(address: HttpUrl) -> bool:
     assert address.port is not None, "HTTP CHECK: Port has to be set"
