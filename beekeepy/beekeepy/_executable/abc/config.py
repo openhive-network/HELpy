@@ -133,3 +133,11 @@ class Config(BaseModel):
             return expected.validate(config_value)
 
         return expected(config_value) if expected is not None else None
+    def get_differences_between(self, other: Self) -> dict[str, tuple[Any, Any]]:
+        differences = {}
+        for member_name in self.__dict__:
+            self_value = getattr(self, member_name)
+            other_value = getattr(other, member_name)
+            if self_value != other_value:
+                differences[member_name] = (self_value, other_value)
+        return differences
