@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from beekeepy._communication import rules
 from beekeepy._communication.abc.communicator import AbstractCommunicator
 from beekeepy._communication.abc.overseer import AbstractOverseer
 from beekeepy._communication.abc.rules import OverseerRule, RulesClassifier
@@ -18,6 +19,7 @@ __all__ = [
     "HttpxCommunicator",
     "OverseerRule",
     "RequestCommunicator",
+    "rules",
     "RulesClassifier",
     "StrictOverseer",
 ]
