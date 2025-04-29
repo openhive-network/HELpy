@@ -1,3 +1,11 @@
+exclude: |
+    (?x)(
+            ^beekeepy/beekeepy/_remote_handle/api/api_description.py|
+            ^beekeepy/beekeepy/_remote_handle/api/sync_api_generated.py|
+            ^beekeepy/beekeepy/_remote_handle/api/async_api_generated.py|
+            ^beekeepy/beekeepy/_remote_handle/api/openapi.json  # temporary - will be imported
+    )
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0

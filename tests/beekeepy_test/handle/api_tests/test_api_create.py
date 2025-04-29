@@ -20,12 +20,12 @@ def test_api_create(beekeeper: Beekeeper) -> None:
     """Test test_api_create will test beekeeper_api.create api call."""
     # ARRANGE
     wallet = WalletInfo(password=generate_wallet_password(), name=generate_wallet_name())
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 0, "At the beginning there should be no wallets."
 
     # ACT
     beekeeper.api.create(wallet_name=wallet.name, password=wallet.password)
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
 
     # ASSERT
     assert len(wallets) == 1, "There should be only one wallet."
@@ -37,7 +37,7 @@ def test_api_create_double_same_wallet(beekeeper: Beekeeper) -> None:
     """Test test_api_create will test beekeeper_api.create will test possibility of creating already existing wallet."""
     # ARRANGE
     wallet = WalletInfo(password=generate_wallet_password(), name=generate_wallet_name())
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 0, "At the beginning there should be no wallets."
 
     # ACT & ASSERT
@@ -46,7 +46,7 @@ def test_api_create_double_same_wallet(beekeeper: Beekeeper) -> None:
         beekeeper.api.create(wallet_name=wallet.name, password=wallet.password)
 
     # ASSERT
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 1, "There should be only one wallet."
     assert wallets[0].name == wallet.name, "After creation there should be only one wallet with given name."
 
@@ -58,7 +58,7 @@ def test_api_create_verify_allowed_chars(beekeeper: Beekeeper, name: str) -> Non
     beekeeper.api.create(wallet_name=name)
 
     # ASSERT
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 1, "There should be one wallet created."
 
 
@@ -72,7 +72,7 @@ def test_api_create_correct_wallet_name(beekeeper: Beekeeper, name: str) -> None
     beekeeper.api.create(wallet_name=name)
 
     # ASSERT
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 1, "There should be one wallet created."
 
 
@@ -84,7 +84,7 @@ def test_api_create_verify_not_allowed_chars(beekeeper: Beekeeper, name: str) ->
         beekeeper.api.create(wallet_name=name)
 
     # ASSERT
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 0, "There should be no wallets at all."
 
 
@@ -99,5 +99,5 @@ def test_api_create_not_correct_wallet_name(beekeeper: Beekeeper, name: str) -> 
         beekeeper.api.create(wallet_name=name)
 
     # ASSERT
-    wallets = (beekeeper.api.list_wallets()).wallets
+    wallets = beekeeper.api.list_wallets()
     assert len(wallets) == 0, "There should be no wallets at all."

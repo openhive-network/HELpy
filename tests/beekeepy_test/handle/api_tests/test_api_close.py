@@ -17,14 +17,14 @@ if TYPE_CHECKING:
 def test_api_close(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     """Test test_api_close will test beekeeper_api.close api call."""
     # ARRANGE
-    assert len((beekeeper.api.list_wallets()).wallets) == 1
+    assert len(beekeeper.api.list_wallets()) == 1
 
     # ACT
     beekeeper.api.close(wallet_name=wallet.name)
 
     # ASSERT
     assert (
-        len((beekeeper.api.list_wallets()).wallets) == 0
+        len(beekeeper.api.list_wallets()) == 0
     ), "After close, there should be no wallets hold by beekeeper."
 
 

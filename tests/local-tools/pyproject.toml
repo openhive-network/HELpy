@@ -42,6 +42,16 @@ types-requests = "2.31.0.2"
 disallow_untyped_decorators = false
 plugins = "pydantic.mypy"
 strict = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = [
+  "beekeepy._remote_handle.api.api_description.py", # All of them are generated
+  "beekeepy._remote_handle.api.api_description.async_api.py",
+  "beekeepy._remote_handle.api.api_description.sync_api.py",
+]
+ignore_errors = true
+
 
 [tool.ruff]
 exclude = [

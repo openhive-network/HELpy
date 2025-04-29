@@ -1,0 +1,1460 @@
+{
+  "components": {
+    "schemas": {
+      "close": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "close_response": {
+        "type": "object"
+      },
+      "close_session": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "close_session_response": {
+        "type": "object"
+      },
+      "create": {
+        "properties": {
+          "is_temporary": {
+            "description": "If `true` the wallet exists only in memory otherwise is saved into a file.",
+            "example": false,
+            "type": "boolean"
+          },
+          "password": {
+            "description": "A password for a wallet, if not given will be automatically generated. Maximum length 128.",
+            "example": "this_my_password",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet. Only alphanumeric and '._-@' chars are allowed. A maximum length depends on a maximum length of a file name in given OS.",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "create_response": {
+        "properties": {
+          "password": {
+            "description": "A plaintext password that is needed to unlock a wallet. A caller is responsible for saving the password otherwise it's impossible to unlock the wallet",
+            "example": "PW5J87GVhYjo3XWpmB6XZCX2t3pdPFRzYhYRfLM5QP9P9HCnhmQ4G",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "create_session": {
+        "properties": {
+          "notifications_endpoint": {
+            "description": "A server attached to given session. It's used to receive notifications. Optional.",
+            "example": "127.0.0.1:8001",
+            "type": "string"
+          },
+          "salt": {
+            "description": "Random data that is used as an additional input so as to create a token. Optional.",
+            "example": "avocado-12345",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "create_session_response": {
+        "properties": {
+          "token": {
+            "description": "A token that is attached to newly created session",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "decrypt_data": {
+        "properties": {
+          "encrypted_content": {
+            "description": "A string to decrypt",
+            "example": "5i27iXeZofCsqdT2dDUf274JBt8TMAjYMBpfCygv5sU2cKHhHQWmLn9XRoVyQ2",
+            "type": "string"
+          },
+          "from_public_key": {
+            "description": "A public key of creator",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          },
+          "to_public_key": {
+            "description": "A public key of receiver",
+            "example": "6oR6ckA4TejTWTjatUdbcS98AKETc3rcnQ9dWxmeNiKDzfhBZa",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of the wallet to find a key corresponding to `from_public_key` or `to_public_key`. Only one private key is necessary",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "from_public_key",
+          "to_public_key",
+          "wallet_name",
+          "encrypted_content"
+        ],
+        "type": "object"
+      },
+      "decrypt_data_response": {
+        "properties": {
+          "decrypted_content": {
+            "description": "A decrypted string",
+            "example": "banana-cherry-plum",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "encrypt_data": {
+        "properties": {
+          "content": {
+            "description": "A string to encrypt",
+            "example": "banana-cherry-plum",
+            "type": "string"
+          },
+          "from_public_key": {
+            "description": "A public key of creator",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          },
+          "nonce": {
+            "description": "If nonce is given then is used for encryption otherwise current time is used",
+            "example": 1234567,
+            "format": "int32",
+            "type": "integer"
+          },
+          "to_public_key": {
+            "description": "A public key of receiver",
+            "example": "6oR6ckA4TejTWTjatUdbcS98AKETc3rcnQ9dWxmeNiKDzfhBZa",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to find a key corresponding to `from_public_key` and `to_public_key`",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "from_public_key",
+          "to_public_key",
+          "wallet_name",
+          "content"
+        ],
+        "type": "object"
+      },
+      "encrypt_data_response": {
+        "properties": {
+          "encrypted_content": {
+            "description": "An encrypted string",
+            "example": "TFEBNPfWYfAsAefNx5Ekx57EvpdQsBuimGu4JvbbXjNw2jHSHy3bdRC3TuNt8",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "get_info": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "get_info_response": {
+        "properties": {
+          "now": {
+            "description": "Current time",
+            "example": "2024-04-11T11:36:12.000Z",
+            "type": "string"
+          },
+          "timeout_time": {
+            "description": "Timeout time",
+            "example": "2024-04-11T12:35:34.000Z",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "get_public_keys": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "If a wallet_name is given public keys are searched in a specific wallet otherwise in every unlocked wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "get_public_keys_response": {
+        "items": {
+          "properties": {
+            "public_key": {
+              "description": "A public key",
+              "example": "6oR6ckA4TejTWTjatUdbcS98AKETc3rcnQ9dWxmeNiKDzfhBZa",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "get_version": {
+        "type": "object"
+      },
+      "get_version_response": {
+        "properties": {
+          "version": {
+            "description": "Current version",
+            "example": "d2abc7e9318fce5a10c73cda8beb57f46fe37247",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "has_matching_private_key": {
+        "properties": {
+          "public_key": {
+            "description": "A public key corresponding to a private key that is stored in a wallet",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name",
+          "public_key"
+        ],
+        "type": "object"
+      },
+      "has_matching_private_key_response": {
+        "properties": {
+          "exists": {
+            "description": "A `true` value if a private key exists otherwise `false`",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "has_wallet": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "has_wallet_response": {
+        "properties": {
+          "exists": {
+            "description": "A `true` value if a wallet exists otherwise `false`",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "import_key": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to import into",
+            "example": "my_second_wallet",
+            "type": "string"
+          },
+          "wif_key": {
+            "description": "The WIF Private Key to import, e.g. 5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n",
+            "example": "5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name",
+          "wif_key"
+        ],
+        "type": "object"
+      },
+      "import_key_response": {
+        "properties": {
+          "public_key": {
+            "description": "A public key corresponding to WIF key",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "import_keys": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to import into",
+            "example": "my_second_wallet",
+            "type": "string"
+          },
+          "wif_keys": {
+            "items": {
+              "description": "The WIF Private Key to import, e.g. 5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n",
+              "example": "5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name",
+          "wif_keys"
+        ],
+        "type": "object"
+      },
+      "import_keys_response": {
+        "items": {
+          "description": "A public key corresponding to WIF key",
+          "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "is_wallet_unlocked": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "is_wallet_unlocked_response": {
+        "properties": {
+          "is_locked": {
+            "description": "A `true` value if a wallet is unlocked otherwise `false`",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "list_created_wallets": {
+        "properties": {
+          "token": {
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "list_created_wallets_response": {
+        "items": {
+          "properties": {
+            "name": {
+              "description": "A name of a wallet",
+              "example": "my_second_wallet",
+              "type": "string"
+            },
+            "unlocked": {
+              "description": "Status of a wallet",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "list_wallets": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "list_wallets_response": {
+        "items": {
+          "properties": {
+            "name": {
+              "description": "A name of a wallet",
+              "example": "my_second_wallet",
+              "type": "string"
+            },
+            "unlocked": {
+              "description": "Status of a wallet",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "lock": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to lock",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "lock_all": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "lock_all_response": {
+        "type": "object"
+      },
+      "lock_response": {
+        "type": "object"
+      },
+      "open": {
+        "properties": {
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name"
+        ],
+        "type": "object"
+      },
+      "open_response": {
+        "type": "object"
+      },
+      "remove_key": {
+        "properties": {
+          "public_key": {
+            "description": "The public key to find corresponding a private key to remove.",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to remove a private key from",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name",
+          "password",
+          "public_key"
+        ],
+        "type": "object"
+      },
+      "remove_key_response": {
+        "type": "object"
+      },
+      "set_timeout": {
+        "properties": {
+          "seconds": {
+            "description": "After `N` seconds of inactivity `lock_all` is called",
+            "example": 3600,
+            "format": "int32",
+            "type": "integer"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "seconds"
+        ],
+        "type": "object"
+      },
+      "set_timeout_response": {
+        "type": "object"
+      },
+      "sign_digest": {
+        "properties": {
+          "public_key": {
+            "description": "A public key corresponding to a private key that is stored in a wallet",
+            "example": "6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4",
+            "type": "string"
+          },
+          "sig_digest": {
+            "description": "A signature digest. Represents a whole transaction",
+            "example": "9b29ba0710af3918e81d7b935556d7ab205d8a8f5ca2e2427535980c2e8bdaff",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet where a private key is stored. If not given, then a private key is searched in all unlocked wallets",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "sig_digest",
+          "public_key"
+        ],
+        "type": "object"
+      },
+      "sign_digest_response": {
+        "properties": {
+          "signature": {
+            "description": "A signature of a transaction",
+            "example": "1f74012018d7c6ee846e0b51f8ab42884f91ccf5c76327ce1282ec79290138e2691ec51c57c80f3b594ea587262244ac8ffecfa6efff4a4e15bed1fa6e46b6423a",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "unlock": {
+        "properties": {
+          "password": {
+            "description": "The plaintext password",
+            "example": "PW5JViFn5gd4rt6ohk7DQMgHzQN6Z9FuMRfKoE5Ysk25mkjy5AY1b",
+            "type": "string"
+          },
+          "token": {
+            "description": "Session's identifier",
+            "example": "c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913",
+            "type": "string"
+          },
+          "wallet_name": {
+            "description": "A name of a wallet to unlock",
+            "example": "my_second_wallet",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "wallet_name",
+          "password"
+        ],
+        "type": "object"
+      },
+      "unlock_response": {
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Beekeeper is a tool that stores private keys. Communication with the beekeeper takes place by API endpoints.\n**Important!** It is highly recommended to backup private keys. When a wallet file with private keys is removed then it is impossible to recover these keys.\n\n_**API details**_\n\nAll API endpoints are processed according to JSON-RPC protocol.\n\n_Example:_\n\nA body of `beekeeper_api.get_info` is given as:\n- `{ \"token\": \"c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913\" }`\n\nbut is finally transformed to:\n- `{\"jsonrpc\":\"2.0\",\"method\":\"beekeeper_api.get_info\",\"id\":1,\"params\":{\"token\":\"c8e3a065a469f3d88de46c69c46b2bfc8fe0aa5f1414748788c4a1c9a6a0f913\"}}`\n\n**Sessions:**\n  Creating a session at the beginning of work with beekeeper is required. Without the session it is impossible to do anything. We can create many sessions at the same time, but concurrent sessions are limited. Maximum number of sessions is `64`. When a limit is reached it is necessary to close previous session so as to open the new one. API endpoint `create_session` generates a token that is used by rest of all API endpoints.\n\n**Wallets:**\nEvery wallet is connected with a file. A name of wallet is equals to a name of file + `.wallet` extension. There is not any API endpoint that can remove a wallet. It is possible only by physically removing a file.\n\n**Keys:**\nEvery wallet contains set of private keys. These keys are encrypted. A number of private keys stored in wallet is not limited. Keys can be added or removed.\n\n**Signatures:**\nBeekeeper can sign given transaction by using a private key stored in a wallet. Transaction should be given as a `sig_digest`.\n\n**Encryption:**\nBeekeeper can sign encrypt or decrypt custom data, for example a memo in a transfer operation.\n\n**Timeout:**\nIt is possible to set timeout. When inactivity lasts longer than given timeout all unlocked wallets are locked. There are 2 options:\n- A config option `unlock-timeout` that defines timeout for unlocked wallets. It is set once when the beekeeper starts. By default is `900s` (`15 minutes`). \n- An API endpoint `beekeeper_api.set_timeout` that sets timeout according to `seconds` value in a request body. Every new call of this endpoint covers old timeout and time starts from zero.\n\n_**Wallet details**_\n\n**Explanation lock/unlock/open/close**\n\nA procedure of interaction with beekeeper would look like this:\n\n- open (open wallet file / mount hardware key (in the future))\n- unlock (pass password so private keys are available for signing)\n- ... some operations ...\n- lock (wallet still can be unlocked again and is visible, but private keys are secure)\n- close (wallet file has been closed / hardware key has been unmounted, other app can access it now)\n\nClose can be called without lock, which is done implicitly, same as unlock an be called without open. Open is implicitly done as well.\n\n**Retrieving private keys**\n\nIt is possible to read private keys stored in wallets. There is no API endpoint that allows to do it, but an internal command line option `export-keys-wallet` exists that allows to get keys from any wallet. A password of the wallet is required. This option should be used only for backup creating.",
+    "title": "Network beekeeper",
+    "version": "1.2.1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "beekeeper_api.close": {
+      "post": {
+        "description": "Closing implicitly locks the wallet",
+        "operationId": "close",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/close"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/close_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Close a wallet",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.close_session": {
+      "post": {
+        "description": "In case when all sessions are closed, the beekeeper is closed as well",
+        "operationId": "close_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/close_session"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/close_session_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Close a session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "beekeeper_api.create": {
+      "post": {
+        "description": "A new wallet is created in file dir/{wallet_name}.wallet. The new wallet is unlocked after creation and is implictly opened",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/create"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/create_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Create a wallet",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.create_session": {
+      "post": {
+        "description": "An unique token is generated. The token represents current session.",
+        "operationId": "create_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/create_session"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/create_session_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Create a session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "beekeeper_api.decrypt_data": {
+      "post": {
+        "description": "Decrypt given content. Using creator's and receivers's public keys, content is decrypted. Private keys must exist in given wallet",
+        "operationId": "decrypt_data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/decrypt_data"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/decrypt_data_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Decrypt given content",
+        "tags": [
+          "encryption"
+        ]
+      }
+    },
+    "beekeeper_api.encrypt_data": {
+      "post": {
+        "description": "Encrypt given content. Using creator's and receivers's public keys, content is encrypted",
+        "operationId": "encrypt_data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/encrypt_data"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/encrypt_data_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Encrypt given content",
+        "tags": [
+          "encryption"
+        ]
+      }
+    },
+    "beekeeper_api.get_info": {
+      "post": {
+        "description": "Get current and timeout time connected with current session",
+        "operationId": "get_info",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/get_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_info_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Get information about time",
+        "tags": [
+          "timeout"
+        ]
+      }
+    },
+    "beekeeper_api.get_public_keys": {
+      "post": {
+        "description": "List all public keys from one wallet if a wallet_name is given otherwise all public keys from all unlocked wallets.",
+        "operationId": "get_public_keys",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/get_public_keys"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_public_keys_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Get public keys",
+        "tags": [
+          "keys"
+        ]
+      }
+    },
+    "beekeeper_api.get_version": {
+      "post": {
+        "description": "Get current version. The version is based on git hash.",
+        "operationId": "get_version",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/get_version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_version_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Get current version.",
+        "tags": [
+          "version"
+        ]
+      }
+    },
+    "beekeeper_api.has_matching_private_key": {
+      "post": {
+        "description": "Tests if a private key corresponding to a public key exists in a wallet",
+        "operationId": "has_matching_private_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/has_matching_private_key"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/has_matching_private_key_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Check if a private key exists",
+        "tags": [
+          "keys"
+        ]
+      }
+    },
+    "beekeeper_api.has_wallet": {
+      "post": {
+        "description": "Tests if a wallet exists",
+        "operationId": "has_wallet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/has_wallet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/has_wallet_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Check if a wallet exists",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.import_key": {
+      "post": {
+        "description": "Import a private key into specified wallet",
+        "operationId": "import_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/import_key"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/import_key_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Import a private key.",
+        "tags": [
+          "keys"
+        ]
+      }
+    },
+    "beekeeper_api.import_keys": {
+      "post": {
+        "description": "Import private keys into specified wallet",
+        "operationId": "import_keys",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/import_keys"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/import_keys_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Import private keys.",
+        "tags": [
+          "keys"
+        ]
+      }
+    },
+    "beekeeper_api.is_wallet_unlocked": {
+      "post": {
+        "description": "Display information if given wallet is locked or not",
+        "operationId": "is_wallet_unlocked",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/is_wallet_unlocked"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/is_wallet_unlocked_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Check if a wallet is unlocked",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.list_created_wallets": {
+      "post": {
+        "description": "List all created wallets stored physically in a directory pointed by the beekeeper. It doesn't matter if these wallets are opened/unlocked",
+        "operationId": "list_created_wallets",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/list_created_wallets"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_created_wallets_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "List all created wallets",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.list_wallets": {
+      "post": {
+        "description": "List all opened wallets with information if given wallet is locked or not",
+        "operationId": "list_wallets",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/list_wallets"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_wallets_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "List all opened wallets",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.lock": {
+      "post": {
+        "description": "A wallet is locked and it is not possible to execute any operations related to the wallet. Signing a transaction is blocked",
+        "operationId": "lock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/lock"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lock_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Lock a wallet",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.lock_all": {
+      "post": {
+        "description": "All unlocked wallets are locked and implicitly closed",
+        "operationId": "lock_all",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/lock_all"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lock_all_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Lock all wallets",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.open": {
+      "post": {
+        "description": "Open an existing wallet. Opening does not unlock the wallet",
+        "operationId": "open",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/open"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/open_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Open a wallet",
+        "tags": [
+          "wallets"
+        ]
+      }
+    },
+    "beekeeper_api.remove_key": {
+      "post": {
+        "description": "Remove a private key. Important! It is highly recommended to backup the key earlier. This operation can be reverted.",
+        "operationId": "remove_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/remove_key"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/remove_key_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Remove a private key.",
+        "tags": [
+          "keys"
+        ]
+      }
+    },
+    "beekeeper_api.set_timeout": {
+      "post": {
+        "description": "Set a timeout in order to lock all wallets when time passes",
+        "operationId": "set_timeout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/set_timeout"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/set_timeout_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Set a timeout",
+        "tags": [
+          "timeout"
+        ]
+      }
+    },
+    "beekeeper_api.sign_digest": {
+      "post": {
+        "description": "Sign a transaction presented as a sig_digest using a private key corresponding to a public key",
+        "operationId": "sign_digest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/sign_digest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sign_digest_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Sign a transaction",
+        "tags": [
+          "signatures"
+        ]
+      }
+    },
+    "beekeeper_api.unlock": {
+      "post": {
+        "description": "A wallet is unlocked and it is possible to execute some operations related to the wallet including a transaction signing. Unlocking implicitly opens the wallet",
+        "operationId": "unlock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/unlock"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unlock_response"
+                }
+              }
+            },
+            "description": "Successful operation"
+          }
+        },
+        "summary": "Unlock a wallet",
+        "tags": [
+          "wallets"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://192.168.6.150:7777"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Creating and closing sessions.",
+      "name": "sessions"
+    },
+    {
+      "description": "Wallets managing",
+      "name": "wallets"
+    },
+    {
+      "description": "Importing and removing private keys",
+      "name": "keys"
+    },
+    {
+      "description": "Signing transactions",
+      "name": "signatures"
+    },
+    {
+      "description": "Encryption and decryption data",
+      "name": "encryption"
+    },
+    {
+      "description": "Timeout managing",
+      "name": "timeout"
+    },
+    {
+      "description": "Get version",
+      "name": "version"
+    }
+  ],
+  "x-envelope": "jsonrpc-2.0"
+}

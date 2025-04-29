@@ -23,14 +23,14 @@ def test_api_unlock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
 
     # ASSERT
-    bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
+    bk_wallet = beekeeper.api.list_wallets()[0]
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 
 
 def test_api_unlock_already_unlocked_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
     """Test test_api_unlock_already_unlocked_wallet will try to unlock already unlocked wallet."""
     # ARRANGE
-    bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
+    bk_wallet = beekeeper.api.list_wallets()[0]
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
 
     # ACT & ASSERT
@@ -42,11 +42,11 @@ def test_api_unlock_created_but_closed_wallet(beekeeper: Beekeeper, wallet: Wall
     """Test test_api_unlock_created_but_closed_wallet will try to unlock closed wallet that was one created."""
     # ARRANGE
     beekeeper.api.close(wallet_name=wallet.name)
-    assert len((beekeeper.api.list_wallets()).wallets) == 0
+    assert len(beekeeper.api.list_wallets()) == 0
 
     # ACT
     beekeeper.api.unlock(wallet_name=wallet.name, password=wallet.password)
-    bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
+    bk_wallet = beekeeper.api.list_wallets()[0]
 
     # ASSERT
     assert bk_wallet.unlocked is True, "Wallet should be unlocked."
@@ -67,14 +67,14 @@ def test_api_unlock_one_wallet_at_the_time(beekeeper: Beekeeper, setup_wallets: 
     for wallet in wallets:
         beekeeper.api.open(wallet_name=wallet.name)
 
-    for bk_wallet in (beekeeper.api.list_wallets()).wallets:
+    for bk_wallet in beekeeper.api.list_wallets():
         assert bk_wallet.unlocked is False, "All wallets should be locked."
 
     # ACT
     beekeeper.api.unlock(wallet_name=wallet_to_lock.name, password=wallet_to_lock.password)
 
     # ASSERT
-    for bk_wallet in (beekeeper.api.list_wallets()).wallets:
+    for bk_wallet in beekeeper.api.list_wallets():
         if bk_wallet.name == wallet_to_lock.name:
             assert bk_wallet.unlocked is True, "Target wallet should be unlocked."
         else:

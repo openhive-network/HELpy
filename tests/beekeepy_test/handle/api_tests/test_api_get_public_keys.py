@@ -39,7 +39,7 @@ def test_api_get_public_keys_xxx(
         beekeeper.api.import_key(wallet_name=wallet.name, wif_key=account.private_key)
 
     # ACT
-    response = (beekeeper.api.get_public_keys(**explicit_wallet_name_param)).keys
+    response = beekeeper.api.get_public_keys(**explicit_wallet_name_param)
     bk_public_keys = [pub.public_key for pub in response]
 
     # ASSERT
@@ -71,14 +71,14 @@ def test_api_get_public_keys_with_many_wallets(beekeeper: Beekeeper, setup_walle
     open_and_unlock_wallet(wallet=wallet_2, beekeeper=beekeeper)
 
     # Get ALL public key from bk it should contain both, wallet_1_keys and  wallet_2_keys
-    bk_pub_keys_all = {pub.public_key for pub in (beekeeper.api.get_public_keys()).keys}  # NOTE 1
+    bk_pub_keys_all = {pub.public_key for pub in beekeeper.api.get_public_keys()}  # NOTE 1
     assert bk_pub_keys_all == all_keys, "All keys should be available."
 
     # ACT & ASSERT 1
     # Lock wallet 2
     beekeeper.api.lock(wallet_name=wallet_2.name)
     # Now only keys from wallet 1 should be available
-    bk_pub_keys_1 = [pub.public_key for pub in (beekeeper.api.get_public_keys()).keys]
+    bk_pub_keys_1 = [pub.public_key for pub in beekeeper.api.get_public_keys()]
     assert bk_pub_keys_1 == wallet_1.get_all_public_keys(), "Only keys from wallet 1 should be available."
 
     # ACT & ASSERT 2
@@ -106,13 +106,13 @@ def test_api_get_public_keys_with_many_wallets_closed(beekeeper: Beekeeper, setu
     open_and_unlock_wallet(wallet=wallet_2, beekeeper=beekeeper)
 
     # Get all available public keys ()
-    bk_pub_keys_all = {pub.public_key for pub in (beekeeper.api.get_public_keys()).keys}  # NOTE 1
+    bk_pub_keys_all = {pub.public_key for pub in beekeeper.api.get_public_keys()}  # NOTE 1
     assert bk_pub_keys_all == all_keys, "Keys from wallet 1 and wallet 2 should be available."
 
     # ACT & ASSERT 1
     # Close wallet 2
     beekeeper.api.close(wallet_name=wallet_2.name)
-    bk_pub_keys_1 = [pub.public_key for pub in (beekeeper.api.get_public_keys()).keys]
+    bk_pub_keys_1 = [pub.public_key for pub in beekeeper.api.get_public_keys()]
     assert bk_pub_keys_1 == wallet_1.get_all_public_keys(), "Only keys from wallet 1 should be available."
 
     # ACT & ASSERT 2
