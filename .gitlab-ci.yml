@@ -107,7 +107,9 @@ build_beekeepy_wheel:
   variables:
     PYPROJECT_DIR: "$BEEKEEPY_DIR"
   before_script:
+    - ls -la $CI_PROJECT_DIR/hived-binaries
     - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
+    - ls -la $BEEKEEPY_DIR/beekeepy
   tags:
     - public-runner-docker
 

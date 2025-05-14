@@ -15,6 +15,9 @@ name = "beekeepy"
 packages = [
   {include = "beekeepy"},
 ]
+include = [
+    { path = "beekeepy/beekeeper", format = ["sdist", "wheel"] }
+]
 repository = "https://gitlab.syncad.com/hive/helpy"
 source = [
   {name = "PyPI", priority = "primary"},
