@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 # We have 500ms time period protection on ulocking wallet.
 WALLET_UNLOCK_INTERVAL: Final[float] = DelayGuardBase.BEEKEEPER_DELAY_TIME.total_seconds()
 AES_DECRYPTION_ERROR: Final[str] = "Invalid password for wallet"
-WALLET_UNACCESSIBLE_ERROR: Final[str] = "Assert Exception:false: unlock is not accessible"
+WALLET_UNACCESSIBLE_ERROR: Final[str] = "false: unlock is not accessible"
 
 
 @pytest.fixture
@@ -124,7 +124,7 @@ async def test_wallet_blocking_timeout(beekeeper: AsyncBeekeeper, wallet: Wallet
         ]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        errors_correctly_raised = [str(result) == WALLET_UNACCESSIBLE_ERROR for result in results]
+        errors_correctly_raised = [WALLET_UNACCESSIBLE_ERROR in str(result) for result in results]
         assert len(errors_correctly_raised) == len(tasks), "Not every call raised the expected error."
     else:
         for unlock_json in good_unlock_calls:

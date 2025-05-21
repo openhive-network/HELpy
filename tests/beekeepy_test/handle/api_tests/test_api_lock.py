@@ -27,7 +27,7 @@ def test_api_lock(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
 
 
 def test_api_lock_locked_wallet(beekeeper: Beekeeper, wallet: WalletInfo) -> None:
-    """Test test_api_unlock_unknown_wallet will try to lock already locked wallet."""
+    """Test test_api_lock_locked_wallet will try to lock already locked wallet."""
     # ARRANGE
     bk_wallet = (beekeeper.api.list_wallets()).wallets[0]
     assert bk_wallet.unlocked is True, "Target wallet should be unlocked."

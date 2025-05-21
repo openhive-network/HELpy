@@ -13,6 +13,7 @@ from beekeepy.exceptions.base import (
     InvalidatedStateError,
     Json,
     OverseerError,
+    ProcessSearchError,
     SchemaDetectableError,
 )
 from beekeepy.exceptions.common import (
@@ -49,8 +50,10 @@ from beekeepy.exceptions.detectable import (
 from beekeepy.exceptions.executable import (
     ExecutableIsNotRunningError,
     FailedToDetectReservedPortsError,
+    FailedToDetectRunningBeekeeperError,
     FailedToStartExecutableError,
     TimeoutReachWhileCloseError,
+    UndistinguishableBeekeeperInstancesError,
 )
 from beekeepy.exceptions.overseer import (
     ApiNotFoundError,
@@ -88,6 +91,7 @@ __all__ = [
     "ExecutableError",
     "ExecutableIsNotRunningError",
     "FailedToDetectReservedPortsError",
+    "FailedToDetectRunningBeekeeperError",
     "FailedToStartExecutableError",
     "GroupedErrorsError",
     "InvalidAccountNameError",
@@ -110,8 +114,9 @@ __all__ = [
     "NotPositiveTimeError",
     "NoWalletWithSuchNameError",
     "NullResultError",
-    "OverseerInvalidPasswordError",
     "OverseerError",
+    "OverseerInvalidPasswordError",
+    "ProcessSearchError",
     "ResponseNotReadyError",
     "SchemaDetectableError",
     "TimeoutExceededError",
@@ -120,6 +125,7 @@ __all__ = [
     "UnableToAcquireDatabaseLockError",
     "UnableToAcquireForkdbLockError",
     "UnableToOpenWalletError",
+    "UndistinguishableBeekeeperInstancesError",
     "UnknownDecisionPathError",
     "UnlockIsNotAccessibleError",
     "UnparsableResponseError",

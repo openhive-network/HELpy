@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from beekeepy.exceptions.base import ExecutableError
+from beekeepy.exceptions.base import ExecutableError, ProcessSearchError
 
 
 class TimeoutReachWhileCloseError(ExecutableError):
@@ -21,3 +21,11 @@ class FailedToStartExecutableError(ExecutableError):
 
 class FailedToDetectReservedPortsError(ExecutableError):
     """Raises when port lookup procedure fails."""
+
+
+class FailedToDetectRunningBeekeeperError(ProcessSearchError):
+    """Raises when no matching instances of beekeeper left after filtering out on given criteria."""
+
+
+class UndistinguishableBeekeeperInstancesError(ProcessSearchError):
+    """Raises when multiple instances of beekeeper were found after filtering out on given criteria."""

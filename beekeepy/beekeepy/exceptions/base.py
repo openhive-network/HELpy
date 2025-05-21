@@ -193,3 +193,7 @@ class OverseerError(CommunicationError, ABC):
 
 class ExecutableError(BeekeepyError, ABC):
     """Base class for errors related to handling executable."""
+
+
+class ProcessSearchError(ExecutableError, ABC):
+    """Base class for error related to looking up for process."""
