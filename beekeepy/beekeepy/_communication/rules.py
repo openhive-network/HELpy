@@ -217,8 +217,8 @@ class UnlockIsNotAccessible(OverseerRule):
 
 class WalletIsAlreadyUnlocked(OverseerRule):
     _WALLET_IS_ALREADY_UNLOCKED_REGEXES: ClassVar[list[re.Pattern[str]]] = [
-        re.compile(r"Assert Exception:_itr->is_locked\(\): Wallet with name: '([\w-]+)' is already unlocked"),
-        re.compile(r"Assert Exception:_itr->is_locked\(\): Wallet is already unlocked: ([\w-]+)rethrow"),
+        re.compile(r"_itr->is_locked\(\): Wallet with name: '([\w-]+)' is already unlocked"),
+        re.compile(r"_itr->is_locked\(\): Wallet is already unlocked: ([\w-]+)rethrow"),
     ]
 
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
@@ -238,7 +238,7 @@ class WalletIsAlreadyUnlocked(OverseerRule):
 
 class UnableToOpenWallet(OverseerRule):
     _UNABLE_TO_OPEN_WALLET_REGEX: ClassVar[re.Pattern[str]] = re.compile(
-        r"Assert Exception:_new_item->load_wallet_file\(\): "
+        r"_new_item->load_wallet_file\(\): "
         r"Unable to open file: " + REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME + r"(?:rethrow)?"
     )
 
@@ -258,13 +258,13 @@ class UnableToOpenWallet(OverseerRule):
 
 class InvalidPassword(OverseerRule):
     _INVALID_PASSWORD_REGEX: ClassVar[re.Pattern[str]] = re.compile(
-        r"Assert Exception:false: Invalid password for wallet: "
-        + REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME
-        + r"(?:rethrow)?"
+        r"false: Invalid password for wallet: '" + REGEX_FOR_PATH_WITH_CAPTURE_GROUP_ON_WALLET_NAME + r"' (?:rethrow)?"
     )
 
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
-        if (match := self._INVALID_PASSWORD_REGEX.search(str(parsed_response))) is not None:
+        if (
+            match := self._INVALID_PASSWORD_REGEX.search(parsed_response.get("error", {}).get("message", ""))
+        ) is not None:
             return [
                 self._construct_exception(
                     error_cls=OverseerInvalidPasswordError,
