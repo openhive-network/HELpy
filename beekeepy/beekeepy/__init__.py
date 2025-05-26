@@ -13,7 +13,7 @@ from beekeepy._interface.abc import (
     UnlockedWallet,
     Wallet,
 )
-from beekeepy._runnable_handle import close_already_running_beekeeper
+from beekeepy._runnable_handle import close_already_running_beekeeper, find_running_beekeepers
 
 __all__ = [
     "AsyncBeekeeper",
@@ -21,8 +21,8 @@ __all__ = [
     "AsyncWallet",
     "AsyncUnlockedWallet",
     "Beekeeper",
-    "RemoteHandleSettings",
     "close_already_running_beekeeper",
+    "find_running_beekeepers",
     "PackedAsyncBeekeeper",
     "PackedSyncBeekeeper",
     "Session",

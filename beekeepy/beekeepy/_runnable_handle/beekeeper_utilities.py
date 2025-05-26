@@ -17,7 +17,7 @@ from beekeepy.exceptions import (
     UndistinguishableBeekeeperInstancesError,
 )
 
-__all__ = ["close_already_running_beekeeper"]
+__all__ = ["close_already_running_beekeeper", "find_running_beekeepers"]
 
 
 ProcessFilter = Callable[[psutil.Process], bool]
@@ -35,6 +35,7 @@ def _kill_by_pid(*, pid: int) -> None:
 
     try:
         _wait_for_pid_to_die(pid, timeout_secs=10)  # check is process actually dead
+
         logger.debug(f"Process {pid} was closed with SIGINT")
     except TimeoutError:
         sig = signal.SIGKILL  # in case of no reaction to ^C, kill process hard way
@@ -103,6 +104,35 @@ def _handle_beekeeper_killing(process: psutil.Process) -> None:
     logger.info(f"Killed beekeeper with pid={pid}")
 
 
+def find_running_beekeepers(
+    *,
+    binary_path: Path | None = None,
+    cwd: Path | None = None,
+    port: int | None = None,
+) -> list[psutil.Process]:
+    """
+    AIO function to find all running beekeeper instances.
+
+    Args:
+        binary_path: if given, filters out all beekeepers that are not started using this binary
+                    (by default it takes binary from package)
+        cwd: if given, filters out all beekeepers that have working directory set in other directories
+        port: if given, selects beekeepers with such reserved port
+
+    Returns:
+        List of processes that match given criteria.
+    """
+    processes = _filter_processes(list(psutil.process_iter()), _filter_proc_preliminary_factory(binary_path))
+
+    if cwd is not None:
+        processes = _filter_processes(processes, _filter_proc_by_cwd_factory(cwd))
+
+    if port is not None:
+        processes = _filter_processes(processes, _filter_proc_by_reserved_port_factory(port))
+
+    return processes
+
+
 def close_already_running_beekeeper(
     *,
     pid: int | None = None,
@@ -129,13 +159,7 @@ def close_already_running_beekeeper(
         _handle_beekeeper_killing(psutil.Process(pid=pid))
         return
 
-    processes = _filter_processes(list(psutil.process_iter()), _filter_proc_preliminary_factory(binary_path))
-
-    if cwd is not None:
-        processes = _filter_processes(processes, _filter_proc_by_cwd_factory(cwd))
-
-    if port is not None:
-        processes = _filter_processes(processes, _filter_proc_by_reserved_port_factory(port))
+    processes = find_running_beekeepers(binary_path=binary_path, cwd=cwd, port=port)
 
     if len(processes) == 0:
         raise FailedToDetectRunningBeekeeperError
