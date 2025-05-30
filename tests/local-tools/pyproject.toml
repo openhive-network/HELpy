@@ -41,7 +41,6 @@ types-psutil = "6.0.0.20240901"
 
 [tool.mypy]
 disallow_untyped_decorators = false
-plugins = "pydantic.mypy"
 strict = true
 
 [tool.ruff]
