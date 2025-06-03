@@ -14,9 +14,10 @@ if TYPE_CHECKING:
 
 Json = dict[str, Any]
 CommunicationResponseT = str | Json | list[Json]
+BaseOfAllExceptions = Exception
 
 
-class BeekeepyError(BaseException, ABC):
+class BeekeepyError(BaseOfAllExceptions, ABC):
     """Base class for all exception raised by beekeepy."""
 
     @property
