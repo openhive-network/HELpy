@@ -198,6 +198,8 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
                 time.sleep(0.1)
 
         if discovered_ports is not None and bool(discovered_ports):
+            self._logger.debug(f"Discovery of ports took {stopwatch.seconds_delta :2f} seconds")
+            self._logger.info(f"{discovered_ports=}")
             return discovered_ports
         raise TimeoutError(f"Timeout after {stopwatch.seconds_delta :2f} waiting for application to start")
 
@@ -240,6 +242,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
     def __discover_ports(self) -> PortMatchingResult:
         reserved_ports = self._exec.reserved_ports()
         matched_ports = match_ports(reserved_ports)
+        self._logger.debug(f"Potentially matched ports: {matched_ports}")
         if matched_ports.http is None:
             warnings.warn("Given executable probably does not provide http network access", stacklevel=3)
             return matched_ports
@@ -249,9 +252,8 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         try:
             status = handle.api.get_app_status()
         except ApiNotFoundError:
-            warnings.warn(
-                "HTTP port detected, but cannot obtain further information. app_status_api plugin is not enabled!",
-                stacklevel=3,
+            self._logger.warning(
+                "HTTP port detected, but cannot obtain further information. app_status_api plugin is not enabled!"
             )
             return matched_ports
 

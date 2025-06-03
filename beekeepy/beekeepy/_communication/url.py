@@ -43,6 +43,9 @@ class Url(Generic[ProtocolT]):
     def __str__(self) -> str:
         return self.as_string()
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Url):
             return self.as_string() == other.as_string()

@@ -6,7 +6,6 @@ from pathlib import Path
 from types import UnionType
 from typing import TYPE_CHECKING, Any, ClassVar, Final, get_args
 
-from loguru import logger
 from pydantic import BaseModel
 
 from beekeepy._communication import Url
@@ -112,7 +111,6 @@ class Config(BaseModel):
             list_arg_t = get_args(expected)[0]
             if len(get_args(list_arg_t)):  # in case of unions
                 list_arg_t = get_args(list_arg_t)[0]
-            logger.info(f"{list_arg_t=}")
             values = [
                 cls._convert_config_value_to_member_value(value, expected=list_arg_t, current_value=None)
                 for value in config_value.split()
