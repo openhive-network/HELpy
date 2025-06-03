@@ -18,6 +18,7 @@ from beekeepy._runnable_handle.match_ports import PortMatchingResult, match_port
 from beekeepy._runnable_handle.settings import Settings
 from beekeepy.exceptions import (
     ApiNotFoundError,
+    CommunicationError,
     FailedToDetectReservedPortsError,
     FailedToStartExecutableError,
 )
@@ -252,6 +253,13 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
                 stacklevel=3,
             )
             return matched_ports
+        except CommunicationError as e:
+            self._logger.warning(
+                f"Cannot connect to app_status_api: {e.message_raw}. "
+                "This is probably because application is not started yet."
+                "Returning incomplete PortMatchingResult for retry."
+            )
+            return PortMatchingResult(http=None)
 
         assert status is not None, "Error has not been caught and further port discovery started"
         http = status.webservers.HTTP

@@ -3,6 +3,7 @@ from __future__ import annotations
 import socket
 import ssl
 from dataclasses import dataclass, field
+from datetime import timedelta
 from typing import Final
 
 from beekeepy._communication import HttpUrl, P2PUrl, WsUrl
@@ -26,13 +27,21 @@ class PortMatchingResult:
 
 def verify_is_http_endpoint(address: HttpUrl) -> bool:
     assert address.port is not None, "HTTP CHECK: Port has to be set"
+    from beekeepy._remote_handle import AppStatusProbe, RemoteHandleSettings
+    from beekeepy.exceptions import CommunicationError
+
     try:
-        with socket.create_connection((address.address, address.port), timeout=1) as sock:
-            sock.sendall(b"GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
-            response = sock.recv(1024)
-            return response.startswith(b"HTTP") and WEBSERVER_SPECIFIC_RESPONSE not in response
-    except (OSError, socket.timeout, ConnectionRefusedError):
+        AppStatusProbe(
+            settings=RemoteHandleSettings(
+                http_endpoint=address,
+                max_retries=0,
+                period_between_retries=timedelta(seconds=0),
+                timeout=timedelta(microseconds=300),
+            )
+        ).api.get_app_status()
+    except CommunicationError:
         return False
+    return True
 
 
 def verify_is_https_endpoint(address: HttpUrl) -> bool:
