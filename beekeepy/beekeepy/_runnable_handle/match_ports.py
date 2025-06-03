@@ -24,6 +24,18 @@ class PortMatchingResult:
     def __bool__(self) -> bool:
         return self.http is not None
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __str__(self) -> str:
+        return (
+            f"<{self.__class__.__name__}: {self.http=} "
+            + (f"{self.https=} " if self.https else "")
+            + (f"{self.websocket=} " if self.websocket else "")
+            + (f"self.p2p={' '.join(str(x) for x in self.p2p)} " if self.p2p else "")
+            + ">"
+        )
+
 
 def verify_is_http_endpoint(address: HttpUrl) -> bool:
     assert address.port is not None, "HTTP CHECK: Port has to be set"
