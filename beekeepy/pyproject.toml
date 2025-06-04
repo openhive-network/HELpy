@@ -36,7 +36,7 @@ requests = "2.32.3"
 setuptools = "77.0.3"
 types-setuptools = "76.0.0.20250313"
 
-schemas = "0.0.1.dev343+6e91e3d"
+schemas = "0.0.1.dev345+0b349a2"
 
 [tool.poetry-dynamic-versioning]
 enable = true

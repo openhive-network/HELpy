@@ -188,7 +188,7 @@ loguru = "0.7.2"
 psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
-schemas = "0.0.1.dev343+6e91e3d"
+schemas = "0.0.1.dev345+0b349a2"
 setuptools = "77.0.3"
 types-setuptools = "76.0.0.20250313"
 
@@ -1252,13 +1252,13 @@ files = [
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev343+6e91e3d"
+version = "0.0.1.dev345+0b349a2"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "schemas-0.0.1.dev343+6e91e3d-py3-none-any.whl", hash = "sha256:177a81e8370f4f06f9f8bcf705a7da1bcad375f936354d7676c76ef0c1e35c6e"},
+    {file = "schemas-0.0.1.dev345+0b349a2-py3-none-any.whl", hash = "sha256:35487f5bd7ca70556f350f74495bc8e8ef15af829b8c86aee783ab2908fab86a"},
 ]
 
 [package.dependencies]
