@@ -3,8 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from pydantic import StrRegexError
-
 from beekeepy._utilities.context import ContextSync
 
 if TYPE_CHECKING:
@@ -81,7 +79,7 @@ class SchemaDetectableError(DetectableError, ABC):
         super().__init__(self._error_message())
 
     def _is_exception_handled(self, ex: BaseException) -> bool:
-        return isinstance(ex, StrRegexError)
+        return isinstance(ex, ValueError)
 
     @abstractmethod
     def _error_message(self) -> str: ...

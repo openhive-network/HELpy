@@ -4,12 +4,12 @@ from abc import abstractmethod
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from pydantic import BaseModel
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-SettingsT = TypeVar("SettingsT", bound=BaseModel)
+SettingsT = TypeVar("SettingsT", bound=PreconfiguredBaseModel)
 
 
 class ContextSettingsUpdater(Generic[SettingsT]):

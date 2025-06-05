@@ -35,7 +35,7 @@ def _raise_acquire_not_possible() -> NoReturn:
 
 
 class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncSessionHolder):
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
         overseer: AbstractOverseer,
@@ -43,9 +43,18 @@ class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncS
         *args: Any,
         session_token: str,
         delay_error_on_data_access: bool = False,
+        is_testnet: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, overseer, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(
+            url,
+            overseer,
+            api,
+            *args,
+            delay_error_on_data_access=delay_error_on_data_access,
+            is_testnet=is_testnet,
+            **kwargs,
+        )
         self.set_session_token(session_token)
 
     def _acquire_session_token(self) -> str:
@@ -53,7 +62,7 @@ class _SyncSessionBatchHandle(SyncBatchHandle[BeekeeperSyncApiCollection], SyncS
 
 
 class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], AsyncSessionHolder):
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         url: HttpUrl,
         overseer: AbstractOverseer,
@@ -61,9 +70,18 @@ class _AsyncSessionBatchHandle(AsyncBatchHandle[BeekeeperAsyncApiCollection], As
         *args: Any,
         session_token: str,
         delay_error_on_data_access: bool = False,
+        is_testnet: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, overseer, api, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(
+            url,
+            overseer,
+            api,
+            *args,
+            delay_error_on_data_access=delay_error_on_data_access,
+            is_testnet=is_testnet,
+            **kwargs,
+        )
         self.set_session_token(session_token)
 
     async def _acquire_session_token(self) -> str:
@@ -94,6 +112,7 @@ class Beekeeper(AbstractSyncHandle[RemoteSettingsT, BeekeeperSyncApiCollection],
             api=lambda o: BeekeeperSyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
             session_token=self.session.token,
+            is_testnet=self.is_testnet(),
         )
 
     def _acquire_session_token(self) -> str:
@@ -130,6 +149,7 @@ class AsyncBeekeeper(AbstractAsyncHandle[RemoteSettingsT, BeekeeperAsyncApiColle
             api=lambda o: BeekeeperAsyncApiCollection(owner=o),
             delay_error_on_data_access=delay_error_on_data_access,
             session_token=(await self.session).token,
+            is_testnet=self.is_testnet(),
         )
 
     async def _acquire_session_token(self) -> str:

@@ -39,7 +39,7 @@ class _SettingsHolderBase(ABC, ContextSettingsUpdater[SettingsT]):
         return self.__settings
 
     def _get_copy_of_settings(self) -> SettingsT:
-        return self._settings.copy()
+        return self.__settings.copy()
 
     @abstractmethod
     def _get_settings_for_storage(self, settings: SettingsT) -> SettingsT: ...

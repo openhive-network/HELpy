@@ -4,17 +4,17 @@ from datetime import timedelta
 from os import environ
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
-from pydantic import BaseModel, Field
+from msgspec import field
+from typing_extensions import Self
 
-from beekeepy._communication.url import Url
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
+from schemas.decoders import get_hf26_decoder
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from typing_extensions import Self
 
-
-class CommunicationSettings(BaseModel):
+class CommunicationSettings(PreconfiguredBaseModel):
     class EnvironNames:
         TIMEOUT: ClassVar[str] = "HELPY_COMMUNICATION_MAX_RETRIES"
         PERIOD_BETWEEN_RETRIES: ClassVar[str] = "HELPY_COMMUNICATION_TIMEOUT_SECS"
@@ -28,7 +28,7 @@ class CommunicationSettings(BaseModel):
         @staticmethod
         def default_factory(env_name: str, default_factory: Callable[[str | None], Any]) -> Any:
             env_value = environ.get(env_name)
-            return Field(default_factory=lambda: default_factory(env_value))
+            return field(default_factory=lambda: default_factory(env_value))
 
     max_retries: int = Defaults.default_factory(
         EnvironNames.RETRIES,
@@ -48,15 +48,10 @@ class CommunicationSettings(BaseModel):
     )
     """Period between failed request and next retry."""
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {  # noqa: RUF012
-            Url: lambda v: cast(Url, v).as_string()  # type: ignore[type-arg]
-        }
-
     def export_settings(self) -> str:
         return self.json()
 
     @classmethod
     def import_settings(cls, settings: str) -> Self:
-        return cls.parse_raw(settings)
+        decoder = get_hf26_decoder(cls)
+        return cast(Self, decoder.decode(settings))

@@ -6,10 +6,11 @@ from pathlib import Path
 from types import UnionType
 from typing import TYPE_CHECKING, Any, ClassVar, Final, get_args
 
-from pydantic import BaseModel
+from loguru import logger
 
 from beekeepy._communication import Url
 from beekeepy.exceptions import InvalidOptionError
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
 CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z0-9]+)(\-([a-zA-Z0-9]+))*$")
 
 
-class Config(BaseModel):
+class Config(PreconfiguredBaseModel):
     DEFAULT_FILE_NAME: ClassVar[str] = "config.ini"
 
     class Config:
@@ -32,7 +33,7 @@ class Config(BaseModel):
 
     def write_to_lines(self) -> list[str]:
         result = []
-        for member_name, member_value in self.__dict__.items():
+        for member_name, member_value in self.dict().items():
             if member_value is not None:
                 if isinstance(member_value, list) and len(member_value) == 0:
                     continue
@@ -60,9 +61,9 @@ class Config(BaseModel):
             if (line := line.strip("\n")) and not line.startswith("#"):
                 config_name, config_value = line.split("=")
                 member_name = cls._convert_config_name_to_member_name(config_name)
-                member_type = fields[member_name].annotation
+                member_type = fields[member_name].type
                 if isinstance(member_type, UnionType) and (type(None) in get_args(member_type)):
-                    member_type = get_args(member_type)[0]
+                    member_type = next(t for t in get_args(member_type) if t is not type(None))
                 values_to_write[member_name] = cls._convert_config_value_to_member_value(
                     config_value, expected=member_type, current_value=values_to_write.get(member_name)
                 )
@@ -151,7 +152,7 @@ class Config(BaseModel):
 
     def get_differences_between(self, other: Self) -> dict[str, tuple[Any, Any]]:
         differences = {}
-        for member_name in self.__dict__:
+        for member_name in self.dict():
             self_value = getattr(self, member_name)
             other_value = getattr(other, member_name)
             if self_value != other_value:

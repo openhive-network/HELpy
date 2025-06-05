@@ -15,7 +15,7 @@ class RemoteHandleSettings(CommunicationSettings):
     class Defaults(CommunicationSettings.Defaults):
         OVERSEER: ClassVar[type[AbstractOverseer]] = CommonOverseer
 
-    http_endpoint: HttpUrl
+    http_endpoint: HttpUrl | None = None
     """
     Endpoint exposed by service to be connect to by handle.
     """

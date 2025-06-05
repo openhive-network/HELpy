@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from beekeepy import exceptions
 from beekeepy._apis.abc import AsyncSendable, SyncSendable
@@ -52,7 +53,7 @@ class _DelayedResponseWrapper:
 
     def _set_response(self, **kwargs: Any) -> None:
         expected_type = super().__getattribute__("_expected_type")
-        response = get_response_model(expected_type, **kwargs)
+        response = get_response_model(expected_type, json.dumps(kwargs), "hf26")
         assert isinstance(response, JSONRPCResult), "Expected JSONRPCResult, model cannot be found."
         super().__setattr__("_response", response.result)
 
@@ -135,6 +136,7 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
         overseer: AbstractOverseer,
         *args: Any,
         delay_error_on_data_access: bool = False,
+        is_testnet: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
@@ -143,6 +145,8 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
         self._delay_error_on_data_access = delay_error_on_data_access
 
         self.__batch: list[_BatchRequestResponseItem] = []
+
+        self.__is_testnet: bool = is_testnet
 
     def _impl_handle_request(self, endpoint: str, params: str, *, expect_type: type[ExpectResultT]) -> ExpectResultT:
         @dataclass
@@ -199,6 +203,9 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
     def _finally(self) -> None:
         return None
 
+    def is_testnet(self) -> bool:
+        return self.__is_testnet
+
 
 ApiT = TypeVar("ApiT")
 OwnerT = TypeVar("OwnerT")
@@ -215,12 +222,22 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], SyncSendable, Generic[Api
         api: ApiFactory[Self, ApiT],
         *args: Any,
         delay_error_on_data_access: bool = False,
+        is_testnet: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(
+            url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, is_testnet=is_testnet, **kwargs
+        )
         self.api: ApiT = api(self)
 
-    def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
+    def _send(
+        self,
+        *,
+        endpoint: str,
+        params: str,
+        expected_type: type[ExpectResultT],
+        serialization_type: Literal["hf26", "legacy"],  # noqa: ARG002
+    ) -> JSONRPCResult[ExpectResultT]:
         return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
 
 
@@ -232,12 +249,20 @@ class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], AsyncSendable, Generic[
         api: ApiFactory[Self, ApiT],
         *args: Any,
         delay_error_on_data_access: bool = False,
+        is_testnet: bool = False,
         **kwargs: Any,
     ) -> None:
-        super().__init__(url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, **kwargs)
+        super().__init__(
+            url, overseer, *args, delay_error_on_data_access=delay_error_on_data_access, is_testnet=is_testnet, **kwargs
+        )
         self.api: ApiT = api(self)
 
     async def _async_send(
-        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+        self,
+        *,
+        endpoint: str,
+        params: str,
+        expected_type: type[ExpectResultT],
+        serialization_type: Literal["hf26", "legacy"],  # noqa: ARG002
     ) -> JSONRPCResult[ExpectResultT]:
         return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]

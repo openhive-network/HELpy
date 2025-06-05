@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from loguru import logger as loguru_logger
 
@@ -58,6 +59,7 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
     @property
     def http_endpoint(self) -> HttpUrl:  # TODO: RESOLVE APPROPRIATE SETTING HANDLE
         """Return endpoint where handle is connected to."""
+        assert self.settings.http_endpoint is not None, "Http endpoint shouldn't be None"
         return self.settings.http_endpoint
 
     @http_endpoint.setter
@@ -113,11 +115,14 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
 
     @classmethod
     def _response_handle(
-        cls, response: Json | list[Json], expected_type: type[ExpectResultT]
+        cls,
+        response: Json | list[Json],
+        expected_type: type[ExpectResultT],
+        serialization_type: Literal["hf26", "legacy"],
     ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
         assert isinstance(response, dict), f"Expected dict as response, got: {response=}"
-        serialized_data = get_response_model(expected_type, **response)
+        serialized_data = get_response_model(expected_type, json.dumps(response), serialization_type)
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
 
@@ -145,12 +150,21 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
             lambda: self._sanitize_data(response),  # to reduce deepcopy
         )
 
+    def is_testnet(self) -> bool:
+        """Returns if handle is connected to testnet."""
+        return False
+
 
 class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsync, AsyncSendable, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
     async def _async_send(
-        self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]
+        self,
+        *,
+        endpoint: str,
+        params: str,
+        expected_type: type[ExpectResultT],
+        serialization_type: Literal["hf26", "legacy"],
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         from beekeepy._utilities.error_logger import ErrorLogger
@@ -160,7 +174,9 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
         with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
             response = await self._overseer.async_send(self.http_endpoint, data=request)
         self._log_response(record.seconds_delta, response)
-        return self._response_handle(response=response, expected_type=expected_type)
+        return self._response_handle(
+            response=response, expected_type=expected_type, serialization_type=serialization_type
+        )
 
     def _is_synchronous(self) -> bool:
         return False
@@ -179,7 +195,14 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
 class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync, SyncSendable, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
-    def _send(self, *, endpoint: str, params: str, expected_type: type[ExpectResultT]) -> JSONRPCResult[ExpectResultT]:
+    def _send(
+        self,
+        *,
+        endpoint: str,
+        params: str,
+        expected_type: type[ExpectResultT],
+        serialization_type: Literal["hf26", "legacy"],
+    ) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         from beekeepy._utilities.error_logger import ErrorLogger
 
@@ -188,7 +211,9 @@ class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync,
         with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
             response = self._overseer.send(self.http_endpoint, data=request)
         self._log_response(record.seconds_delta, response)
-        return self._response_handle(response=response, expected_type=expected_type)
+        return self._response_handle(
+            response=response, expected_type=expected_type, serialization_type=serialization_type
+        )
 
     def _is_synchronous(self) -> bool:
         return True

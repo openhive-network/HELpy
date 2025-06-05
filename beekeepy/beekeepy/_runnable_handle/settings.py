@@ -27,7 +27,7 @@ class Settings(RemoteHandleSettings):
     working_directory: Path | None = None
     """Path, where beekeeper binary will store all it's data and logs."""
 
-    http_endpoint: HttpUrl | None = None  # type: ignore[assignment]
+    http_endpoint: HttpUrl | None = None
     """
     Endpoint on which python will communicate with beekeeper, required for remote beekeeper.
     In case of local beekeeper, this address will be used for beekeeper to start listening on.

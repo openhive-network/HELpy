@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field
+from msgspec import field
 
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
@@ -77,8 +77,8 @@ class CliParser:
         return key, value
 
 
-class Arguments(PreconfiguredBaseModel, ABC):
-    help_: bool = Field(alias="help", default=False)
+class Arguments(PreconfiguredBaseModel):
+    help: bool = False
     version: bool = False
     dump_config: bool = False
 
@@ -105,9 +105,11 @@ class Arguments(PreconfiguredBaseModel, ABC):
     def _convert_member_value_to_string_default(self, member_value: Any) -> str | Any: ...
 
     def __prepare_arguments(self, pattern: str) -> list[str]:
-        data = self.dict(by_alias=True, exclude_none=True, exclude_unset=True, exclude_defaults=True)
+        data = self.dict(exclude_none=True, exclude_defaults=True)
         cli_arguments: list[str] = []
         for k, v in data.items():
+            if isinstance(v, list) and len(v) == 0:
+                continue
             cli_arguments.append(pattern.format(self.__convert_member_name_to_cli_value(k)))
             cli_arguments.append(self.__convert_member_value_to_string(v))
         return cli_arguments
@@ -123,17 +125,17 @@ class Arguments(PreconfiguredBaseModel, ABC):
         if other is None:
             return
 
-        for other_name, other_value in other.dict(exclude_unset=True, exclude_defaults=True, exclude_none=True).items():
+        for other_name, other_value in other.dict(exclude_defaults=True, exclude_none=True).items():
             assert isinstance(other_name, str), "Member name has to be string"
             setattr(self, other_name, other_value)
 
     @classmethod
     def parse_cli_input(cls, cli: list[str]) -> Self:
-        return cls(**CliParser.parse_cli_input(cli))
+        return cls(**CliParser.parse_cli_input(cli))  # type: ignore[arg-type]
 
     @classmethod
     def just_get_help(cls) -> Self:
-        return cls(help_=True)
+        return cls(help=True)
 
     @classmethod
     def just_get_version(cls) -> Self:

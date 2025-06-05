@@ -1,34 +1,29 @@
 from __future__ import annotations
 
-import json
 import re
 from abc import ABC
 from collections import defaultdict
-from datetime import datetime
 from enum import IntEnum
-from functools import partial, wraps
+from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,
     Generic,
+    Literal,
     ParamSpec,
     TypeVar,
     get_type_hints,
 )
 
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from schemas._preconfigured_base_model import PreconfiguredBaseModel
-from schemas.fields.serializable import Serializable
-from schemas.operations.representations.legacy_representation import LegacyRepresentation
+from schemas.encoders import get_hf26_encoder, get_legacy_encoder, get_legacy_encoder_testnet
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
 
-    from schemas.jsonrpc import ExpectResultT
-
-
 P = ParamSpec("P")
+R = TypeVar("R")
 HandleT = TypeVar("HandleT", bound=SyncSendable | AsyncSendable)
 
 RegisteredApisT = defaultdict[bool, defaultdict[str, set[str]]]
@@ -51,29 +46,21 @@ class AbstractApi(ABC, Generic[HandleT]):
     __registered_apis: ClassVar[RegisteredApisT] = defaultdict(lambda: defaultdict(lambda: set()))
 
     @staticmethod
-    def _get_api_name_from_method(method: Callable[P, ExpectResultT] | Callable[P, Awaitable[ExpectResultT]]) -> str:
+    def _get_api_name_from_method(method: Callable[P, R] | Callable[P, Awaitable[R]]) -> str:
         """Converts __qualname__ to api name."""
         return _convert_pascal_case_to_sneak_case(method.__qualname__.split(".")[0])
 
-    @classmethod
-    def json_dumps(cls) -> Callable[[Any], str]:
-        class JsonEncoder(json.JSONEncoder):
-            def default(self, o: Any) -> Any:
-                if isinstance(o, LegacyRepresentation):
-                    return (o.type, o.value)
-                if isinstance(o, Serializable):
-                    return o.serialize()
-                if isinstance(o, PreconfiguredBaseModel):
-                    return o.shallow_dict()
-                if isinstance(o, datetime):
-                    return PreconfiguredBaseModel.Config.json_encoders[datetime](o)  # type: ignore[no-untyped-call]
-                return super().default(o)
-
-        return partial(json.dumps, cls=JsonEncoder, ensure_ascii=False)
+    def json_dumps(self) -> Callable[[Any], str]:
+        encoder = (
+            get_hf26_encoder()
+            if self._serialize_type() == "hf26"
+            else (get_legacy_encoder_testnet() if self._owner.is_testnet() else get_legacy_encoder())
+        )
+        return lambda x: encoder.encode(x).decode()
 
     def _serialize_params(self, arguments: ApiArgumentsToSerialize) -> str:
         """Return serialized given params. Can be overloaded."""
-        json_dumps = AbstractApi.json_dumps()
+        json_dumps = self.json_dumps()
         if self.argument_serialization() == ApiArgumentSerialization.ARRAY:
             return json_dumps(arguments[0])
         if self.argument_serialization() == ApiArgumentSerialization.DOUBLE_ARRAY:
@@ -82,6 +69,9 @@ class AbstractApi(ABC, Generic[HandleT]):
         for key, value in arguments[1].items():
             prepared_kwargs[key.strip("_")] = value
         return json_dumps(prepared_kwargs)
+
+    def _serialize_type(self) -> Literal["hf26", "legacy"]:
+        return "hf26"
 
     def _verify_positional_keyword_args(self, args: Any, kwargs: dict[str, Any]) -> None:
         if self.argument_serialization() == ApiArgumentSerialization.OBJECT:
@@ -125,15 +115,14 @@ class AbstractSyncApi(AbstractApi[SyncSendable]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def endpoint(cls, wrapped_function: Callable[P, ExpectResultT]) -> Callable[P, ExpectResultT]:
+    def endpoint(cls, wrapped_function: Callable[P, R]) -> Callable[P, R]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)
-
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=True)
 
         @wraps(wrapped_function)
-        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+        def impl(this: AbstractSyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
@@ -141,6 +130,7 @@ class AbstractSyncApi(AbstractApi[SyncSendable]):
                 endpoint=endpoint,
                 params=this._serialize_params((args_, kwargs_)),
                 expected_type=get_type_hints(wrapped_function)["return"],
+                serialization_type=this._serialize_type(),
             ).result
 
         return impl  # type: ignore[return-value]
@@ -157,15 +147,14 @@ class AbstractAsyncApi(AbstractApi[AsyncSendable]):
         return self._prepare_arguments_for_serialization(arguments)
 
     @classmethod
-    def endpoint(cls, wrapped_function: Callable[P, Awaitable[ExpectResultT]]) -> Callable[P, Awaitable[ExpectResultT]]:
+    def endpoint(cls, wrapped_function: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         """Decorator for all api methods in child classes."""
         wrapped_function_name = wrapped_function.__name__
         api_name = cls._get_api_name_from_method(wrapped_function)  # type: ignore[arg-type]
-
         cls._register_method(api=api_name, endpoint=wrapped_function_name, sync=False)
 
         @wraps(wrapped_function)
-        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> ExpectResultT:
+        async def impl(this: AbstractAsyncApi, *args: P.args, **kwargs: P.kwargs) -> R:
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = await this._additional_arguments_actions(endpoint, (args, kwargs))
@@ -174,6 +163,7 @@ class AbstractAsyncApi(AbstractApi[AsyncSendable]):
                     endpoint=endpoint,
                     params=this._serialize_params((args_, kwargs_)),
                     expected_type=get_type_hints(wrapped_function)["return"],
+                    serialization_type=this._serialize_type(),
                 )
             ).result
 
