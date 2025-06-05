@@ -14,7 +14,7 @@ from beekeepy.exceptions import InvalidOptionError
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z]+)(\-([a-zA-Z0-9]+))*$")
+CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z0-9]+)(\-([a-zA-Z0-9]+))*$")
 
 
 class Config(BaseModel):
