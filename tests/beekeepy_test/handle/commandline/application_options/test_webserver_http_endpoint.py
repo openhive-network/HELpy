@@ -28,7 +28,7 @@ def check_webserver_http_endpoint(*, webserver_http_endpoint: HttpUrl) -> None:
     resp = requests.post(webserver_http_endpoint.as_string(), data=json.dumps(data), timeout=10.0)
     assert resp.ok
     resp_json = resp.json()
-    get_response_model(beekeeper_api.CreateSession, **resp_json)
+    get_response_model(beekeeper_api.CreateSession, json.dumps(resp_json), "hf26")
 
 
 @pytest.mark.parametrize(

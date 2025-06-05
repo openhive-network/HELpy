@@ -526,9 +526,9 @@ class AccountCredentials(KeyPair):
 
         account_data = ACCOUNTS_DATA[account_index]
         return AccountCredentials(
-            name=account_data.get("account_name"),
-            public_key=account_data.get("public_key"),
-            private_key=account_data.get("private_key"),
+            name=account_data["account_name"],
+            public_key=account_data["public_key"],
+            private_key=account_data["private_key"],
         )
 
     @classmethod

@@ -84,8 +84,9 @@ def test_api_remove_key_simple_scenario(beekeeper: Beekeeper, setup_wallets: Wal
     bk_pub_keys_after = [pub_key.public_key for pub_key in bk_keys_after]
 
     # Check if key was removed
-    assert key_to_remove.public_key not in bk_keys_after, "Recently removed key shouldn't not be listed."
-    # Check if other keys still exists
+    assert (
+        key_to_remove.public_key not in bk_pub_keys_after
+    ), "Recently removed key shouldn't not be listed."  # Check if other keys still exists
     bk_pub_keys_before_copy = bk_pub_keys_before.copy()
     bk_pub_keys_before_copy.remove(PublicKey(key_to_remove.public_key))
     assert sorted(bk_pub_keys_before_copy) == sorted(bk_pub_keys_after), "Check if beekeeper removes only target key."
