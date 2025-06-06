@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from beekeepy._executable import BeekeeperArguments, BeekeeperConfig, BeekeeperExecutable
 from beekeepy._executable.abc import Arguments, ArgumentT, AutoCloser, Config, ConfigT, Executable
-from beekeepy._runnable_handle import AsyncBeekeeper, Beekeeper, RunnableHandleSettings, close_already_running_beekeeper
+from beekeepy._runnable_handle import (
+    AsyncBeekeeper,
+    Beekeeper,
+    RunnableHandleSettings,
+    close_already_running_beekeeper,
+    find_running_beekeepers,
+)
 from beekeepy._runnable_handle.match_ports import PortMatchingResult, match_ports
 from beekeepy._runnable_handle.runnable_handle import RunnableHandle
 
@@ -19,6 +25,7 @@ __all__ = [
     "Config",
     "ConfigT",
     "Executable",
+    "find_running_beekeepers",
     "match_ports",
     "PortMatchingResult",
     "RunnableHandle",
