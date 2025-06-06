@@ -236,7 +236,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         temp_path_to_file = path_to_config.rename(path_to_config.with_suffix(".ini.tmp"))
         if orig_path_to_config is not None:
             orig_path_to_config.rename(path_to_config)
-        return self.config.load(temp_path_to_file)
+        return self.config.from_path(temp_path_to_file)
 
     def get_help_text(self) -> str:
         return self.run_and_get_output(arguments=self.__arguments.just_get_help())

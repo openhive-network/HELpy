@@ -43,14 +43,17 @@ class Config(BaseModel):
                     result.append(f"{entry_name} = {value}")  # noqa: PERF401  # would be unreadable
         return result
 
-    @classmethod
-    def load(cls, source: Path) -> Self:
-        source = source / Config.DEFAULT_FILE_NAME if source.is_dir() else source
-        assert source.exists(), "Given file does not exists."
-        return cls.load_from_lines(source.read_text().strip().splitlines())
+    def load(self, source: Path | Self) -> None:
+        self.__dict__.update((self.from_path(source) if isinstance(source, Path) else source).dict())
 
     @classmethod
-    def load_from_lines(cls, lines: list[str]) -> Self:
+    def from_path(cls, source: Path) -> Self:
+        source = source / Config.DEFAULT_FILE_NAME if source.is_dir() else source
+        assert source.exists(), "Given file does not exists."
+        return cls.from_lines(source.read_text().strip().splitlines())
+
+    @classmethod
+    def from_lines(cls, lines: list[str]) -> Self:
         fields = cls.__fields__
         values_to_write: dict[str, Any] = cls().dict()
         for line in lines:
