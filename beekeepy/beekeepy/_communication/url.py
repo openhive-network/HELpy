@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Generic, Literal, TypeVar, get_args
+from typing import Any, Generic, Literal, TypeVar, cast, get_args
 from urllib.parse import urlparse
 
 from typing_extensions import Self
+
+from schemas.fields.resolvables import Resolvable
 
 P2PProtocolT = Literal[""]
 HttpProtocolT = Literal["http", "https"]
@@ -11,7 +13,7 @@ WsProtocolT = Literal["ws", "wss"]
 ProtocolT = TypeVar("ProtocolT", bound=HttpProtocolT | WsProtocolT | P2PProtocolT)
 
 
-class Url(Generic[ProtocolT]):
+class Url(Resolvable["Url[ProtocolT]", str], Generic[ProtocolT]):
     """Wrapper for Url, for handy access to all of it members with serialization."""
 
     def __init__(self, url: str | Url[ProtocolT], *, protocol: ProtocolT | None = None) -> None:
@@ -91,6 +93,14 @@ class Url(Generic[ProtocolT]):
     @classmethod
     def _default_protocol(cls) -> str:
         return cls._allowed_protocols()[0]
+
+    @staticmethod
+    def resolve(incoming_cls: type, value: str) -> Url[ProtocolT]:
+        """Resolve string to Url."""
+        return cast(Url[ProtocolT], incoming_cls(value))
+
+    def serialize(self) -> Any:
+        return self.as_string(with_protocol=False)
 
 
 class HttpUrl(Url[HttpProtocolT]):
