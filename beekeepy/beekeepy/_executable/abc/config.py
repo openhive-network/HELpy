@@ -1,15 +1,10 @@
 from __future__ import annotations
 
 import re
-from inspect import isclass
 from pathlib import Path
-from types import UnionType
-from typing import TYPE_CHECKING, Any, ClassVar, Final, get_args
-
-from loguru import logger
+from typing import TYPE_CHECKING, Any, ClassVar, Final
 
 from beekeepy._communication import Url
-from beekeepy.exceptions import InvalidOptionError
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
@@ -55,19 +50,16 @@ class Config(PreconfiguredBaseModel):
 
     @classmethod
     def from_lines(cls, lines: list[str]) -> Self:
-        fields = cls.__fields__
-        values_to_write: dict[str, Any] = cls().dict()
+        default_object = cls()
+        values_to_write: dict[str, Any | list[Any]] = {}
         for line in lines:
             if (line := line.strip("\n")) and not line.startswith("#"):
                 config_name, config_value = line.split("=")
                 member_name = cls._convert_config_name_to_member_name(config_name)
-                member_type = fields[member_name].type
-                if isinstance(member_type, UnionType) and (type(None) in get_args(member_type)):
-                    member_type = next(t for t in get_args(member_type) if t is not type(None))
                 values_to_write[member_name] = cls._convert_config_value_to_member_value(
-                    config_value, expected=member_type, current_value=values_to_write.get(member_name)
+                    config_value, current_value=values_to_write.get(member_name, default_object[member_name])
                 )
-        return cls(**values_to_write)
+        return cls.parse_builtins(values_to_write)
 
     @classmethod
     def _convert_member_name_to_config_name(cls, member_name: str) -> str:
@@ -97,58 +89,19 @@ class Config(PreconfiguredBaseModel):
         return str(member_value)
 
     @classmethod
-    def _convert_config_value_to_member_value(  # noqa: PLR0911, PLR0912, C901
-        cls, config_value: str, *, expected: type[Any], current_value: Any | None
-    ) -> Any | None:
-        config_value = config_value.strip()
-        if config_value is None:
-            return None
+    def _convert_config_value_to_member_value(cls, config_value: str, *, current_value: Any) -> Any | None:
+        config_value = config_value.strip(" \t\n\"'")
+        if len(config_value) == 0:
+            return current_value
 
-        if expected == Path:
-            return Path(config_value.replace('"', ""))
+        if current_value is None:
+            return config_value
 
-        if (
-            (isclass(expected) and issubclass(expected, list))
-            or isinstance(current_value, list)
-            or "list" in str(expected)
-        ):
-            list_arg_t = get_args(expected)[0]
-            if len(get_args(list_arg_t)):  # in case of unions
-                list_arg_t = get_args(list_arg_t)[0]
-            values = [
-                cls._convert_config_value_to_member_value(value, expected=list_arg_t, current_value=None)
-                for value in config_value.split()
-            ]
-            if current_value is not None:
-                if isinstance(current_value, list):
-                    current_value.extend(values)
-                    return current_value
-                return [*values, current_value]
-            return values
+        if isinstance(current_value, list):
+            current_value.extend(config_value.strip().split(" "))
+            return current_value
 
-        if expected == Url:
-            return Url(config_value)
-
-        if expected is type(bool):
-            cv_lower = config_value.lower()
-            if cv_lower == "yes":
-                return True
-
-            if cv_lower == "no":
-                return False
-
-            raise InvalidOptionError(f"Expected `yes` or `no`, got: `{config_value}`")
-
-        if "str" in str(expected):
-            return config_value.strip('"')
-
-        if isinstance(expected, type) and issubclass(expected, int | str) and hasattr(expected, "validate"):
-            return expected.validate(config_value)
-
-        if str(expected).startswith("typing.Union["):
-            expected = get_args(expected)[0]
-
-        return expected(config_value) if expected is not None else None
+        return config_value
 
     def get_differences_between(self, other: Self) -> dict[str, tuple[Any, Any]]:
         differences = {}

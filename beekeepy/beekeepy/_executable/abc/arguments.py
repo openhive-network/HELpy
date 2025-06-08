@@ -4,8 +4,6 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from msgspec import field
-
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
