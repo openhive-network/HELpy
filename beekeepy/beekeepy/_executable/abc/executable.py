@@ -89,6 +89,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         environ: dict[str, str] | None = None,
         propagate_sigint: bool = True,
         save_config: bool = True,
+        timeout: float | None = None,
     ) -> AutoCloser:
         return self.__run(
             blocking=blocking,
@@ -96,9 +97,10 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             environ=environ,
             propagate_sigint=propagate_sigint,
             save_config=save_config,
+            timeout=timeout,
         )
 
-    def __run(
+    def __run(  # noqa: PLR0913
         self,
         *,
         blocking: bool,
@@ -106,6 +108,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         environ: dict[str, str] | None = None,
         propagate_sigint: bool = True,
         save_config: bool = True,
+        timeout: float | None = None,
     ) -> AutoCloser:
         command, environment_variables = self.__prepare(arguments=arguments, environ=environ, save_config=save_config)
         self._logger.info(f"starting `{self.__executable_path.stem}` as: `{command}`")
@@ -119,6 +122,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
                     check=True,
                     stdout=stdout,
                     stderr=stderr,
+                    timeout=timeout,
                 )
                 return AutoCloser(None)
 

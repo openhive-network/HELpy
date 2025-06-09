@@ -90,6 +90,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
         perform_unification: bool = True,
         blocking: bool = False,
         save_config: bool = True,
+        timeout: float | None = None,
     ) -> None:
         """
         Runs executable and unifies arguments.
@@ -116,6 +117,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
                 environ=environment_variables,
                 propagate_sigint=settings.propagate_sigint,
                 save_config=save_config,
+                timeout=timeout,
             )
             if blocking:
                 return
