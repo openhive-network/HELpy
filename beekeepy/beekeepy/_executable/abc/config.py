@@ -6,10 +6,9 @@ from pathlib import Path
 from types import UnionType
 from typing import TYPE_CHECKING, Any, ClassVar, Final, get_args
 
-from pydantic import BaseModel
-
 from beekeepy._communication import Url
 from beekeepy.exceptions import InvalidOptionError
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z0-9]+)(\-([a-zA-Z0-9]+))*$")
 
 
-class Config(BaseModel):
+class Config(PreconfiguredBaseModel):
     DEFAULT_FILE_NAME: ClassVar[str] = "config.ini"
 
     class Config:

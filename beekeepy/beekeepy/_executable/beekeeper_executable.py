@@ -7,9 +7,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from beekeepy._executable.abc.executable import AutoCloser, Executable
-from beekeepy._executable.beekeeper_arguments import BeekeeperArguments, ExportKeysWalletParams
+from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
 from beekeepy._executable.beekeeper_executable_discovery import get_beekeeper_binary_path
+from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams
 from beekeepy._utilities.key_pair import KeyPair
 
 if TYPE_CHECKING:

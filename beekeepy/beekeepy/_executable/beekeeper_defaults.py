@@ -5,11 +5,11 @@ from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
-from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams  # noqa: TCH001
-from helpy import (  # noqa: TCH001
+from beekeepy._communication import (  # noqa: TCH001
     HttpUrl,
     WsUrl,
 )
+from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams  # noqa: TCH001
 
 
 class BeekeeperDefaults(BaseModel):
