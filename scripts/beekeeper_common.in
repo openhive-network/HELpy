@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path  # noqa: TCH003
 
 from beekeepy._executable.beekeeper_defaults import BeekeeperDefaults
-from helpy import HttpUrl, WsUrl  # noqa: TCH001
+from beekeepy._communication import HttpUrl, WsUrl, P2PUrl  # noqa: TCH001
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 

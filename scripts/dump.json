@@ -1,0 +1,240 @@
+{
+  "command_line": [
+    {
+      "description": "Configuration file name relative to data-dir",
+      "name": "config",
+      "value": {
+        "composed": false,
+        "default_value": "\"config.ini\"",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "path"
+      }
+    },
+    {
+      "description": "Directory containing configuration file config.ini. Default location: $HOME/.beekeeper or CWD/. beekeeper",
+      "name": "data-dir",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "path"
+      }
+    },
+    {
+      "description": "Dump configuration and exit",
+      "name": "dump-config",
+      "value": null
+    },
+    {
+      "description": "Dump information about all supported command line and config options in JSON format and exit",
+      "name": "dump-options",
+      "value": null
+    },
+    {
+      "description": "Export explicitly private keys to a local file `wallet_name.keys`. Both [name, password] are required for every wallet. By default is empty.Two wallets example: --export-keys-wallet \"[\"blue-wallet\", \"PW5JViFn5gd4rt6ohk7DQMgHzQN6Z9FuMRfKoE5Ysk25mkjy5AY1b\"]\" --export-keys-wallet \"[\"green-wallet\", \"PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk\"]\"",
+      "name": "export-keys-wallet",
+      "value": {
+        "composed": true,
+        "default_value": [],
+        "fields_count": 2,
+        "multitoken": true,
+        "required": false,
+        "value_type": "string_array"
+      }
+    },
+    {
+      "description": "Generate bash auto-complete script (try: eval \"$(hived --generate-completions)\")",
+      "name": "generate-completions",
+      "value": null
+    },
+    {
+      "description": "Print this help message and exit.",
+      "name": "help",
+      "value": null
+    },
+    {
+      "description": "Print names of all available plugins and exit",
+      "name": "list-plugins",
+      "value": null
+    },
+    {
+      "description": "Print version information.",
+      "name": "version",
+      "value": null
+    }
+  ],
+  "common": [
+    {
+      "description": "Whether to print backtrace on SIGSEGV",
+      "name": "backtrace",
+      "value": {
+        "composed": false,
+        "default_value": "yes",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "json-rpc log directory name.",
+      "name": "log-json-rpc",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "path"
+      }
+    },
+    {
+      "description": "Plugin(s) to enable, may be specified multiple times",
+      "name": "plugin",
+      "value": {
+        "composed": true,
+        "default_value": [],
+        "fields_count": 1,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string_array"
+      }
+    },
+    {
+      "description": "Protection against unlocking by bots. Every wrong `unlock` enables a delay. By default 500[ms].",
+      "name": "unlock-interval",
+      "value": {
+        "composed": false,
+        "default_value": "500",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "ulong"
+      }
+    },
+    {
+      "description": "Timeout for unlocked wallet in seconds (default 900 (15 minutes)).Wallets will be automatically locked after specified number of seconds of inactivity.Activity is defined as any wallet command e.g. list-wallets.",
+      "name": "unlock-timeout",
+      "value": {
+        "composed": false,
+        "default_value": "900",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "ulong"
+      }
+    },
+    {
+      "description": "The path of the wallet files (absolute path or relative to application data dir)",
+      "name": "wallet-dir",
+      "value": {
+        "composed": false,
+        "default_value": ".",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "path"
+      }
+    },
+    {
+      "description": "Local http endpoint for webserver requests.",
+      "name": "webserver-http-endpoint",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "File name with a server's certificate.",
+      "name": "webserver-https-certificate-file-name",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "Local https endpoint for webserver requests.",
+      "name": "webserver-https-endpoint",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "File name with a server's private key.",
+      "name": "webserver-https-key-file-name",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "Number of threads used to handle queries. Default: 32.",
+      "name": "webserver-thread-pool-size",
+      "value": {
+        "composed": false,
+        "default_value": "32",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "uint"
+      }
+    },
+    {
+      "description": "Local unix http endpoint for webserver requests.",
+      "name": "webserver-unix-endpoint",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    },
+    {
+      "description": "Enable the RFC-7692 permessage-deflate extension for the WebSocket server (only used if the client requests it).  This may save bandwidth at the expense of CPU",
+      "name": "webserver-ws-deflate",
+      "value": {
+        "composed": false,
+        "default_value": "false",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "bool"
+      }
+    },
+    {
+      "description": "Local websocket endpoint for webserver requests.",
+      "name": "webserver-ws-endpoint",
+      "value": {
+        "composed": false,
+        "default_value": "",
+        "fields_count": null,
+        "multitoken": false,
+        "required": false,
+        "value_type": "string"
+      }
+    }
+  ]
+}

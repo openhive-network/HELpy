@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
 
-from beekeepy._executable.arguments import Arguments
+from beekeepy._executable.abc.arguments import Arguments
 from beekeepy._executable.beekeeper_common import (
     BeekeeperCommon,
 )
 from beekeepy._executable.beekeeper_defaults import BeekeeperDefaults
-from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams  # noqa: TCH001
 
 
 # All config items are automatically generated
