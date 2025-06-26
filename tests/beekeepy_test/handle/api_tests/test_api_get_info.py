@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from beekeepy._executable.defaults import BeekeeperDefaults
+from beekeepy.handle.runnable import BeekeeperDefaults
 
 if TYPE_CHECKING:
     from beekeepy.handle.runnable import Beekeeper
