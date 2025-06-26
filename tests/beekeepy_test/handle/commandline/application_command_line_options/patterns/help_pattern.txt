@@ -25,7 +25,7 @@ Application Options:
           empty.Two wallets example: --export-keys-wallet "["blue-wallet", 
           "PW5JViFn5gd4rt6ohk7DQMgHzQN6Z9FuMRfKoE5Ysk25mkjy5AY1b"]" 
           --export-keys-wallet "["green-wallet", 
-          "PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk"]" 
+          "PW5KYF9Rt4ETnuP4uheHSCm9kLbCuunf6RqeKgQ8QRoxZmGeZUhhk"]"
 
   --unlock-interval arg (=500)
           Protection against unlocking by bots. Every wrong `unlock` enables a 
@@ -60,3 +60,6 @@ Application Command Line Options:
           Directory containing configuration file config.ini. Default location: $HOME/.beekeeper or CWD/. beekeeper
   -c [ --config ] filename (="config.ini")
           Configuration file name relative to data-dir
+  --dump-options 
+          Dump information about all supported command line and config options in JSON format and exit
+
