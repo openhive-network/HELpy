@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from beekeepy._executable import BeekeeperArguments, BeekeeperConfig, BeekeeperExecutable
+from beekeepy._executable import BeekeeperArguments, BeekeeperConfig, BeekeeperDefaults, BeekeeperExecutable
 from beekeepy._executable.abc import Arguments, ArgumentT, AutoCloser, Config, ConfigT, Executable
 from beekeepy._runnable_handle import (
     AsyncBeekeeper,
@@ -20,6 +20,7 @@ __all__ = [
     "Beekeeper",
     "BeekeeperArguments",
     "BeekeeperConfig",
+    "BeekeeperDefaults",
     "BeekeeperExecutable",
     "close_already_running_beekeeper",
     "Config",

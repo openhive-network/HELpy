@@ -11,6 +11,7 @@ from beekeepy._executable.abc import (
 )
 from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
 from beekeepy._executable.beekeeper_config import BeekeeperConfig
+from beekeepy._executable.beekeeper_defaults import BeekeeperDefaults
 from beekeepy._executable.beekeeper_executable import BeekeeperExecutable
 from beekeepy._utilities.key_pair import KeyPair
 
@@ -19,6 +20,7 @@ __all__ = [
     "ArgumentT",
     "BeekeeperArguments",
     "BeekeeperConfig",
+    "BeekeeperDefaults",
     "BeekeeperExecutable",
     "Config",
     "ConfigT",
