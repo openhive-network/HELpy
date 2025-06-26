@@ -1,0 +1,14 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import ClassVar
+
+from msgspec import field
+
+from beekeepy._communication import HttpUrl, P2PUrl, WsUrl  # noqa: TCH001
+from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams  # noqa: TCH001
+from schemas._preconfigured_base_model import PreconfiguredBaseModel
+
+
+class BeekeeperDefaults(PreconfiguredBaseModel):
+{GENERATED-ITEMS}
