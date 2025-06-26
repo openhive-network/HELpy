@@ -34,7 +34,7 @@ variables:
 include:
   - project: 'hive/hive'
     # This has to be the same as the commit checked out in the submodule
-    ref: f3a19664e0490647b318c9cc264c75a17c5be9f8
+    ref: 7a3f31426f24052bd1bd2ffb5dd77e116bf93675
     file: '/scripts/ci-helpers/prepare_data_image_job.yml'
   # DO NOT include ccc here. It will be indirectly included by above yaml file.
   #- project: 'hive/common-ci-configuration'
@@ -135,6 +135,8 @@ build_beekeepy_wheel:
     - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
     - python3 -m pytest --asyncio-mode auto -n auto --durations 0 --junitxml=report.xml ${HIVED_HTTP_ENDPOINT} "tests/${SUBPROJECT_TEST_TARGET}_test"
   artifacts:
+    paths:
+    - "**/generated_*"
     when: always
     expire_in: 1 week
     reports:
