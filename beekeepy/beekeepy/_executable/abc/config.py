@@ -16,9 +16,6 @@ CONFIG_MEMBER_REGEX: Final[re.Pattern[str]] = re.compile(r"^([a-zA-Z0-9]+)(\-([a
 class Config(PreconfiguredBaseModel):
     DEFAULT_FILE_NAME: ClassVar[str] = "config.ini"
 
-    class Config:
-        arbitrary_types_allowed = True
-
     def save(self, destination: Path) -> None:
         destination = destination / Config.DEFAULT_FILE_NAME if destination.is_dir() else destination
         with destination.open("wt", encoding="utf-8") as out_file:
@@ -28,7 +25,7 @@ class Config(PreconfiguredBaseModel):
 
     def write_to_lines(self) -> list[str]:
         result = []
-        for member_name, member_value in self.dict().items():
+        for member_name, member_value in self.dict(exclude_defaults=True, exclude_none=True).items():
             if member_value is not None:
                 if isinstance(member_value, list) and len(member_value) == 0:
                     continue

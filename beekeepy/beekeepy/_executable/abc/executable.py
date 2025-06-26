@@ -230,8 +230,8 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
             orig_path_to_config = path_to_config.rename(
                 path_to_config.with_suffix(".ini.orig")
             )  # temporary move it to not interfere with config generation
-        arguments = self._construct_arguments()
-        arguments.dump_config = True
+        arguments = self._construct_arguments().just_dump_config()
+        arguments.update_with(self._construct_arguments())
         self.__run(blocking=True, arguments=arguments, save_config=False)
         temp_path_to_file = path_to_config.rename(path_to_config.with_suffix(".ini.tmp"))
         if orig_path_to_config is not None:
