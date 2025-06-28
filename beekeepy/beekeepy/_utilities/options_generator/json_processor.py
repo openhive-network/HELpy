@@ -1,81 +1,12 @@
 from __future__ import annotations
 
-import argparse
-import sys
 import textwrap
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, ClassVar, Final
+from typing import Any, ClassVar
 
-from loguru import logger
-
+from beekeepy._utilities.options_generator.code_creator import CodeCreator
+from beekeepy._utilities.options_generator.common import TypeInfo, indent_str
 from schemas.dump_options.options import Option, Options, OptionValue
-
-indent: Final[int] = 4
-indent_str: Final[str] = " " * indent
-
-
-@dataclass
-class TypeInfo:
-    type_name: str
-    fields_count: int
-
-
-def is_keyword(name: str) -> bool:
-    return name in {"help", "version"}
-
-
-class CodeCreator:
-    @staticmethod
-    def name(name: str) -> str:
-        name_to_write = name.replace("-", "_")
-        if is_keyword(name_to_write):
-            name_to_write += "_"
-        return name_to_write
-
-    @staticmethod
-    def default_name(name: str) -> str:
-        content = "DEFAULT_" + CodeCreator.name(name)
-        content = content.upper()
-        return content.upper()
-
-    @staticmethod
-    def default_declaration(name: str) -> str:
-        default_str = "BeekeeperDefaults." + CodeCreator.default_name(name)
-        if is_keyword(name):
-            default_str = f'field(name="{name}", default={default_str})'
-        return default_str
-
-    @staticmethod
-    def custom_type(name: str) -> str:
-        content = ""
-        words = name.split("-")
-        for word in words:
-            content += word[0:1].upper() + word[1 : len(word)]
-        content += "Params"
-        return content
-
-    @staticmethod
-    def line(content: str) -> str:
-        return indent_str + content + "\n"
-
-    @staticmethod
-    def custom_types(custom_parameters_types: list[TypeInfo]) -> str:
-        content = ""
-        for custom_type in custom_parameters_types:
-            content += f"class {custom_type.type_name}(NamedTuple):\n"
-            for i in range(custom_type.fields_count):
-                content += CodeCreator.line(f"field_{i}: str")
-
-        return content
-
-    @staticmethod
-    def default_value(default_values: list[str]) -> str:
-        content = ""
-        for default_value in default_values:
-            content += CodeCreator.line(f"{default_value}")
-
-        return content
 
 
 class JSONProcessor:
@@ -138,7 +69,7 @@ class JSONProcessor:
         return f'"{value}"'
 
     @staticmethod
-    def __read_value(name: str, value: OptionValue) -> tuple[str, str]:
+    def __read_value(name: str, value: OptionValue, prefix: str) -> tuple[str, str]:
         current_type = JSONProcessor.__find_type(name, value)
 
         none_is_allowed = len(str(value.default_value)) == 0 and not value.required
@@ -151,9 +82,11 @@ class JSONProcessor:
             if isinstance(value.default_value, list):
                 if len(value.default_value) > 0:
                     content += (
-                        " = ["
-                        + ", ".join([JSONProcessor.__prepare_string_value(item) for item in value.default_value])
-                        + "]"
+                        f" = field(default_factory=lambda: [\n{indent_str*2}"
+                        + f",\n{indent_str*2}".join(
+                            [JSONProcessor.__prepare_string_value(item) for item in value.default_value]
+                        )
+                        + f"\n{indent_str}])"
                     )
                 else:
                     content += " = []"
@@ -166,7 +99,7 @@ class JSONProcessor:
             else:
                 content += f" = {value.default_value}"
 
-        return content_type + CodeCreator.default_declaration(name), content_type_default + content
+        return content_type + CodeCreator.default_declaration(name, prefix=prefix), content_type_default + content
 
     @staticmethod
     def __prepare_description(description: str) -> str:
@@ -185,7 +118,7 @@ class JSONProcessor:
         )
 
     @staticmethod
-    def __read_option(option: Option) -> str:
+    def __read_option(option: Option, prefix: str) -> str:
         content = ""
         value = option.value or OptionValue(
             required=True,
@@ -196,7 +129,7 @@ class JSONProcessor:
             fields_count=None,
         )
 
-        values = JSONProcessor.__read_value(option.name, value)
+        values = JSONProcessor.__read_value(option.name, value, prefix=prefix)
         values_size = 2
         assert len(values) == values_size
 
@@ -210,58 +143,55 @@ class JSONProcessor:
         return content
 
     @staticmethod
-    def __read_options(options: list[Option] | None) -> str:
+    def __read_options(options: list[Option] | None, prefix: str) -> str:
         content = ""
 
         if options is not None and len(options) > 0:
             content += "\n"
             for option in options:
-                content += JSONProcessor.__read_option(option)
+                content += JSONProcessor.__read_option(option, prefix=prefix)
 
         return content
 
     @staticmethod
-    def __write_file(content: str, file_name: str) -> None:
+    def __write_file(  # noqa: PLR0913
+        content: str,
+        file_name: str,
+        dest_dir: Path,
+        src_dir: Path,
+        prefix: str,
+        *,
+        force_generate: bool = False,
+    ) -> None:
+        if (not force_generate) and not content.strip():
+            return
+
         marker = "{GENERATED-ITEMS}"
 
-        src_path_file = f"{file_name}.in"
-        dst_path_file = f"../beekeepy/beekeepy/_executable/{file_name}.py"
+        src_path_file = JSONProcessor.build_path_with_prefix(prefix, file_name, src_dir, in_sufix=True)
+        dst_path_file = JSONProcessor.build_path_with_prefix(prefix, file_name, dest_dir, in_sufix=False)
 
-        src_file_content = Path(src_path_file).read_text()
-        src_file_content = src_file_content.replace(marker, content).strip("\n \t")
-
-        Path(dst_path_file).write_text(src_file_content + "\n")
+        src_file_content = src_path_file.read_text()
+        src_file_content = src_file_content.replace(marker, content)
+        Path(dst_path_file).write_text(src_file_content.strip("\n \t") + "\n")
 
     @staticmethod
-    def update_options(options_file: str) -> None:
-        opts = Options.parse_file(Path(options_file))
+    def build_path_with_prefix(prefix: str, filename: str, path: Path, *, in_sufix: bool) -> Path:
+        path = path.absolute()
+        return path / (f"{prefix}_{filename}." + ("in" if in_sufix else "py"))
 
-        content_common = JSONProcessor.__read_options(opts.common)
-        content_config_file = JSONProcessor.__read_options(opts.config_file)
-        content_command_line = JSONProcessor.__read_options(opts.command_line)
+    @staticmethod
+    def update_options(*, options_file: Path, source_dir: Path, dest_dir: Path, prefix: str) -> None:
+        opts = Options.parse_file(options_file)
+
+        content_common = JSONProcessor.__read_options(opts.common, prefix)
+        content_config_file = JSONProcessor.__read_options(opts.config_file, prefix)
+        content_command_line = JSONProcessor.__read_options(opts.command_line, prefix)
         content_custom_types = CodeCreator.custom_types(JSONProcessor.custom_parameters_types)
         content_default_values = CodeCreator.default_value(JSONProcessor.default_values)
 
-        JSONProcessor.__write_file(content_common, "beekeeper_common")
-        JSONProcessor.__write_file(content_config_file, "beekeeper_config")
-        JSONProcessor.__write_file(content_command_line, "beekeeper_arguments")
-        JSONProcessor.__write_file(content_custom_types, "custom_parameters_types")
-        JSONProcessor.__write_file(content_default_values, "beekeeper_defaults")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate CLI and CONFIG parameters.")
-    parser.add_argument(
-        "--options-file",
-        required=True,
-        type=str,
-        default="",
-        help="JSON file that contains options retrieved from hived by `--dump-options`",
-    )
-    args = parser.parse_args()
-
-    if len(args.options_file) == 0:
-        logger.error("JSON file is required. Aborting.")
-        sys.exit(-1)
-
-    JSONProcessor.update_options(args.options_file)
+        JSONProcessor.__write_file(content_common, "common", dest_dir, source_dir, prefix)
+        JSONProcessor.__write_file(content_config_file, "config", dest_dir, source_dir, prefix, force_generate=True)
+        JSONProcessor.__write_file(content_command_line, "arguments", dest_dir, source_dir, prefix, force_generate=True)
+        JSONProcessor.__write_file(content_custom_types, "custom_parameters_types", dest_dir, source_dir, prefix)
+        JSONProcessor.__write_file(content_default_values, "defaults", dest_dir, source_dir, prefix)

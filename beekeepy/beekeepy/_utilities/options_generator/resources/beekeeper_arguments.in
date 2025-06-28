@@ -1,0 +1,26 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+from msgspec import field
+
+from beekeepy._executable.abc.arguments import Arguments
+from beekeepy._executable.beekeeper_common import (
+    BeekeeperCommon,
+)
+from beekeepy._executable.beekeeper_custom_parameters_types import ExportKeysWalletParams
+from beekeepy._executable.beekeeper_defaults import BeekeeperDefaults
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+# All config items are automatically generated
+class BeekeeperArguments(BeekeeperCommon, Arguments):
+    """Parameters used in command line."""
+
+    def _convert_member_value_to_string(self, name: str, member_value: int | str | Path | Any) -> list[str]:
+        if isinstance(member_value, ExportKeysWalletParams):
+            return [name, f'["{member_value[0]}","{member_value[1]}"]']
+        return super()._convert_member_value_to_string(name, member_value)
+{GENERATED-ITEMS}
