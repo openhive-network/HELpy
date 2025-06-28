@@ -77,6 +77,8 @@ type_check_with_mypy:
   extends: .type_check_with_mypy_template
   <<: *static_code_analysis_vars
 
+
+
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| STATIC CODE ANALYSIS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| BUILD |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -149,6 +151,32 @@ run_beekeepy_tests:
   extends: .run_tests_template
   variables:
     SUBPROJECT_TEST_TARGET: "beekeepy"
+
+check_generated_files:
+  stage: beekeepy
+  extends: .project_develop_configuration_template
+  needs:
+    - job: prepare_hived_image
+      artifacts: true
+  variables:
+    PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
+    DUMP_OPTIONS_FILE: "/tmp/dumped_options.json"
+  script:
+    - echo -e "${TXT_BLUE}Checking generated files...${TXT_CLEAR}"
+    - $CI_PROJECT_DIR/hived-binaries/beekeeper --dump-options > "${DUMP_OPTIONS_FILE}"
+    - python3 -m beekeepy._utilities.options_generator.update_options
+        --options-file "${DUMP_OPTIONS_FILE}"
+        --source-dir "${BEEKEEPY_DIR}/beekeepy/_utilities/options_generator/resources"
+        --dest-dir "${BEEKEEPY_DIR}/beekeepy/_executable"
+        --prefix beekeeper
+    - |
+      if ! git diff --exit-code; then
+        echo -e "${TXT_BLUE}ERROR Some files were modified after running the script. Please commit generated files.${TXT_CLEAR}"
+        git status
+        git diff
+        exit 1
+      fi
+    - echo -e "${TXT_BLUE}Generated files check completed.${TXT_CLEAR}"
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| DEPLOY |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
