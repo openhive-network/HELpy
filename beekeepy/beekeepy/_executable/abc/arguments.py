@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeGuard
 
 from beekeepy._communication import HttpUrl
-from beekeepy._executable.custom_parameters_types import ExportKeysWalletParams
 from beekeepy._utilities.cli_parser import CliParser
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
@@ -35,12 +34,12 @@ class Arguments:
         ), "This is (phantom) abstract class, it should be composited with one that is PreconfiguredBaseModel"
         return True
 
-    def __convert_member_value_to_string(self, name: str, member_value: int | str | Path | Any) -> list[str]:
+    def _convert_member_value_to_string(self, name: str, member_value: int | str | Path | Any) -> list[str]:
         response = []
         if isinstance(member_value, list):
             temp_response = []
             for item in member_value:
-                temp_response.extend(self.__convert_member_value_to_string(name, item))
+                temp_response.extend(self._convert_member_value_to_string(name, item))
             response = temp_response
         elif isinstance(member_value, bool):
             response = [name, ""]
@@ -52,8 +51,6 @@ class Arguments:
             response = [name, member_value.as_posix()]
         elif isinstance(member_value, HttpUrl):
             response = [name, member_value.as_string(with_protocol=False)]
-        elif isinstance(member_value, ExportKeysWalletParams):
-            response = [name, f'["{member_value[0]}","{member_value[1]}"]']
         else:
             raise TypeError("Invalid type")
 
@@ -72,7 +69,7 @@ class Arguments:
         for k, v in data.items():
             if v is not None and v is not False:
                 name = pattern.format(self.__convert_member_name_to_cli_value(k))
-                cli_arguments.extend(self.__convert_member_value_to_string(name, v))
+                cli_arguments.extend(self._convert_member_value_to_string(name, v))
         return cli_arguments
 
     def process(self, *, with_prefix: bool = True) -> list[str]:
