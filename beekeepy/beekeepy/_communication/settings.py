@@ -4,10 +4,10 @@ from datetime import timedelta
 from os import environ
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
-from msgspec import field
 from typing_extensions import Self
 
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
+from schemas.base import field
 from schemas.decoders import get_hf26_decoder
 
 if TYPE_CHECKING:

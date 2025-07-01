@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
 
-from msgspec import field
-
 from beekeepy._communication import HttpUrl, WsUrl
 from beekeepy._executable.abc.config import Config
 from beekeepy._executable.defaults import BeekeeperDefaults, ExportKeysWalletParams
+from schemas.base import field
 
 
 def http_webserver_default() -> HttpUrl:

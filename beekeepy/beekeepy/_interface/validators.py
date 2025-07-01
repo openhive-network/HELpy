@@ -4,8 +4,6 @@ import re
 from re import Pattern
 from typing import Final
 
-import msgspec
-
 from beekeepy.exceptions import (
     InvalidAccountNameError,
     InvalidSchemaHexError,
@@ -15,6 +13,7 @@ from beekeepy.exceptions import (
     SchemaDetectableError,
     TimeTooBigError,
 )
+from schemas.errors import ValidationError
 from schemas.fields.basic import AccountName, PrivateKey, PublicKey
 from schemas.fields.hex import Hex
 
@@ -35,7 +34,7 @@ def _generic_kwargs_validator(
     try:
         for _arg_name, arg_value in arguments.items():
             validator(arg_value)
-    except msgspec.ValidationError as error:
+    except ValidationError as error:
         raise exception(_arg_name, arg_value) from error
 
 
