@@ -17,7 +17,6 @@ from typing import (
 )
 
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from schemas.encoders import get_hf26_encoder, get_legacy_encoder, get_legacy_encoder_testnet
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -51,6 +50,8 @@ class AbstractApi(ABC, Generic[HandleT]):
         return _convert_pascal_case_to_sneak_case(method.__qualname__.split(".")[0])
 
     def json_dumps(self) -> Callable[[Any], str]:
+        from schemas.encoders import get_hf26_encoder, get_legacy_encoder, get_legacy_encoder_testnet
+
         encoder = (
             get_hf26_encoder()
             if self._serialize_type() == "hf26"

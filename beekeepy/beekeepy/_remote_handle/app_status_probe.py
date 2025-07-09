@@ -2,19 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from beekeepy._apis import AppStatusProbeSyncApiCollection
 from beekeepy._remote_handle.abc.handle import AbstractSyncHandle
 from beekeepy._remote_handle.settings import RemoteHandleSettings
 
 if TYPE_CHECKING:
-    from beekeepy._apis import SyncAppStatusApi
+    from beekeepy._apis.app_status_api import AppStatusProbeSyncApiCollection
+    from beekeepy._apis.app_status_api.sync_api import AppStatusApi as SyncAppStatusApi
     from beekeepy._remote_handle.abc.batch_handle import SyncBatchHandle
 
 
-class AppStatusProbe(AbstractSyncHandle[RemoteHandleSettings, AppStatusProbeSyncApiCollection]):
+class AppStatusProbe(AbstractSyncHandle[RemoteHandleSettings, "AppStatusProbeSyncApiCollection"]):
     """Synchronous handle for probing."""
 
     def _construct_api(self) -> AppStatusProbeSyncApiCollection:
+        from beekeepy._apis.app_status_api import AppStatusProbeSyncApiCollection
+
         return AppStatusProbeSyncApiCollection(owner=self)
 
     @property
