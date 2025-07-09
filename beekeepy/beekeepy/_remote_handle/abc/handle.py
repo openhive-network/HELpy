@@ -11,7 +11,7 @@ from beekeepy._apis.abc.api_collection import (
     AbstractSyncApiCollection,
 )
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from beekeepy._communication import AioHttpCommunicator, RequestCommunicator
+from beekeepy._communication import get_communicator_cls
 from beekeepy._remote_handle.settings import RemoteHandleSettings
 from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 from beekeepy._utilities.context import SelfContextAsync, SelfContextSync
@@ -182,7 +182,7 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
         return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return AioHttpCommunicator(settings=self._settings)
+        return get_communicator_cls("aiohttp")(settings=self._settings)
 
     @abstractmethod
     async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
@@ -219,7 +219,7 @@ class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync,
         return True
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return RequestCommunicator(settings=self._settings)
+        return get_communicator_cls("request")(settings=self._settings)
 
     @abstractmethod
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:

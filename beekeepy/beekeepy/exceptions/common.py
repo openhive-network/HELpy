@@ -155,3 +155,12 @@ class UnknownValueForBooleanConversionError(BeekeepyError):
         """Constructor."""
         super().__init__(f"Value `{val}` is not convertible to boolean.")
         self.val = val
+
+
+class UnsupportedCommunicatorTypeError(BeekeepyError):
+    """Raised if communicator type is not supported."""
+
+    def __init__(self, communicator_type: str) -> None:
+        """Constructor."""
+        super().__init__(f"Communicator type `{communicator_type}` is not supported.")
+        self.communicator_type = communicator_type
