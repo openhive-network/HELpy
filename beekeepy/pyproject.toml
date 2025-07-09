@@ -33,8 +33,6 @@ loguru = "0.7.2"
 psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
-setuptools = "77.0.3"
-types-setuptools = "76.0.0.20250313"
 
 schemas = "0.0.1.dev369+ef896c2"
 

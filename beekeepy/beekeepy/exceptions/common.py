@@ -146,3 +146,12 @@ class TimeoutExceededError(CommunicationError):
         super().__init__(url, request, response, message=message)
         self.timeout_secs = timeout_secs
         self.total_wait_time = total_wait_time
+
+
+class UnknownValueForBooleanConversionError(BeekeepyError):
+    """Raised if value is not convertible to boolean."""
+
+    def __init__(self, val: str) -> None:
+        """Constructor."""
+        super().__init__(f"Value `{val}` is not convertible to boolean.")
+        self.val = val

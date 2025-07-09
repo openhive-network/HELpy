@@ -31,6 +31,7 @@ from beekeepy.exceptions.common import (
     TimeoutExceededError,
     TimeTooBigError,
     UnknownDecisionPathError,
+    UnknownValueForBooleanConversionError,
     WalletIsLockedError,
 )
 from beekeepy.exceptions.detectable import (
@@ -127,6 +128,7 @@ __all__ = [
     "UnableToOpenWalletError",
     "UndistinguishableBeekeeperInstancesError",
     "UnknownDecisionPathError",
+    "UnknownValueForBooleanConversionError",
     "UnlockIsNotAccessibleError",
     "UnparsableResponseError",
     "WalletIsAlreadyUnlockedError",

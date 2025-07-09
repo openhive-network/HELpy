@@ -1,12 +1,28 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from distutils.util import strtobool
 from pathlib import Path
 from typing import ClassVar
 
 from beekeepy._communication import HttpUrl  # noqa: TCH001
 from beekeepy._remote_handle import RemoteHandleSettings
+from beekeepy.exceptions import UnknownValueForBooleanConversionError
+
+
+def strtobool(value: str) -> bool:
+    """Convert a string representation of truth to true (1) or false (0).
+
+    This is a simple implementation, similar to distutils.util.strtobool.
+
+    NOTE: This function is replacement for distutils.util.strtobool,
+        which is deprecated and slow to import.
+    """
+    val = value.lower()
+    if val in ("y", "yes", "true", "t", "1"):
+        return True
+    if val in ("n", "no", "false", "f", "0"):
+        return False
+    raise UnknownValueForBooleanConversionError(value)
 
 
 class Settings(RemoteHandleSettings):
