@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from loguru import logger as loguru_logger
 
-from beekeepy._apis.abc import (
+from beekeepy._apis.abc.api_collection import (
     AbstractAsyncApiCollection,
     AbstractSyncApiCollection,
 )

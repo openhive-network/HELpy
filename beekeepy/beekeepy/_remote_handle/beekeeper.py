@@ -3,15 +3,15 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, Any, NoReturn
 
-from beekeepy._apis import (
+from beekeepy._apis.abc.session_holder import (
+    AsyncSessionHolder,
+    SyncSessionHolder,
+)
+from beekeepy._apis.beekeeper_api import (
     AsyncBeekeeperApi,
     BeekeeperAsyncApiCollection,
     BeekeeperSyncApiCollection,
     SyncBeekeeperApi,
-)
-from beekeepy._apis.abc import (
-    AsyncSessionHolder,
-    SyncSessionHolder,
 )
 from beekeepy._remote_handle.abc.batch_handle import ApiFactory, AsyncBatchHandle, SyncBatchHandle
 from beekeepy._remote_handle.abc.handle import AbstractAsyncHandle, AbstractSyncHandle, RemoteSettingsT

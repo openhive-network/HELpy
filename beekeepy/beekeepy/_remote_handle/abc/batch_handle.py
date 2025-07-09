@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from beekeepy import exceptions
-from beekeepy._apis.abc import AsyncSendable, SyncSendable
+from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
 from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 from beekeepy._utilities.context import ContextAsync, ContextSync, EnterReturnT
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model

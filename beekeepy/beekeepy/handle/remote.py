@@ -1,24 +1,23 @@
 from __future__ import annotations
 
-from beekeepy._apis import (
+from beekeepy._apis.abc.api import AbstractAsyncApi, AbstractSyncApi, ApiArgumentSerialization, RegisteredApisT
+from beekeepy._apis.abc.api_collection import (
+    AbstractAsyncApiCollection,
+    AbstractSyncApiCollection,
+)
+from beekeepy._apis.abc.sendable import (
+    AsyncSendable,
+    SyncSendable,
+)
+from beekeepy._apis.app_status_api import (
     AppStatusProbeAsyncApiCollection,
     AppStatusProbeSyncApiCollection,
-    AsyncAppStatusApi,
+)
+from beekeepy._apis.beekeeper_api import (
     AsyncBeekeeperApi,
     BeekeeperAsyncApiCollection,
     BeekeeperSyncApiCollection,
-    SyncAppStatusApi,
     SyncBeekeeperApi,
-)
-from beekeepy._apis.abc import (
-    AbstractAsyncApi,
-    AbstractAsyncApiCollection,
-    AbstractSyncApi,
-    AbstractSyncApiCollection,
-    ApiArgumentSerialization,
-    AsyncSendable,
-    RegisteredApisT,
-    SyncSendable,
 )
 from beekeepy._remote_handle import (
     AbstractAsyncHandle,
@@ -41,7 +40,6 @@ __all__ = [
     "ApiArgumentSerialization",
     "AppStatusProbeAsyncApiCollection",
     "AppStatusProbeSyncApiCollection",
-    "AsyncAppStatusApi",
     "AsyncBatchHandle",
     "AsyncBeekeeper",
     "AsyncBeekeeperApi",
@@ -52,7 +50,6 @@ __all__ = [
     "RegisteredApisT",
     "RemoteHandleSettings",
     "RemoteSettingsT",
-    "SyncAppStatusApi",
     "SyncBatchHandle",
     "SyncBeekeeperApi",
     "SyncSendable",

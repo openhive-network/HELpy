@@ -7,7 +7,7 @@ from beekeepy._apis.beekeeper_api.async_api import BeekeeperApi as AsyncBeekeepe
 from beekeepy._apis.beekeeper_api.sync_api import BeekeeperApi as SyncBeekeeperApi
 
 if TYPE_CHECKING:
-    from beekeepy._apis.abc import AsyncSessionHolder, SyncSessionHolder
+    from beekeepy._apis.abc.session_holder import AsyncSessionHolder, SyncSessionHolder
 
 
 class BeekeeperAsyncApiCollection(AppStatusProbeAsyncApiCollection):

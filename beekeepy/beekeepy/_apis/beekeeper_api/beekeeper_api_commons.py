@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Generic, Protocol
 from beekeepy._apis.abc.api import HandleT
 
 if TYPE_CHECKING:
-    from beekeepy._apis.abc import AsyncSessionHolder, SyncSessionHolder
+    from beekeepy._apis.abc.session_holder import AsyncSessionHolder, SyncSessionHolder
 
 
 class CreateSessionActionProtocol(Protocol):
