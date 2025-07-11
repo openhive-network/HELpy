@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Final
 
 from beekeepy._communication import Url
+from beekeepy._runnable_handle.settings import strtobool
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 
 if TYPE_CHECKING:
@@ -40,7 +41,9 @@ class Config(PreconfiguredBaseModel):
         return result
 
     def load(self, source: Path | Self) -> None:
-        self.__dict__.update((self.from_path(source) if isinstance(source, Path) else source).dict())
+        new_config = self.from_path(source) if isinstance(source, Path) else source
+        for member_name, member_value in new_config.dict().items():
+            setattr(self, member_name, member_value)
 
     @classmethod
     def from_path(cls, source: Path) -> Self:
@@ -57,7 +60,9 @@ class Config(PreconfiguredBaseModel):
                 config_name, config_value = line.split("=")
                 member_name = cls._convert_config_name_to_member_name(config_name)
                 values_to_write[member_name] = cls._convert_config_value_to_member_value(
-                    config_value, current_value=values_to_write.get(member_name, default_object[member_name])
+                    config_value,
+                    current_value=values_to_write.get(member_name, default_object[member_name]),
+                    member_name=member_name,
                 )
         return cls.parse_builtins(values_to_write)
 
@@ -89,8 +94,17 @@ class Config(PreconfiguredBaseModel):
         return str(member_value)
 
     @classmethod
-    def _convert_config_value_to_member_value(cls, config_value: str, *, current_value: Any) -> Any | None:
+    def _convert_config_value_to_member_value(
+        cls, config_value: str, *, current_value: Any, member_name: str
+    ) -> Any | None:
         config_value = config_value.strip(" \t\n\"'")
+        member_type: str = cls.__annotations__[member_name]
+        if config_value is not None and "bool" in member_type:
+            return strtobool(config_value)
+
+        if config_value is not None and "int" in member_type and "[" not in member_type:
+            return int(config_value)
+
         if len(config_value) == 0:
             return current_value
 
