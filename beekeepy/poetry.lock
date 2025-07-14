@@ -775,20 +775,17 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev393+d04802f"
+version = "0.0.1.dev424+eeb5c94"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "schemas-0.0.1.dev393+d04802f-py3-none-any.whl", hash = "sha256:9624e7c143c4c88319a20866297ca75dadd2e1d990cf496d4a65b35e1ef9bdc9"},
+    {file = "schemas-0.0.1.dev424+eeb5c94-py3-none-any.whl", hash = "sha256:eaa87991fbec3878d1f3fbba1cf9562995364b80530787d1eb7598ad62bdea72"},
 ]
 
 [package.dependencies]
 msgspec = "0.18.6"
-
-[package.extras]
-api-generation = ["datamodel-code-generator (==0.30.1)", "ruff (==0.11.5)"]
 
 [package.source]
 type = "legacy"
@@ -965,4 +962,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "fc02c9c7b4ce6ff7b66ff93d90bc5909bf482c6dc60784e5642c490833d70f5a"
+content-hash = "09ab12d7ca828842a3bbe0d01bb12dd22302aacb80e87415d5d690c9499e628a"
