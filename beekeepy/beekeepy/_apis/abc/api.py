@@ -17,6 +17,7 @@ from typing import (
 )
 
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
+from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -133,11 +134,16 @@ class AbstractSyncApi(AbstractApi[SyncSendable]):
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = this._additional_arguments_actions(endpoint, (args, kwargs))
-            return this._owner._send(  # type: ignore[no-any-return]
-                endpoint=endpoint,
+            data = build_json_rpc_call(
+                method=endpoint,
                 params=this._serialize_params((args_, kwargs_)),
+                id_=this._owner._id_for_jsonrpc_request(),
+            )
+            return this._owner._send(  # type: ignore[no-any-return]
+                method="POST",
                 expected_type=get_type_hints(wrapped_function)["return"],
                 serialization_type=this._serialize_type(),
+                data=data,
             ).result
 
         return impl  # type: ignore[return-value]
@@ -165,12 +171,17 @@ class AbstractAsyncApi(AbstractApi[AsyncSendable]):
             this._verify_positional_keyword_args(args, kwargs)
             endpoint = f"{api_name}.{wrapped_function_name}"
             args_, kwargs_ = await this._additional_arguments_actions(endpoint, (args, kwargs))
+            data = build_json_rpc_call(
+                method=endpoint,
+                params=this._serialize_params((args_, kwargs_)),
+                id_=this._owner._id_for_jsonrpc_request(),
+            )
             return (  # type: ignore[no-any-return]
                 await this._owner._async_send(
-                    endpoint=endpoint,
-                    params=this._serialize_params((args_, kwargs_)),
+                    method="POST",
                     expected_type=get_type_hints(wrapped_function)["return"],
                     serialization_type=this._serialize_type(),
+                    data=data,
                 )
             ).result
 

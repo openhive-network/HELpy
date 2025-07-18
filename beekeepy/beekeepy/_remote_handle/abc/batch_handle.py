@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from beekeepy import exceptions
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 from beekeepy._utilities.context import ContextAsync, ContextSync, EnterReturnT
 from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 
@@ -18,6 +17,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from beekeepy._communication import AbstractOverseer, HttpUrl
+    from beekeepy._communication.abc.communicator_models import AsyncCallbacks, Callbacks, Methods
 
 
 class _DelayedResponseWrapper:
@@ -148,27 +148,30 @@ class _BatchHandle(ContextSync[EnterReturnT], ContextAsync[EnterReturnT], Generi
 
         self.__is_testnet: bool = is_testnet
 
-    def _impl_handle_request(self, endpoint: str, params: str, *, expect_type: type[ExpectResultT]) -> ExpectResultT:
+    def _next_id_for_request(self) -> int:
+        """Returns next id for request."""
+        return len(self.__batch)
+
+    def _impl_handle_request(self, data: str, *, expect_type: type[ExpectResultT]) -> ExpectResultT:
         @dataclass
         class DummyResponse:
             result: Any
 
-        request = build_json_rpc_call(method=endpoint, params=params, id_=len(self.__batch))
-        delayed_result = _DelayedResponseWrapper(url=self.__url, request=request, expected_type=expect_type)
-        self.__batch.append(_BatchRequestResponseItem(request=request, delayed_result=delayed_result))
+        delayed_result = _DelayedResponseWrapper(url=self.__url, request=data, expected_type=expect_type)
+        self.__batch.append(_BatchRequestResponseItem(request=data, delayed_result=delayed_result))
         return DummyResponse(result=delayed_result)  # type: ignore[return-value]
 
     def __sync_evaluate(self) -> None:
         query = self.__prepare_request()
 
         with _PostRequestManager(self) as mgr:
-            mgr.set_responses(self.__overseer.send(url=self.__url, data=query))
+            mgr.set_responses(self.__overseer.send(url=self.__url, method="POST", data=query))
 
     async def __async_evaluate(self) -> None:
         query = self.__prepare_request()
 
         with _PostRequestManager(self) as mgr:
-            mgr.set_responses(await self.__overseer.async_send(url=self.__url, data=query))
+            mgr.set_responses(await self.__overseer.async_send(url=self.__url, method="POST", data=query))
 
     def __prepare_request(self) -> str:
         return "[" + ",".join([x.request for x in self.__batch]) + "]"
@@ -230,15 +233,20 @@ class SyncBatchHandle(_BatchHandle["SyncBatchHandle"], SyncSendable, Generic[Api
         )
         self.api: ApiT = api(self)
 
-    def _send(
+    def _send(  # noqa: PLR0913
         self,
         *,
-        endpoint: str,
-        params: str,
+        method: Methods,  # noqa: ARG002
         expected_type: type[ExpectResultT],
         serialization_type: Literal["hf26", "legacy"],  # noqa: ARG002
+        data: str | None = None,
+        url: HttpUrl | None = None,  # noqa: ARG002
+        callbacks: Callbacks | None = None,  # noqa: ARG002
     ) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
+        return self._impl_handle_request(data, expect_type=expected_type)  # type: ignore[arg-type]
+
+    def _id_for_jsonrpc_request(self) -> int:
+        return self._next_id_for_request()
 
 
 class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], AsyncSendable, Generic[ApiT]):  # type: ignore[type-arg]
@@ -257,12 +265,17 @@ class AsyncBatchHandle(_BatchHandle["AsyncBatchHandle"], AsyncSendable, Generic[
         )
         self.api: ApiT = api(self)
 
-    async def _async_send(
+    async def _async_send(  # noqa: PLR0913
         self,
         *,
-        endpoint: str,
-        params: str,
+        method: Methods,  # noqa: ARG002
         expected_type: type[ExpectResultT],
         serialization_type: Literal["hf26", "legacy"],  # noqa: ARG002
+        data: str | None = None,
+        url: HttpUrl | None = None,  # noqa: ARG002
+        callbacks: AsyncCallbacks | None = None,  # noqa: ARG002
     ) -> JSONRPCResult[ExpectResultT]:
-        return self._impl_handle_request(endpoint, params, expect_type=expected_type)  # type: ignore[arg-type]
+        return self._impl_handle_request(data, expect_type=expected_type)  # type: ignore[arg-type]
+
+    def _id_for_jsonrpc_request(self) -> int:
+        return self._next_id_for_request()

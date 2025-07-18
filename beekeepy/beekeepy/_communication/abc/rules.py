@@ -20,7 +20,7 @@ class RulesClassifier:
     finitely_repeatable: Sequence[type[OverseerRule]]
     """Checks if response is ok just settings.max_retries, after this rethrows."""
 
-    def instantiate(self, url: HttpUrl, request: Json | list[Json]) -> Rules:
+    def instantiate(self, url: HttpUrl, request: Json | list[Json] | None) -> Rules:
         return Rules(
             preliminary=[rule_cls(url=url, request=request) for rule_cls in self.preliminary],
             infinitely_repeatable=[rule_cls(url=url, request=request) for rule_cls in self.infinitely_repeatable],
@@ -36,9 +36,9 @@ class Rules:
 
 
 class OverseerRule(ABC):
-    def __init__(self, url: HttpUrl, request: Json | list[Json]) -> None:
+    def __init__(self, url: HttpUrl, request: Json | list[Json] | None) -> None:
         self.url = url
-        self.request = request
+        self.request = request or {}  # if None, then this is REST request
 
     def check(self, response: Json | list[Json] | Exception, response_raw: str) -> list[OverseerError]:
         """Call to verify response."""

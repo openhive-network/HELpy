@@ -136,11 +136,11 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
     def _sanitize_data(self, data: Json | list[Json] | str) -> Json | list[Json] | str:
         return data
 
-    def _log_request(self, request: str) -> None:
+    def _log_request(self, url: HttpUrl, request: str | None) -> None:
         self.logger.trace(
-            "sending to `{}`: `{}`",
-            self.http_endpoint.as_string,
-            lambda: self._sanitize_data(request),  # to reduce deepcopy
+            "sending to `{}` data: `{}`",
+            url.as_string,
+            lambda: self._sanitize_data(request or ""),  # to reduce deepcopy
         )
 
     def _log_response(self, seconds_delta: float, response: Json | list[Json]) -> None:
@@ -154,28 +154,46 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
         """Returns if handle is connected to testnet."""
         return False
 
+    def _merge_url(self, query_url: HttpUrl | None) -> HttpUrl:
+        """Merges given url with path."""
+        return HttpUrl.factory(
+            address=self.http_endpoint.address,
+            port=self.http_endpoint.port,
+            path=(query_url or self.http_endpoint).path,
+            query=(query_url or self.http_endpoint).query,
+            protocol=self.http_endpoint.protocol,
+        )
 
 class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsync, AsyncSendable, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
-    async def _async_send(
+    async def _async_send(  # noqa: PLR0913
         self,
         *,
-        endpoint: str,
-        params: str,
+        method: Methods,
         expected_type: type[ExpectResultT],
         serialization_type: Literal["hf26", "legacy"],
+        data: str | None = None,
+        url: HttpUrl | None = None,
+        callbacks: AsyncCallbacks | None = None,
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data asynchronously to handled service basing on jsonrpc."""
         from beekeepy._utilities.error_logger import ErrorLogger
 
-        request = build_json_rpc_call(method=endpoint, params=params)
-        self._log_request(request)
+        final_url = self._merge_url(url)
+        self._log_request(final_url, data)
         with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
-            response = await self._overseer.async_send(self.http_endpoint, data=request)
+            response = await self._overseer.async_send(
+                url=final_url,
+                method=method,
+                data=data,
+                callbacks=callbacks,
+            )
         self._log_response(record.seconds_delta, response)
         return self._response_handle(
-            response=response, expected_type=expected_type, serialization_type=serialization_type
+            response=response,
+            expected_type=expected_type,
+            serialization_type=serialization_type,
         )
 
     def _is_synchronous(self) -> bool:
@@ -195,24 +213,33 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
 class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync, SyncSendable, ABC):
     """Base class for service handlers that uses synchronous communication."""
 
-    def _send(
+    def _send(  # noqa: PLR0913
         self,
         *,
-        endpoint: str,
-        params: str,
+        method: Methods,
         expected_type: type[ExpectResultT],
         serialization_type: Literal["hf26", "legacy"],
+        data: str | None = None,
+        url: HttpUrl | None = None,
+        callbacks: Callbacks | None = None,
     ) -> JSONRPCResult[ExpectResultT]:
         """Sends data synchronously to handled service basing on jsonrpc."""
         from beekeepy._utilities.error_logger import ErrorLogger
 
-        request = build_json_rpc_call(method=endpoint, params=params)
-        self._log_request(request)
+        final_url = self._merge_url(url)
+        self._log_request(final_url, data)
         with Stopwatch() as record, ErrorLogger(self.logger, CommunicationError):
-            response = self._overseer.send(self.http_endpoint, data=request)
+            response = self._overseer.send(
+                url=final_url,
+                method=method,
+                data=data,
+                callbacks=callbacks,
+            )
         self._log_response(record.seconds_delta, response)
         return self._response_handle(
-            response=response, expected_type=expected_type, serialization_type=serialization_type
+            response=response,
+            expected_type=expected_type,
+            serialization_type=serialization_type,
         )
 
     def _is_synchronous(self) -> bool:

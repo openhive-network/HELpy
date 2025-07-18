@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import json
+import time
 from abc import ABC, abstractmethod
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Sequence
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from beekeepy._communication.abc.communicator import AbstractCommunicator
+    from beekeepy._communication.abc.communicator_models import AsyncCallbacks, Callbacks, Methods
     from beekeepy._communication.abc.rules import Rules, RulesClassifier
     from beekeepy._communication.url import HttpUrl
     from beekeepy.exceptions import OverseerError
@@ -116,30 +119,35 @@ class AbstractOverseer(ABC):
         self.communicator = communicator
         self._json_loads = json_loads
 
-    def send(self, url: HttpUrl, data: str) -> Json | list[Json]:
+    def send(
+        self, url: HttpUrl, method: Methods, data: str | None = None, callbacks: Callbacks | None = None
+    ) -> Json | list[Json]:
         with _OverseerExceptionManager(owner=self, rules=self.__rules(url=url, request=data)) as mgr:
             while mgr.continue_loop():
-                response = self.communicator.send(url, data)
+                response = self.communicator.send(url=url, method=method, data=data, callbacks=callbacks)
                 mgr.update(response)
                 if mgr.should_sleep():
-                    self.communicator._sleep_for_retry()
+                    self._sleep_for_retry()
             return mgr.response
         raise self._unknown_decision_path_after_exiting_context("send")
 
-    async def async_send(self, url: HttpUrl, data: str) -> Json | list[Json]:
+    async def async_send(
+        self, url: HttpUrl, method: Methods, data: str | None = None, callbacks: AsyncCallbacks | None = None
+    ) -> Json | list[Json]:
         with _OverseerExceptionManager(owner=self, rules=self.__rules(url=url, request=data)) as mgr:
             while mgr.continue_loop():
-                mgr.update(await self.communicator.async_send(url, data))
+                response = await self.communicator.async_send(url=url, method=method, data=data, callbacks=callbacks)
+                mgr.update(response)
                 if mgr.should_sleep():
-                    await self.communicator._async_sleep_for_retry()
+                    await self._async_sleep_for_retry()
             return mgr.response
         raise self._unknown_decision_path_after_exiting_context("async_send")
 
     @abstractmethod
     def _rules(self) -> RulesClassifier: ...
 
-    def __rules(self, url: HttpUrl, request: str) -> Rules:
-        return self._rules().instantiate(url=url, request=self._json_loads(request))
+    def __rules(self, url: HttpUrl, request: str | None) -> Rules:
+        return self._rules().instantiate(url=url, request=self._json_loads(request) if request else None)
 
     def _oversee(
         self, rules: Rules, response: Json | list[Json] | Exception, response_raw: str
@@ -183,3 +191,11 @@ class AbstractOverseer(ABC):
             "Exited _OverseerExceptionManager context without raising"
             f"any exception nor returning any value in {type(self)}:{func}"
         )
+
+    async def _async_sleep_for_retry(self) -> None:
+        """Sleeps using asyncio.sleep (for asynchronous implementations)."""
+        await asyncio.sleep(self.communicator.settings.period_between_retries.total_seconds())
+
+    def _sleep_for_retry(self) -> None:
+        """Sleeps using time.sleep (for synchronous implementations)."""
+        time.sleep(self.communicator.settings.period_between_retries.total_seconds())
