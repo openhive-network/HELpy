@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import asyncio.exceptions
 from typing import TYPE_CHECKING, Any
 
 import aiohttp
@@ -9,12 +8,11 @@ import aiohttp
 from beekeepy._communication.abc.communicator import (
     AbstractCommunicator,
 )
-from beekeepy.exceptions import CommunicationError, UnknownDecisionPathError
+from beekeepy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from beekeepy._communication.abc.communicator_models import Request, Response
     from beekeepy._communication.settings import CommunicationSettings
-    from beekeepy._communication.url import HttpUrl
-    from beekeepy._utilities.stopwatch import StopwatchResult
 
 
 class AioHttpCommunicator(AbstractCommunicator):
@@ -27,32 +25,28 @@ class AioHttpCommunicator(AbstractCommunicator):
     @property
     async def session(self) -> aiohttp.ClientSession:
         if self.__session is None:
-            self.__session = aiohttp.ClientSession(
-                headers=self._json_headers(), timeout=aiohttp.ClientTimeout(total=self.settings.timeout.total_seconds())
-            )
+            self.__session = aiohttp.ClientSession()
         return self.__session
 
-    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
-        last_exception: BaseException | None = None
-        amount_of_retries = 0
-        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
-            amount_of_retries += 1
-            try:
-                async with (await self.session).post(url.as_string(), data=data) as response:
-                    return await response.text()
-            except (aiohttp.ServerTimeoutError, asyncio.TimeoutError):
-                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
-            except aiohttp.ClientConnectorError as error:
-                raise CommunicationError(url=url.as_string(), request=data) from error
-            except aiohttp.ClientError as error:
-                last_exception = error
-            await self._async_sleep_for_retry()
+    async def _async_send(self, request: Request) -> Response:
+        """Sends to given url given data asynchronously."""
+        try:
+            async with (await self.session).request(
+                method=request.method,
+                url=request.url.as_string(),
+                data=self._encode_data(request.body) if request.body is not None else None,
+                headers=request.headers,
+                timeout=aiohttp.ClientTimeout(total=request.get_timeout()),
+            ) as response:
+                return self._prepare_response(
+                    status_code=response.status, headers=dict(response.headers), response=await response.text()
+                )
+        except (aiohttp.ServerTimeoutError, asyncio.TimeoutError) as error:
+            raise self._construct_timeout_exception(request) from error
+        except aiohttp.ClientConnectorError as error:
+            raise CommunicationError(url=request.url, request=request.body or "") from error
 
-        if last_exception is None:
-            raise UnknownDecisionPathError("Retry loop finished, but last_exception was not set")
-        raise last_exception
-
-    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
+    def _send(self, request: Request) -> Response:
         raise NotImplementedError
 
     def teardown(self) -> None:

@@ -10,9 +10,8 @@ from beekeepy._communication.abc.communicator import (
 from beekeepy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from beekeepy._communication.abc.communicator_models import Request, Response
     from beekeepy._communication.settings import CommunicationSettings
-    from beekeepy._communication.url import HttpUrl
-    from beekeepy._utilities.stopwatch import StopwatchResult
 
 ClientTypes = httpx.AsyncClient | httpx.Client
 
@@ -35,7 +34,7 @@ class HttpxCommunicator(AbstractCommunicator):
             self.__sync_client = None
 
     def __create_client(self, client_type: type[ClientTypes]) -> ClientTypes:
-        return client_type(timeout=self.settings.timeout.total_seconds(), http2=True)
+        return client_type(http2=True)
 
     async def get_async_client(self) -> httpx.AsyncClient:
         if self.__async_client is None:
@@ -47,50 +46,42 @@ class HttpxCommunicator(AbstractCommunicator):
             self.__sync_client = cast(httpx.Client, self.__create_client(httpx.Client))
         return self.__sync_client
 
-    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
-        last_exception: BaseException | None = None
-        amount_of_retries = 0
-        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
-            amount_of_retries += 1
-            try:
-                response: httpx.Response = await (await self.get_async_client()).post(
-                    url.as_string(), content=data, headers=self._json_headers()
-                )
-                data_received = response.content.decode()
-                self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
-                return data_received  # noqa: TRY300
-            except httpx.TimeoutException:
-                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
-            except httpx.ConnectError as error:
-                raise CommunicationError(url=url.as_string(), request=data) from error
-            except httpx.HTTPError as error:
-                last_exception = error
-            await self._async_sleep_for_retry()
+    async def _async_send(self, request: Request) -> Response:
+        """Sends to given url given data asynchronously."""
+        try:
+            response: httpx.Response = await (await self.get_async_client()).request(
+                method=request.method,
+                url=request.url.as_string(),
+                content=request.body,
+                headers=request.headers,
+                timeout=request.get_timeout(),
+            )
+            return self._prepare_response(
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                response=self._decode_data(response.content),
+            )
+        except httpx.TimeoutException as error:
+            raise self._construct_timeout_exception(request) from error
+        except httpx.ConnectError as error:
+            raise CommunicationError(url=request.url, request=request.body or "") from error
 
-        if last_exception is None:
-            raise ValueError("Retry loop finished, but last_exception was not set")
-        raise last_exception
-
-    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
-        last_exception: BaseException | None = None
-        amount_of_retries = 0
-        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
-            amount_of_retries += 1
-            try:
-                response: httpx.Response = self.get_sync_client().post(
-                    url.as_string(), content=data, headers=self._json_headers()
-                )
-                data_received = response.content.decode()
-                self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
-                return data_received  # noqa: TRY300
-            except httpx.TimeoutException:
-                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
-            except httpx.ConnectError as error:
-                raise CommunicationError(url=url.as_string(), request=data) from error
-            except httpx.HTTPError as error:
-                last_exception = error
-            self._sleep_for_retry()
-
-        if last_exception is None:
-            raise ValueError("Retry loop finished, but last_exception was not set")
-        raise last_exception
+    def _send(self, request: Request) -> Response:
+        """Sends to given url given data synchronously."""
+        try:
+            response: httpx.Response = self.get_sync_client().request(
+                method=request.method,
+                url=request.url.as_string(),
+                content=self._encode_data(request.body) if request.body is not None else None,
+                headers=request.headers,
+                timeout=self.settings.timeout.total_seconds(),
+            )
+            return self._prepare_response(
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                response=self._decode_data(response.content),
+            )
+        except httpx.TimeoutException as error:
+            raise self._construct_timeout_exception(request) from error
+        except httpx.ConnectError as error:
+            raise CommunicationError(url=request.url, request=request.body or "") from error

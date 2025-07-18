@@ -126,7 +126,7 @@ build_beekeepy_wheel:
     PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
     PYPROJECT_DIR: "$LOCAL_TOOLS_DIR"
     SUBPROJECT_TEST_TARGET: ""
-    HIVED_HTTP_ENDPOINT: ""
+    HIVED_HTTP_ENDPOINT: "https://api.hive.blog"
   before_script:
     - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
     - !reference [.project_develop_configuration_template, before_script]

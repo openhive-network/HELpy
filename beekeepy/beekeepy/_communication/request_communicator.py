@@ -10,9 +10,8 @@ from beekeepy._communication.abc.communicator import (
 from beekeepy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from beekeepy._communication.abc.communicator_models import Request, Response
     from beekeepy._communication.settings import CommunicationSettings
-    from beekeepy._communication.url import HttpUrl
-    from beekeepy._utilities.stopwatch import StopwatchResult
 
 
 class RequestCommunicator(AbstractCommunicator):
@@ -22,7 +21,7 @@ class RequestCommunicator(AbstractCommunicator):
         super().__init__(*args, settings=settings, **kwargs)
         self.__session: requests.Session | None = None
 
-    async def _async_send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
+    async def _async_send(self, request: Request) -> Response:
         raise NotImplementedError
 
     @property
@@ -31,32 +30,24 @@ class RequestCommunicator(AbstractCommunicator):
             self.__session = requests.Session()
         return self.__session
 
-    def _send(self, url: HttpUrl, data: bytes, stopwatch: StopwatchResult) -> str:
-        last_exception: BaseException | None = None
-        amount_of_retries = 0
-        while not self._is_amount_of_retries_exceeded(amount=amount_of_retries):
-            amount_of_retries += 1
-            try:
-                response: requests.Response = self.session.post(
-                    url.as_string(),
-                    data=data,
-                    headers=self._json_headers(),
-                    timeout=self.settings.timeout.total_seconds(),
-                )
-                data_received: str = response.content.decode()
-                self._assert_status_code(status_code=response.status_code, sent=data, received=data_received)
-                return data_received  # noqa: TRY300
-            except requests.Timeout:
-                last_exception = self._construct_timeout_exception(url, data, stopwatch.lap)
-            except requests.exceptions.ConnectionError as error:
-                raise CommunicationError(url=url.as_string(), request=data) from error
-            except requests.exceptions.RequestException as error:
-                last_exception = error
-            self._sleep_for_retry()
-
-        if last_exception is None:
-            raise ValueError("Retry loop finished, but last_exception was not set")
-        raise last_exception
+    def _send(self, request: Request) -> Response:
+        try:
+            response: requests.Response = self.session.request(
+                method=request.method,
+                url=request.url.as_string(),
+                data=self._encode_data(request.body) if request.body is not None else None,
+                headers=request.headers,
+                timeout=request.get_timeout(),
+            )
+            return self._prepare_response(
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                response=self._decode_data(response.content),
+            )
+        except requests.Timeout as error:
+            raise self._construct_timeout_exception(request) from error
+        except requests.exceptions.ConnectionError as error:
+            raise CommunicationError(url=request.url, request=request.body or "") from error
 
     def teardown(self) -> None:
         self.session.close()
