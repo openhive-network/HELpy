@@ -9,13 +9,14 @@ from beekeepy.handle.remote import RemoteHandleSettings
 
 if TYPE_CHECKING:
     from beekeepy.interfaces import HttpUrl
+
     from schemas.jsonrpc import JSONRPCRequest
 
 
 async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
     communicator = get_communicator_cls("aiohttp")(settings=RemoteHandleSettings(http_endpoint=http_endpoint))
-    response = await communicator.async_send(url=http_endpoint, data=data.json())
+    response = await communicator.async_post(url=http_endpoint, data=data.json())
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"
     return parsed
@@ -24,7 +25,7 @@ async def async_raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -
 def raw_http_call(*, http_endpoint: HttpUrl, data: JSONRPCRequest) -> dict[str, Any]:
     """Make raw call with given data to given http_endpoint."""
     communicator = get_communicator_cls("request")(settings=RemoteHandleSettings(http_endpoint=http_endpoint))
-    response = communicator.send(url=http_endpoint, data=data.json())
+    response = communicator.post(url=http_endpoint, data=data.json())
     parsed = loads(response)
     assert isinstance(parsed, dict), "expected json object"
     return parsed
