@@ -16,7 +16,9 @@ from typing import (
     get_type_hints,
 )
 
+from beekeepy._apis.abc.rest_api_definition_helpers import AsyncRestApiDefinitionHelper, SyncRestApiDefinitionHelper
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
+from beekeepy._communication.url import HttpUrl
 from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 
 if TYPE_CHECKING:
@@ -72,6 +74,10 @@ class AbstractApi(ABC, Generic[HandleT]):
             prepared_kwargs[key.strip("_")] = value
         return json_dumps(prepared_kwargs)
 
+    def _serialize_single_param(self, param: Any) -> str:
+        """Return serialized single param. Can be overloaded."""
+        return self.json_dumps()(param).strip('"')
+
     def _serialize_type(self) -> Literal["hf26", "legacy"]:
         return "hf26"
 
@@ -107,6 +113,24 @@ class AbstractApi(ABC, Generic[HandleT]):
 
     def argument_serialization(self) -> ApiArgumentSerialization:
         return ApiArgumentSerialization.OBJECT
+
+    def base_path(self) -> str:
+        """Returns base path for api."""
+        return ""
+
+    def prepare_rest_url(
+        self, positional_args: list[Any], query_args: dict[str, Any], api_type_hints: dict[str, Any], api_orig_path: str
+    ) -> HttpUrl:
+        # Prepare path in url
+        type_hint_names = list(api_type_hints.keys())
+        arguments_to_format: dict[str, str] = {}
+        for i, arg in enumerate(positional_args):
+            arguments_to_format[type_hint_names[i].replace("_", "-")] = self._serialize_single_param(arg)
+        path = (self.base_path() + api_orig_path).format(**arguments_to_format)
+
+        return HttpUrl.factory(
+            path=path, query={k.replace("_", "-"): self._serialize_single_param(v) for k, v in query_args.items()}
+        )
 
     def __init__(self, owner: HandleT) -> None:
         self._owner = owner
@@ -148,6 +172,10 @@ class AbstractSyncApi(AbstractApi[SyncSendable]):
 
         return impl  # type: ignore[return-value]
 
+    @classmethod
+    def endpoint_rest(cls) -> type[SyncRestApiDefinitionHelper]:
+        return SyncRestApiDefinitionHelper
+
 
 class AbstractAsyncApi(AbstractApi[AsyncSendable]):
     """Base class for all apis, that provides asynchronous endpoints."""
@@ -186,3 +214,7 @@ class AbstractAsyncApi(AbstractApi[AsyncSendable]):
             ).result
 
         return impl  # type: ignore[return-value]
+
+    @classmethod
+    def endpoint_rest(cls) -> type[AsyncRestApiDefinitionHelper]:
+        return AsyncRestApiDefinitionHelper

@@ -11,9 +11,8 @@ from beekeepy._apis.abc.api_collection import (
     AbstractSyncApiCollection,
 )
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from beekeepy._communication import get_communicator_cls
+from beekeepy._communication import get_communicator_cls, HttpUrl
 from beekeepy._remote_handle.settings import RemoteHandleSettings
-from beekeepy._utilities.build_json_rpc_call import build_json_rpc_call
 from beekeepy._utilities.context import SelfContextAsync, SelfContextSync
 from beekeepy._utilities.settings_holder import UniqueSettingsHolder
 from beekeepy._utilities.stopwatch import Stopwatch
@@ -23,7 +22,8 @@ from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 if TYPE_CHECKING:
     from loguru import Logger
 
-    from beekeepy._communication import AbstractCommunicator, AbstractOverseer, HttpUrl
+    from beekeepy._communication import AbstractCommunicator, AbstractOverseer
+    from beekeepy._communication.abc.communicator_models import AsyncCallbacks, Callbacks, Methods
     from beekeepy._remote_handle.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from beekeepy.exceptions import Json
 
@@ -119,9 +119,14 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
         response: Json | list[Json],
         expected_type: type[ExpectResultT],
         serialization_type: Literal["hf26", "legacy"],
+        *,
+        is_jsonrpc: bool,
     ) -> JSONRPCResult[ExpectResultT]:
         """Validates and builds response."""
-        assert isinstance(response, dict), f"Expected dict as response, got: {response=}"
+        if is_jsonrpc:
+            assert isinstance(response, dict), f"Expected dict as response, got: {response=}"
+        else:
+            response = {"result": response, "jsonrpc": "2.0", "id": 0}
         serialized_data = get_response_model(expected_type, json.dumps(response), serialization_type)
         assert isinstance(serialized_data, JSONRPCResult)
         return serialized_data
@@ -164,6 +169,14 @@ class AbstractHandle(UniqueSettingsHolder[RemoteSettingsT], ABC, Generic[RemoteS
             protocol=self.http_endpoint.protocol,
         )
 
+    @classmethod
+    def _is_jsonrpc(cls, data: str | None) -> bool:
+        """Checks if data is jsonrpc."""
+        if data is None:
+            return False
+        return '"jsonrpc":' in data
+
+
 class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsync, AsyncSendable, ABC):
     """Base class for service handlers that uses asynchronous communication."""
 
@@ -194,6 +207,7 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
             response=response,
             expected_type=expected_type,
             serialization_type=serialization_type,
+            is_jsonrpc=self._is_jsonrpc(data),
         )
 
     def _is_synchronous(self) -> bool:
@@ -240,6 +254,7 @@ class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync,
             response=response,
             expected_type=expected_type,
             serialization_type=serialization_type,
+            is_jsonrpc=self._is_jsonrpc(data),
         )
 
     def _is_synchronous(self) -> bool:
