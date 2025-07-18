@@ -86,9 +86,15 @@ class AbstractApi(ABC, Generic[HandleT]):
         return _convert_pascal_case_to_sneak_case(cls.__name__)
 
     @classmethod
+    def _register_api(cls) -> bool:
+        """Defines is apis should be registered in global collection."""
+        return True
+
+    @classmethod
     def _register_method(cls, *, api: str, endpoint: str, sync: bool) -> None:
         """For tests purposes only; Registers apis in global collection."""
-        cls.__registered_apis[sync][api].add(endpoint)
+        if cls._register_api():
+            cls.__registered_apis[sync][api].add(endpoint)
 
     @classmethod
     def _get_registered_methods(cls) -> RegisteredApisT:
