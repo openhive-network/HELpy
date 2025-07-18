@@ -9,7 +9,7 @@ from schemas.apis import beekeeper_api  # noqa: TCH001
 
 
 class BeekeeperApi(AbstractSyncApi, BeekeeperApiCommons[SyncSendable]):
-    api = AbstractSyncApi.endpoint
+    api = AbstractSyncApi.endpoint_jsonrpc
 
     _owner: SyncSessionHolder
 

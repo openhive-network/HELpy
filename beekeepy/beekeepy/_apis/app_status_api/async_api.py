@@ -5,7 +5,7 @@ from schemas.apis import app_status_api  # noqa: TCH001
 
 
 class AppStatusApi(AbstractAsyncApi):
-    api = AbstractAsyncApi.endpoint
+    api = AbstractAsyncApi.endpoint_jsonrpc
 
     @api
     async def get_app_status(self) -> app_status_api.GetAppStatus:

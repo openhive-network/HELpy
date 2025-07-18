@@ -11,7 +11,7 @@ from schemas.apis import beekeeper_api  # noqa: TCH001
 class BeekeeperApi(AbstractAsyncApi, BeekeeperApiCommons[AsyncSendable]):
     """Set of endpoints, that allows asynchronous communication with beekeeper service."""
 
-    api = AbstractAsyncApi.endpoint
+    api = AbstractAsyncApi.endpoint_jsonrpc
     _owner: AsyncSessionHolder
 
     def __init__(self, owner: AsyncSessionHolder) -> None:
