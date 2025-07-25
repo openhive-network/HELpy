@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Final
 
 import pytest
 
-from beekeepy.communication import Callbacks, CommunicationSettings, RequestCommunicator
+from beekeepy.communication import Callbacks, CommunicationSettings, get_communicator_cls
 
 if TYPE_CHECKING:
     from beekeepy.communication import Request, Response
@@ -16,7 +16,7 @@ INVALID_DATA: Final[str] = """{"id": 0, "jsonrpc": "2.0", "method": "database_ap
 
 def test_simple_jsonrpc(hived_http_endpoint: HttpUrl) -> None:
     # ARRANGE
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.post(url=hived_http_endpoint, data=SIMPLE_DATA)
@@ -28,7 +28,7 @@ def test_simple_jsonrpc(hived_http_endpoint: HttpUrl) -> None:
 
 def test_jsonrpc_with_error(hived_http_endpoint: HttpUrl) -> None:
     # ARRANGE
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.post(url=hived_http_endpoint, data=INVALID_DATA)
@@ -41,7 +41,7 @@ def test_jsonrpc_with_error(hived_http_endpoint: HttpUrl) -> None:
 def test_jsonrpc_with_error_and_callback_reraise(hived_http_endpoint: HttpUrl) -> None:
     # ARRANGE
     error_message: Final[str] = "Invalid response received"
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     def raise_if_error_in_respone(*, request: Request, response: Response) -> None:  # noqa: ARG001
         if "error" in response.body:

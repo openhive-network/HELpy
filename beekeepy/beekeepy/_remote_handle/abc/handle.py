@@ -11,7 +11,7 @@ from beekeepy._apis.abc.api_collection import (
     AbstractSyncApiCollection,
 )
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from beekeepy._communication import get_communicator_cls, HttpUrl
+from beekeepy._communication import HttpUrl, get_communicator_cls
 from beekeepy._remote_handle.settings import RemoteHandleSettings
 from beekeepy._utilities.context import SelfContextAsync, SelfContextSync
 from beekeepy._utilities.settings_holder import UniqueSettingsHolder

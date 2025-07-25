@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from requests.status_codes import codes
 
-from beekeepy.communication import Callbacks, CommunicationSettings, RequestCommunicator
+from beekeepy.communication import Callbacks, CommunicationSettings, get_communicator_cls
 from beekeepy.interfaces import HttpUrl
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ def invalid_get(hived_http_endpoint: HttpUrl) -> HttpUrl:
 
 def test_simple_restapi(simple_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.get(url=simple_get)
@@ -46,7 +46,7 @@ def test_simple_restapi(simple_get: HttpUrl) -> None:
 
 def test_restapi_with_error(invalid_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.get(url=invalid_get)
@@ -59,7 +59,7 @@ def test_restapi_with_error(invalid_get: HttpUrl) -> None:
 def test_restapi_with_error_and_callback_reraise(invalid_get: HttpUrl) -> None:
     # ARRANGE
     error_message: Final[str] = "Invalid status code received"
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     def raise_if_invalid_status_code(*, request: Request, response: Response) -> None:  # noqa: ARG001
         if response.status_code != codes.ok:
@@ -75,7 +75,7 @@ def test_restapi_with_error_and_callback_reraise(invalid_get: HttpUrl) -> None:
 
 def test_restapi_with_request_correction(simple_get: HttpUrl, invalid_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = RequestCommunicator(settings=CommunicationSettings())
+    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
 
     def fix_url(*, request: Request) -> Request:
         request.url = simple_get

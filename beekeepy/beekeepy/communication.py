@@ -14,11 +14,11 @@ from beekeepy._communication import (
     ErrorCallback,
     Request,
     RequestCallback,
-    get_communicator_cls,
     Response,
     ResponseCallback,
     StrictOverseer,
     SyncCallback,
+    get_communicator_cls,
     rules,
 )
 
