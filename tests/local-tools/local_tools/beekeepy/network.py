@@ -9,7 +9,6 @@ from beekeepy.handle.remote import RemoteHandleSettings
 
 if TYPE_CHECKING:
     from beekeepy.interfaces import HttpUrl
-
     from schemas.jsonrpc import JSONRPCRequest
 
 
