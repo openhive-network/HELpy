@@ -28,7 +28,7 @@ class Config(PreconfiguredBaseModel):
 
     def write_to_lines(self) -> list[str]:
         result = []
-        for member_name, member_value in self.dict().items():
+        for member_name, member_value in self.dict(exclude_defaults=True, exclude_none=True).items():
             if member_value is not None:
                 if isinstance(member_value, list) and len(member_value) == 0:
                     continue
@@ -111,3 +111,7 @@ class Config(PreconfiguredBaseModel):
             if self_value != other_value:
                 differences[member_name] = (self_value, other_value)
         return differences
+
+    @classmethod
+    def default(cls) -> Self:
+        return cls()
