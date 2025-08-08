@@ -775,13 +775,13 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "schemas"
-version = "0.0.1.dev424+eeb5c94"
+version = "0.0.1.dev426+0dea163"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "schemas-0.0.1.dev424+eeb5c94-py3-none-any.whl", hash = "sha256:eaa87991fbec3878d1f3fbba1cf9562995364b80530787d1eb7598ad62bdea72"},
+    {file = "schemas-0.0.1.dev426+0dea163-py3-none-any.whl", hash = "sha256:783301368543c6643b71fcb449060ce1c489a15a140e894e37c1d60e59f6399a"},
 ]
 
 [package.dependencies]
@@ -962,4 +962,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "09ab12d7ca828842a3bbe0d01bb12dd22302aacb80e87415d5d690c9499e628a"
+content-hash = "1e0565e2d29b9a0fba78461193fc0d6aa695f8e11a24e8399e9d8c73b7947514"
