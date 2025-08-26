@@ -63,7 +63,7 @@ class HttpxCommunicator(AbstractCommunicator):
             )
         except httpx.TimeoutException as error:
             raise self._construct_timeout_exception(request) from error
-        except httpx.ConnectError as error:
+        except httpx.HTTPError as error:
             raise CommunicationError(url=request.url, request=request.body or "") from error
 
     def _send(self, request: Request) -> Response:
@@ -83,5 +83,5 @@ class HttpxCommunicator(AbstractCommunicator):
             )
         except httpx.TimeoutException as error:
             raise self._construct_timeout_exception(request) from error
-        except httpx.ConnectError as error:
+        except httpx.HTTPError as error:
             raise CommunicationError(url=request.url, request=request.body or "") from error

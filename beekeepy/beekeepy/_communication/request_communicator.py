@@ -46,7 +46,7 @@ class RequestCommunicator(AbstractCommunicator):
             )
         except requests.Timeout as error:
             raise self._construct_timeout_exception(request) from error
-        except requests.exceptions.ConnectionError as error:
+        except requests.exceptions.RequestException as error:
             raise CommunicationError(url=request.url, request=request.body or "") from error
 
     def teardown(self) -> None:

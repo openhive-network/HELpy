@@ -43,7 +43,7 @@ class AioHttpCommunicator(AbstractCommunicator):
                 )
         except (aiohttp.ServerTimeoutError, asyncio.TimeoutError) as error:
             raise self._construct_timeout_exception(request) from error
-        except aiohttp.ClientConnectorError as error:
+        except aiohttp.ClientError as error:
             raise CommunicationError(url=request.url, request=request.body or "") from error
 
     def _send(self, request: Request) -> Response:
