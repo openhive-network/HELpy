@@ -90,7 +90,7 @@ class Session(SessionInterface, StateInvalidator):
 
     @property
     def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
-        return [wallet.unlocked for wallet in self.__list_wallets() if wallet.unlocked]
+        return self.__list_unlocked_wallets()
 
     @property
     def token(self) -> str:
@@ -127,6 +127,13 @@ class Session(SessionInterface, StateInvalidator):
         return [
             self.__construct_wallet(name=wallet.name)
             for wallet in self.__beekeeper.api.list_wallets(token=self.token).wallets
+        ]
+
+    def __list_unlocked_wallets(self) -> list[UnlockedWalletInterface]:
+        return [
+            self.__construct_unlocked_wallet(name=wallet.name)
+            for wallet in self.__beekeeper.api.list_wallets(token=self.token).wallets
+            if wallet.unlocked
         ]
 
     def _enter(self) -> SessionInterface:

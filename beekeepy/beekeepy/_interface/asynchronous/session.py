@@ -99,12 +99,7 @@ class Session(SessionInterface, StateInvalidator):
 
     @property
     async def wallets_unlocked(self) -> list[UnlockedWalletInterface]:
-        result = []
-        for wallet in await self.__list_wallets():
-            unlocked_wallet = await wallet.unlocked
-            if unlocked_wallet:
-                result.append(unlocked_wallet)
-        return result
+        return await self.__list_unlocked_wallets()
 
     @property
     async def token(self) -> str:
@@ -142,6 +137,15 @@ class Session(SessionInterface, StateInvalidator):
             *[
                 self.__construct_wallet(name=wallet.name)
                 for wallet in (await self.__beekeeper.api.list_wallets(token=await self.token)).wallets
+            ]
+        )
+
+    async def __list_unlocked_wallets(self) -> list[UnlockedWalletInterface]:
+        return await asyncio.gather(
+            *[
+                self.__construct_unlocked_wallet(name=wallet.name)
+                for wallet in (await self.__beekeeper.api.list_wallets(token=await self.token)).wallets
+                if wallet.unlocked
             ]
         )
 
