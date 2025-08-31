@@ -3,10 +3,12 @@ from __future__ import annotations
 import shutil
 from typing import TYPE_CHECKING
 
+import pytest
 from local_tools.beekeepy import checkers
 from loguru import logger
 
 from beekeepy import Settings
+from beekeepy.exceptions import BeekeeperFailedToStartError, FailedToStartExecutableError
 from beekeepy.handle.runnable import Beekeeper
 
 if TYPE_CHECKING:
@@ -34,10 +36,9 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
         assert bk1.is_running() is True, "First instance of beekeeper should launch without any problems."
 
         # ACT & ASSERT 2
-        with Beekeeper(settings=settings, logger=logger) as bk2:
-            assert (
-                "opening beekeeper failed" in bk2.apis.app_status.get_app_status().statuses
-            ), "Second instance of beekeeper should fail to start."
+        with pytest.raises(BeekeeperFailedToStartError) as exc, Beekeeper(settings=settings, logger=logger):
+            pass
+        assert isinstance(exc.value.cause, FailedToStartExecutableError)
 
 
 def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
