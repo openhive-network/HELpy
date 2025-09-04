@@ -34,7 +34,7 @@ psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
 
-schemas = "0.0.1.dev426+0dea163"
+schemas = "0.0.1.dev429+933dde6"
 
 [tool.poetry-dynamic-versioning]
 enable = true
