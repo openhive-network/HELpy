@@ -4,7 +4,6 @@ import contextlib
 import time
 import warnings
 from abc import ABC, abstractmethod
-from datetime import timedelta
 from pathlib import Path
 from subprocess import SubprocessError
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
@@ -117,7 +116,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
                 environ=environment_variables,
                 propagate_sigint=settings.propagate_sigint,
                 save_config=save_config,
-                timeout=timeout,
+                timeout=timeout or settings.initialization_timeout.total_seconds(),
             )
             if blocking:
                 return
@@ -247,7 +246,15 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             warnings.warn("Given executable probably does not provide http network access", stacklevel=3)
             return matched_ports
 
-        handle = AppStatusProbe(settings=Settings(http_endpoint=matched_ports.http, timeout=timedelta(seconds=1)))
+        settings = self._get_settings()
+        handle = AppStatusProbe(
+            settings=Settings(
+                http_endpoint=matched_ports.http,
+                timeout=settings.timeout,
+                max_retries=settings.max_retries,
+                period_between_retries=settings.period_between_retries,
+            )
+        )
         status: None | GetAppStatus = None
         try:
             status = handle.api.get_app_status()
