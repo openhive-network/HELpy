@@ -31,17 +31,17 @@ class CommonOverseer(AbstractOverseer):
                 UnableToOpenWallet,
                 InvalidPassword,
                 UnlockIsNotAccessible,
+                ErrorInResponse,
             ],
             infinitely_repeatable=[
                 UnableToAcquireDatabaseLock,
                 UnableToAcquireForkdbLock,
+                JussiResponse,
             ],
             finitely_repeatable=[
                 UnparsableResponse,
-                JussiResponse,
                 DifferenceBetweenAmountOfRequestsAndResponses,
                 NullResult,
-                ErrorInResponse,
             ],
         )
 
@@ -53,7 +53,6 @@ class StrictOverseer(AbstractOverseer):
         return RulesClassifier(
             preliminary=[
                 UnparsableResponse,
-                JussiResponse,
                 DifferenceBetweenAmountOfRequestsAndResponses,
                 ApiNotFound,
                 NullResult,
@@ -66,6 +65,7 @@ class StrictOverseer(AbstractOverseer):
             infinitely_repeatable=[
                 UnableToAcquireDatabaseLock,
                 UnableToAcquireForkdbLock,
+                JussiResponse,
             ],
             finitely_repeatable=[],
         )
