@@ -24,6 +24,10 @@ class StopwatchResult:
     def lap(self) -> float:
         return (Stopwatch.now() - self.started_at).total_seconds()
 
+    def reset(self) -> None:
+        self.started_at = Stopwatch.now()
+        self.stopped_at = Stopwatch.now()
+
 
 class Stopwatch(ContextSync[StopwatchResult]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:

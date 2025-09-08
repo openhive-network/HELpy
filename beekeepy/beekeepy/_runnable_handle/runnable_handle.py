@@ -110,23 +110,29 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             self._unify_cli_arguments(settings.working_directory, settings.http_endpoint)
             self._unify_config(settings.working_directory, settings.http_endpoint)
 
-        try:
-            self._exec._run(
-                blocking=blocking,
-                environ=environment_variables,
-                propagate_sigint=settings.propagate_sigint,
-                save_config=save_config,
-                timeout=timeout or settings.initialization_timeout.total_seconds(),
-            )
-            if blocking:
-                return
-        except SubprocessError as e:
-            raise FailedToStartExecutableError from e
-        try:
-            ports = self._wait_for_app_to_start()
-        except TimeoutError as e:
-            raise FailedToDetectReservedPortsError from e
-        self._setup_ports(ports)
+        timeout = timeout or settings.initialization_timeout.total_seconds()
+
+        with Stopwatch() as sw:
+            try:
+                self._exec._run(
+                    blocking=blocking,
+                    environ=environment_variables,
+                    propagate_sigint=settings.propagate_sigint,
+                    save_config=save_config,
+                    timeout=timeout,
+                )
+                if blocking:
+                    return
+            except SubprocessError as e:
+                raise FailedToStartExecutableError(f"{timeout= :.4f}, wait time={sw.lap:.4f}") from e
+            sw.reset()
+            try:
+                ports = self._wait_for_app_to_start()
+            except TimeoutError as e:
+                raise FailedToDetectReservedPortsError(
+                    f"timeout={settings.initialization_timeout.total_seconds():.4f}, wait time={sw.lap:.4f}"
+                ) from e
+            self._setup_ports(ports)
 
     @abstractmethod
     def _construct_executable(self) -> ExecutableT:
