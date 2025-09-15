@@ -2,11 +2,18 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Sequence
+from enum import IntEnum
+from typing import TYPE_CHECKING, Iterator, Sequence
 
 if TYPE_CHECKING:
     from beekeepy._communication.url import HttpUrl
     from beekeepy.exceptions import Json, OverseerError
+
+
+class ContinueMode(IntEnum):
+    BREAK = 0
+    CONTINUE = 1
+    INF = 2
 
 
 @dataclass(kw_only=True)
@@ -35,10 +42,24 @@ class RulesExceptions:
     finitely_repeatable: Sequence[type[OverseerError]]
 
 
+@dataclass(kw_only=True, frozen=True)
 class Rules:
     preliminary: Sequence[OverseerRule]
+    """If rules in this category detect error, retries won't be attempted."""
+
     infinitely_repeatable: Sequence[OverseerRule]
+    """If rules in this category detect error, retries will be attempted indefinitely."""
+
     finitely_repeatable: Sequence[OverseerRule]
+    """If rules in this category detect error, retries will be attempted up to settings.max_retries times."""
+
+    def resolved_rules(self) -> Iterator[tuple[OverseerRule, ContinueMode]]:
+        """Yields all rules in proper order with their associated ContinueMode."""
+        yield from  (
+            *((rule, ContinueMode.INF) for rule in self.infinitely_repeatable),
+            *((rule, ContinueMode.BREAK) for rule in self.preliminary),
+            *((rule, ContinueMode.CONTINUE) for rule in self.finitely_repeatable),
+        )
 
     def grouped_exceptions(self) -> RulesExceptions:
         return RulesExceptions(

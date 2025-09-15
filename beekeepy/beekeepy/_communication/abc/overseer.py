@@ -4,9 +4,9 @@ import asyncio
 import json
 import time
 from abc import ABC, abstractmethod
-from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Sequence
 
+from beekeepy._communication.abc.rules import ContinueMode
 from beekeepy._utilities.context import SelfContextSync
 from beekeepy.exceptions import GroupedErrorsError, Json, UnknownDecisionPathError
 
@@ -21,12 +21,6 @@ if TYPE_CHECKING:
 
 
 __all__ = ["AbstractOverseer"]
-
-
-class ContinueMode(IntEnum):
-    BREAK = 0
-    CONTINUE = 1
-    INF = 2
 
 
 class _OverseerExceptionManager(SelfContextSync):
@@ -164,22 +158,17 @@ class AbstractOverseer(ABC):
         self, rules: Rules, response: Json | list[Json] | Exception, response_raw: str
     ) -> tuple[list[OverseerError], ContinueMode]:
         exceptions: list[OverseerError] = []
+        result_status: ContinueMode = ContinueMode.INF
 
-        for rules_category, status in (
-            (rules.infinitely_repeatable, ContinueMode.INF),
-            (rules.preliminary, ContinueMode.BREAK),
-            (rules.finitely_repeatable, ContinueMode.CONTINUE),
-        ):
-            for rule in rules_category:
-                exceptions_to_add = rule.check(response=response, response_raw=response_raw)
-                exceptions.extend(exceptions_to_add)
-                for ex in exceptions_to_add:
-                    if not ex.retry():
-                        return (exceptions, status)
-
-                if bool(exceptions):
+        for rule, status in rules.resolved_rules():
+            exceptions_to_add = rule.check(response=response, response_raw=response_raw)
+            exceptions.extend(exceptions_to_add)
+            result_status = min(result_status, status)
+            for ex in exceptions_to_add:
+                if not ex.retry():
                     return (exceptions, status)
-        return ([], ContinueMode.CONTINUE)
+
+        return (exceptions, result_status) if bool(exceptions) else ([], ContinueMode.CONTINUE)
 
     def _parse(self, response: str) -> Json | list[Json] | Exception:
         response_parsed: Json | list[Json] | None = None
