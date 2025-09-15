@@ -29,10 +29,23 @@ class RulesClassifier:
 
 
 @dataclass(kw_only=True)
+class RulesExceptions:
+    preliminary: Sequence[type[OverseerError]]
+    infinitely_repeatable: Sequence[type[OverseerError]]
+    finitely_repeatable: Sequence[type[OverseerError]]
+
+
 class Rules:
     preliminary: Sequence[OverseerRule]
     infinitely_repeatable: Sequence[OverseerRule]
     finitely_repeatable: Sequence[OverseerRule]
+
+    def grouped_exceptions(self) -> RulesExceptions:
+        return RulesExceptions(
+            preliminary=[rule.expected_exception() for rule in self.preliminary],
+            infinitely_repeatable=[rule.expected_exception() for rule in self.infinitely_repeatable],
+            finitely_repeatable=[rule.expected_exception() for rule in self.finitely_repeatable],
+        )
 
 
 class OverseerRule(ABC):

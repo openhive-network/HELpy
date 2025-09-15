@@ -42,6 +42,7 @@ class _OverseerExceptionManager(SelfContextSync):
         super().__init__()
         self._owner = owner
         self._rules = rules
+        self._exception_rules = rules.grouped_exceptions()
         self._exceptions: Sequence[OverseerError] = []
         self._last_status = ContinueMode.INF
         self._counter = 0
@@ -85,7 +86,17 @@ class _OverseerExceptionManager(SelfContextSync):
         return self.CONTINUE_LOOP
 
     def should_sleep(self) -> bool:
-        return len(self._exceptions) > 0
+        if len(self._exceptions) == 0:
+            # No exceptions, no need to sleep
+            return False
+        for exception in self._exceptions:
+            if type(exception) in self._exception_rules.preliminary:
+                # Preliminary exception, no need to sleep
+                return False
+            if self._counter <= 0 and type(exception) in self._exception_rules.finitely_repeatable:
+                # Finitely repeatable exception, but no retries left, no need to sleep
+                return False
+        return True
 
     def _finally(self) -> None:
         if not self._response_read_or_exception_occurred:
