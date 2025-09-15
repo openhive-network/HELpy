@@ -31,6 +31,7 @@ class CommonOverseer(AbstractOverseer):
                 UnableToOpenWallet,
                 InvalidPassword,
                 UnlockIsNotAccessible,
+                ErrorInResponse,
             ],
             infinitely_repeatable=[
                 UnableToAcquireDatabaseLock,
@@ -41,7 +42,6 @@ class CommonOverseer(AbstractOverseer):
                 JussiResponse,
                 DifferenceBetweenAmountOfRequestsAndResponses,
                 NullResult,
-                ErrorInResponse,
             ],
         )
 
