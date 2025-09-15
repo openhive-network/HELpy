@@ -76,15 +76,19 @@ class OverseerRule(ABC):
         assert isinstance(self.request, dict), f"self.request is not a dict, nor list, but is `{type(self.request)}`"
         return self.request
 
+    @classmethod
+    @abstractmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        """Overload this method to specify which exception should be raised in case of detection."""
+
     def _construct_exception(
         self,
-        error_cls: type[OverseerError],
         response: Json | list[Json] | Exception,
         whole_response: Json | list[Json],
         request_id: int | None,
         message: str = "",
     ) -> OverseerError:
-        return error_cls(
+        return self.expected_exception()(
             url=self.url,
             request=self.request,
             request_id=request_id,

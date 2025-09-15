@@ -37,7 +37,6 @@ class UnableToAcquireDatabaseLock(OverseerRule):
         if self.LOOKUP_MESSAGE in str(parsed_response):
             return [
                 self._construct_exception(
-                    error_cls=UnableToAcquireDatabaseLockError,
                     request_id=parsed_response.get("id"),
                     response=parsed_response,
                     message=f"Found `{self.LOOKUP_MESSAGE}` in response",
@@ -45,6 +44,10 @@ class UnableToAcquireDatabaseLock(OverseerRule):
                 )
             ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return UnableToAcquireDatabaseLockError
 
 
 class UnableToAcquireForkdbLock(OverseerRule):
@@ -54,7 +57,6 @@ class UnableToAcquireForkdbLock(OverseerRule):
         if self.LOOKUP_MESSAGE in str(parsed_response):
             return [
                 self._construct_exception(
-                    error_cls=UnableToAcquireForkdbLockError,
                     message=f"Found `{self.LOOKUP_MESSAGE}` in response",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -62,6 +64,10 @@ class UnableToAcquireForkdbLock(OverseerRule):
                 )
             ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return UnableToAcquireForkdbLockError
 
 
 class NullResult(OverseerRule):
@@ -73,7 +79,6 @@ class NullResult(OverseerRule):
 
             return [
                 self._construct_exception(
-                    error_cls=NullResultError,
                     message="`result` field in response is null",
                     response=parsed_response,
                     request_id=request_id,
@@ -91,6 +96,10 @@ class NullResult(OverseerRule):
             "condenser_api.get_escrow",
         ]
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return NullResultError
+
 
 class ApiNotFound(OverseerRule):
     _API_NOT_FOUND_REGEX: ClassVar[re.Pattern[str]] = re.compile(
@@ -102,7 +111,6 @@ class ApiNotFound(OverseerRule):
         if search_result is not None:
             return [
                 self._construct_exception(
-                    error_cls=ApiNotFoundError,
                     message=f"Requested api not found: {search_result.group(1)}",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -111,13 +119,16 @@ class ApiNotFound(OverseerRule):
             ]
         return []
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return ApiNotFoundError
+
 
 class JussiResponse(OverseerRule):
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
         if "jussi_request_id" in str(parsed_response):
             return [
                 self._construct_exception(
-                    error_cls=JussiResponseError,
                     message="Jussi responded instead of target service",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -126,13 +137,16 @@ class JussiResponse(OverseerRule):
             ]
         return []
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return JussiResponseError
+
 
 class UnparsableResponse(OverseerRule):
     def _check_non_json_response(self, parsed_response: Exception, response_raw: str) -> list[OverseerError]:
         if isinstance(parsed_response, json.JSONDecodeError):
             return [
                 self._construct_exception(
-                    error_cls=UnparsableResponseError,
                     message=(
                         "Received response is not parsable, " f"probably plaintext or invalid json: {response_raw}"
                     ),
@@ -150,12 +164,15 @@ class UnparsableResponse(OverseerRule):
     ) -> list[OverseerError]:
         return []
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return UnparsableResponseError
+
 
 class DifferenceBetweenAmountOfRequestsAndResponses(OverseerRule):
     def _check_batch(self, parsed_response: list[Json]) -> list[OverseerError]:
         def exception_factory(msg: str) -> OverseerError:
             return self._construct_exception(
-                error_cls=DifferenceBetweenAmountOfRequestsAndResponsesError,
                 message=msg,
                 response=parsed_response,
                 whole_response=parsed_response,
@@ -184,13 +201,16 @@ class DifferenceBetweenAmountOfRequestsAndResponses(OverseerRule):
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:  # noqa: ARG002
         return []
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return DifferenceBetweenAmountOfRequestsAndResponsesError
+
 
 class ErrorInResponse(OverseerRule):
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
         if (error := parsed_response.get("error")) is not None:
             return [
                 self._construct_exception(
-                    error_cls=ErrorInResponseError,
                     message=f"Error found in response: {error=}",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -199,13 +219,16 @@ class ErrorInResponse(OverseerRule):
             ]
         return []
 
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return ErrorInResponseError
+
 
 class UnlockIsNotAccessible(OverseerRule):
     def _check_single(self, parsed_response: Json, whole_response: Json | list[Json]) -> list[OverseerError]:
         if "unlock is not accessible" in str(parsed_response):
             return [
                 self._construct_exception(
-                    error_cls=UnlockIsNotAccessibleError,
                     message="You tried to unlock wallet too fast",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -213,6 +236,10 @@ class UnlockIsNotAccessible(OverseerRule):
                 )
             ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return UnlockIsNotAccessibleError
 
 
 class WalletIsAlreadyUnlocked(OverseerRule):
@@ -226,7 +253,6 @@ class WalletIsAlreadyUnlocked(OverseerRule):
             if (match := regex.search(str(parsed_response))) is not None:
                 return [
                     self._construct_exception(
-                        error_cls=WalletIsAlreadyUnlockedError,
                         message=f"You tried to unlock already unlocked wallet: `{match.group(1)}`",
                         response=parsed_response,
                         request_id=parsed_response.get("id"),
@@ -234,6 +260,10 @@ class WalletIsAlreadyUnlocked(OverseerRule):
                     )
                 ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return WalletIsAlreadyUnlockedError
 
 
 class UnableToOpenWallet(OverseerRule):
@@ -246,7 +276,6 @@ class UnableToOpenWallet(OverseerRule):
         if (match := self._UNABLE_TO_OPEN_WALLET_REGEX.search(str(parsed_response))) is not None:
             return [
                 self._construct_exception(
-                    error_cls=UnableToOpenWalletError,
                     message=f"No such wallet: {match.group(1)}",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -254,6 +283,10 @@ class UnableToOpenWallet(OverseerRule):
                 )
             ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return UnableToOpenWalletError
 
 
 class InvalidPassword(OverseerRule):
@@ -267,7 +300,6 @@ class InvalidPassword(OverseerRule):
         ) is not None:
             return [
                 self._construct_exception(
-                    error_cls=OverseerInvalidPasswordError,
                     message=f"Invalid password for wallet: {match.group(1)}",
                     response=parsed_response,
                     request_id=parsed_response.get("id"),
@@ -275,3 +307,7 @@ class InvalidPassword(OverseerRule):
                 )
             ]
         return []
+
+    @classmethod
+    def expected_exception(cls) -> type[OverseerError]:
+        return OverseerInvalidPasswordError
