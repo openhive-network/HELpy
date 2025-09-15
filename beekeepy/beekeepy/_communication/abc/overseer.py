@@ -158,17 +158,18 @@ class AbstractOverseer(ABC):
         self, rules: Rules, response: Json | list[Json] | Exception, response_raw: str
     ) -> tuple[list[OverseerError], ContinueMode]:
         exceptions: list[OverseerError] = []
-        result_status: ContinueMode = ContinueMode.INF
 
         for rule, status in rules.resolved_rules():
             exceptions_to_add = rule.check(response=response, response_raw=response_raw)
             exceptions.extend(exceptions_to_add)
-            result_status = min(result_status, status)
             for ex in exceptions_to_add:
                 if not ex.retry():
                     return (exceptions, status)
 
-        return (exceptions, result_status) if bool(exceptions) else ([], ContinueMode.CONTINUE)
+            if bool(exceptions):
+                return (exceptions, status)
+
+        return (exceptions, ContinueMode.CONTINUE)
 
     def _parse(self, response: str) -> Json | list[Json] | Exception:
         response_parsed: Json | list[Json] | None = None

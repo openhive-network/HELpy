@@ -55,11 +55,21 @@ class Rules:
 
     def resolved_rules(self) -> Iterator[tuple[OverseerRule, ContinueMode]]:
         """Yields all rules in proper order with their associated ContinueMode."""
-        yield from  (
+        from beekeepy._communication.rules import ErrorInResponse
+
+        fallback_rule: tuple[OverseerRule, ContinueMode] | None = None
+        for rule, mode in (
             *((rule, ContinueMode.INF) for rule in self.infinitely_repeatable),
             *((rule, ContinueMode.BREAK) for rule in self.preliminary),
             *((rule, ContinueMode.CONTINUE) for rule in self.finitely_repeatable),
-        )
+        ):
+            if type(rule) is ErrorInResponse:
+                fallback_rule = (rule, mode)
+                continue
+            yield rule, mode
+
+        assert fallback_rule is not None, "ErrorInResponse rule was not found among rules"
+        yield fallback_rule
 
     def grouped_exceptions(self) -> RulesExceptions:
         return RulesExceptions(
