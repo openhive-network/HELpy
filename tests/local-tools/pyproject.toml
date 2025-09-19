@@ -24,7 +24,7 @@ version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-beekeepy = { path = "../../beekeepy", develop = true }
+hiveio-beekeepy = { path = "../../beekeepy", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.11.2"

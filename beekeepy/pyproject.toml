@@ -11,7 +11,7 @@ authors = [
   "Krzysztof Mochocki <kmochocki@syncad.com>",
 ]
 description = "All in one package for beekeeper interaction via Python interface."
-name = "beekeepy"
+name = "hiveio-beekeepy"
 packages = [
   {include = "beekeepy"},
 ]
@@ -34,7 +34,7 @@ psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
 
-schemas = "0.0.1.dev430+47552ae"
+hiveio-schemas = "0.0.1.dev431+2255381"
 
 [tool.poetry-dynamic-versioning]
 enable = true
