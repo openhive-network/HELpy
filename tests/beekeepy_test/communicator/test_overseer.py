@@ -45,12 +45,10 @@ ERRORS_TO_DETECT: Final[list[tuple[type[OverseerError], str]]] = [
 ]
 
 SYNC_COMMUNICATORS: Final[list[type[AbstractCommunicator]]] = [
-    get_communicator_cls("request"),
-    get_communicator_cls("httpx"),
+    get_communicator_cls("sync"),
 ]
 ASYNC_COMMUNICATORS: Final[list[type[AbstractCommunicator]]] = [
-    get_communicator_cls("aiohttp"),
-    get_communicator_cls("httpx"),
+    get_communicator_cls("async"),
 ]
 OVERSEERS: Final[list[type[AbstractOverseer]]] = [CommonOverseer, StrictOverseer]
 

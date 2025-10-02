@@ -35,7 +35,7 @@ def invalid_get(hived_http_endpoint: HttpUrl) -> HttpUrl:
 
 def test_simple_restapi(simple_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
+    communicator = get_communicator_cls("sync")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.get(url=simple_get)
@@ -47,7 +47,7 @@ def test_simple_restapi(simple_get: HttpUrl) -> None:
 
 def test_restapi_with_error(invalid_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
+    communicator = get_communicator_cls("sync")(settings=CommunicationSettings())
 
     # ACT
     result = communicator.get(url=invalid_get)
@@ -60,7 +60,7 @@ def test_restapi_with_error(invalid_get: HttpUrl) -> None:
 def test_restapi_with_error_and_callback_reraise(invalid_get: HttpUrl) -> None:
     # ARRANGE
     error_message: Final[str] = "Invalid status code received"
-    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
+    communicator = get_communicator_cls("sync")(settings=CommunicationSettings())
 
     def raise_if_invalid_status_code(*, request: Request, response: Response) -> None:  # noqa: ARG001
         if response.status_code != codes.ok:
@@ -76,7 +76,7 @@ def test_restapi_with_error_and_callback_reraise(invalid_get: HttpUrl) -> None:
 
 def test_restapi_with_request_correction(simple_get: HttpUrl, invalid_get: HttpUrl) -> None:
     # ARRANGE
-    communicator = get_communicator_cls("request")(settings=CommunicationSettings())
+    communicator = get_communicator_cls("sync")(settings=CommunicationSettings())
 
     def fix_url(*, request: Request) -> Request:
         request.url = simple_get
