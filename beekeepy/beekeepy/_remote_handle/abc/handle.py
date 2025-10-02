@@ -11,7 +11,8 @@ from beekeepy._apis.abc.api_collection import (
     AbstractSyncApiCollection,
 )
 from beekeepy._apis.abc.sendable import AsyncSendable, SyncSendable
-from beekeepy._communication import HttpUrl, get_communicator_cls
+from beekeepy._communication.communicator_getter import get_communicator_cls
+from beekeepy._communication.url import HttpUrl
 from beekeepy._remote_handle.settings import RemoteHandleSettings
 from beekeepy._utilities.context import SelfContextAsync, SelfContextSync
 from beekeepy._utilities.settings_holder import UniqueSettingsHolder
@@ -22,8 +23,9 @@ from schemas.jsonrpc import ExpectResultT, JSONRPCResult, get_response_model
 if TYPE_CHECKING:
     from loguru import Logger
 
-    from beekeepy._communication import AbstractCommunicator, AbstractOverseer
+    from beekeepy._communication.abc.communicator import AbstractCommunicator
     from beekeepy._communication.abc.communicator_models import AsyncCallbacks, Callbacks, Methods
+    from beekeepy._communication.abc.overseer import AbstractOverseer
     from beekeepy._remote_handle.abc.batch_handle import AsyncBatchHandle, SyncBatchHandle
     from beekeepy.exceptions import Json
 
@@ -214,7 +216,7 @@ class AbstractAsyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextAsyn
         return False
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return get_communicator_cls("aiohttp")(settings=self._settings)
+        return get_communicator_cls("async")(settings=self._settings)
 
     @abstractmethod
     async def batch(self, *, delay_error_on_data_access: bool = False) -> AsyncBatchHandle[Any]:
@@ -261,7 +263,7 @@ class AbstractSyncHandle(AbstractHandle[RemoteSettingsT, ApiT], SelfContextSync,
         return True
 
     def _get_recommended_communicator(self) -> AbstractCommunicator:
-        return get_communicator_cls("request")(settings=self._settings)
+        return get_communicator_cls("sync")(settings=self._settings)
 
     @abstractmethod
     def batch(self, *, delay_error_on_data_access: bool = False) -> SyncBatchHandle[Any]:

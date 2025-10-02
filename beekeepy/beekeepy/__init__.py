@@ -1,32 +1,67 @@
 from __future__ import annotations
 
-from beekeepy._interface import InterfaceSettings as Settings
-from beekeepy._interface.abc import (
-    AsyncBeekeeper,
-    AsyncSession,
-    AsyncUnlockedWallet,
-    AsyncWallet,
-    Beekeeper,
-    PackedAsyncBeekeeper,
-    PackedSyncBeekeeper,
-    Session,
-    UnlockedWallet,
-    Wallet,
-)
-from beekeepy._runnable_handle import close_already_running_beekeeper, find_running_beekeepers
+from typing import TYPE_CHECKING
 
 __all__ = [
     "AsyncBeekeeper",
     "AsyncSession",
     "AsyncWallet",
     "AsyncUnlockedWallet",
-    "Beekeeper",
     "close_already_running_beekeeper",
     "find_running_beekeepers",
     "PackedAsyncBeekeeper",
+    "InterfaceSettings",
+    "Beekeeper",
     "PackedSyncBeekeeper",
     "Session",
-    "Settings",
+    "InterfaceSettings",
     "Wallet",
     "UnlockedWallet",
 ]
+
+if TYPE_CHECKING:
+    from beekeepy._interface.abc.asynchronous import (
+        AsyncBeekeeper,
+        AsyncSession,
+        AsyncUnlockedWallet,
+        AsyncWallet,
+        PackedAsyncBeekeeper,
+    )
+    from beekeepy._interface.abc.synchronous import (
+        Beekeeper,
+        PackedSyncBeekeeper,
+        Session,
+        UnlockedWallet,
+        Wallet,
+    )
+    from beekeepy._interface.settings import InterfaceSettings
+    from beekeepy._runnable_handle.beekeeper_utilities import close_already_running_beekeeper, find_running_beekeepers
+else:
+    from sys import modules
+
+    from beekeepy._utilities.smart_lazy_import import aggregate_same_import, lazy_module_factory
+
+    __getattr__ = lazy_module_factory(
+        modules[__name__],
+        __all__,
+        # Translations
+        **aggregate_same_import(
+            "AsyncBeekeeper",
+            "PackedAsyncBeekeeper",
+            "AsyncSession",
+            "AsyncWallet",
+            "AsyncUnlockedWallet",
+            module="beekeepy._interface.abc.asynchronous",
+        ),
+        **aggregate_same_import(
+            "Beekeeper",
+            "PackedSyncBeekeeper",
+            "Session",
+            "UnlockedWallet",
+            "Wallet",
+            module="beekeepy._interface.abc.synchronous",
+        ),
+        close_already_running_beekeeper="beekeepy._runnable_handle.beekeeper_utilities",
+        find_running_beekeepers="beekeepy._runnable_handle.beekeeper_utilities",
+        InterfaceSettings="beekeepy._interface.settings",
+    )

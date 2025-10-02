@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 from sys import argv
 
-from beekeepy import Beekeeper, Settings, close_already_running_beekeeper
+from beekeepy import Beekeeper, InterfaceSettings, close_already_running_beekeeper
 
-settings = Settings(working_directory=Path(argv[1]))
+settings = InterfaceSettings(working_directory=Path(argv[1]))
 pid_file = settings.ensured_working_directory / "pid.txt"
 
 if argv[2] == "start":

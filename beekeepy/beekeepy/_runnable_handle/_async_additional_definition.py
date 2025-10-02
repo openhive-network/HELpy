@@ -1,0 +1,6 @@
+from __future__ import annotations
+
+from beekeepy._runnable_handle.runnable_async_beekeeper import AsyncBeekeeperTemplate
+from beekeepy._runnable_handle.settings import RunnableHandleSettings
+
+AsyncBeekeeper = AsyncBeekeeperTemplate[RunnableHandleSettings]

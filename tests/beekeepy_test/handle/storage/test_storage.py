@@ -7,9 +7,9 @@ import pytest
 from local_tools.beekeepy import checkers
 from loguru import logger
 
-from beekeepy import Settings
 from beekeepy.exceptions import BeekeeperFailedToStartError, FailedToStartExecutableError
 from beekeepy.handle.runnable import Beekeeper
+from beekeepy.handle.settings import RunnableHandleSettings
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -29,7 +29,7 @@ def test_multiply_beekeepeer_same_storage(working_directory: Path) -> None:
     # ARRANGE
     same_storage = working_directory / "same_storage"
     prepare_directory(same_storage)
-    settings = Settings(working_directory=same_storage)
+    settings = RunnableHandleSettings(working_directory=same_storage)
 
     # ACT & ASSERT 1
     with Beekeeper(settings=settings, logger=logger) as bk1:
@@ -55,8 +55,8 @@ def test_multiply_beekeepeer_different_storage(working_directory: Path) -> None:
 
     # ACT
     bks: list[Beekeeper] = []
-    with Beekeeper(settings=Settings(working_directory=bk1_path), logger=logger) as bk1, Beekeeper(
-        settings=Settings(working_directory=bk2_path), logger=logger
+    with Beekeeper(settings=RunnableHandleSettings(working_directory=bk1_path), logger=logger) as bk1, Beekeeper(
+        settings=RunnableHandleSettings(working_directory=bk2_path), logger=logger
     ) as bk2:
         # ASSERT
         assert bk1.is_running(), "First instance of beekeeper should be working."

@@ -2,29 +2,27 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeVar
 
-from beekeepy._executable import BeekeeperArguments, BeekeeperConfig, BeekeeperExecutable
-from beekeepy._remote_handle import AsyncBeekeeperTemplate, BeekeeperTemplate
+from beekeepy._executable.beekeeper_arguments import BeekeeperArguments
+from beekeepy._executable.beekeeper_config import BeekeeperConfig
+from beekeepy._executable.beekeeper_executable import BeekeeperExecutable
 from beekeepy._runnable_handle.runnable_handle import RunnableHandle
-from beekeepy._runnable_handle.settings import Settings
+from beekeepy._runnable_handle.settings import RunnableHandleSettings
 from beekeepy.exceptions import BeekeeperFailedToStartError, ExecutableError
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from beekeepy._communication import HttpUrl
-    from beekeepy._executable import KeyPair
+    from beekeepy._communication.url import HttpUrl
     from beekeepy._runnable_handle.match_ports import PortMatchingResult
+    from beekeepy._utilities.key_pair import KeyPair
 
 
-__all__ = [
-    "Beekeeper",
-    "AsyncBeekeeper",
-]
-
-RunnableSettingsT = TypeVar("RunnableSettingsT", bound=Settings)
+RunnableSettingsT = TypeVar("RunnableSettingsT", bound=RunnableHandleSettings)
 
 
-class RunnableBeekeeper(RunnableHandle[BeekeeperExecutable, BeekeeperConfig, BeekeeperArguments, Settings]):
+class RunnableBeekeeper(
+    RunnableHandle[BeekeeperExecutable, BeekeeperConfig, BeekeeperArguments, RunnableHandleSettings]
+):
     def _construct_executable(self) -> BeekeeperExecutable:
         settings = self._get_settings()
         return BeekeeperExecutable(
@@ -56,7 +54,7 @@ class RunnableBeekeeper(RunnableHandle[BeekeeperExecutable, BeekeeperConfig, Bee
             except ExecutableError as e:
                 raise BeekeeperFailedToStartError from e
 
-    def _write_ports(self, editable_settings: Settings, ports: PortMatchingResult) -> None:
+    def _write_ports(self, editable_settings: RunnableHandleSettings, ports: PortMatchingResult) -> None:
         editable_settings.http_endpoint = ports.http
         self.config.webserver_http_endpoint = ports.http
         self.config.webserver_ws_endpoint = ports.websocket
@@ -76,39 +74,3 @@ class RunnableBeekeeper(RunnableHandle[BeekeeperExecutable, BeekeeperConfig, Bee
             wallet_password=wallet_password,
             extract_to=extract_to,
         )
-
-
-class Beekeeper(RunnableBeekeeper, BeekeeperTemplate[RunnableSettingsT]):
-    def _get_settings(self) -> Settings:
-        return self.settings
-
-    def _enter(self) -> Beekeeper[RunnableSettingsT]:
-        self.run()
-        return self
-
-    def teardown(self) -> None:
-        self._close()
-        self._clear_session()
-        super().teardown()
-
-    def _setup_ports(self, ports: PortMatchingResult) -> None:
-        with self.update_settings() as settings:
-            self._write_ports(settings, ports)
-
-
-class AsyncBeekeeper(RunnableBeekeeper, AsyncBeekeeperTemplate[RunnableSettingsT]):
-    def _get_settings(self) -> Settings:
-        return self.settings
-
-    async def _aenter(self) -> AsyncBeekeeper[RunnableSettingsT]:
-        self.run()
-        return self
-
-    def teardown(self) -> None:
-        self.close()
-        self._clear_session()
-        super().teardown()
-
-    def _setup_ports(self, ports: PortMatchingResult) -> None:
-        with self.update_settings() as settings:
-            self._write_ports(settings, ports)

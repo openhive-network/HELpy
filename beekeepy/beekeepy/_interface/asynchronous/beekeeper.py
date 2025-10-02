@@ -8,8 +8,8 @@ from beekeepy._interface.abc.asynchronous.beekeeper import Beekeeper as Beekeepe
 from beekeepy._interface.abc.packed_object import PackedAsyncBeekeeper
 from beekeepy._interface.asynchronous.session import Session
 from beekeepy._interface.settings import InterfaceSettings
-from beekeepy._remote_handle import AsyncBeekeeperTemplate as AsynchronousRemoteBeekeeperHandle
-from beekeepy._runnable_handle import AsyncBeekeeperTemplate as AsynchronousBeekeeperHandle
+from beekeepy._remote_handle.async_beekeeper import AsyncBeekeeper as AsynchronousRemoteBeekeeperHandle
+from beekeepy._runnable_handle.runnable_async_beekeeper import AsyncBeekeeper as AsynchronousBeekeeperHandle
 from beekeepy._utilities.delay_guard import AsyncDelayGuard
 from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
@@ -19,7 +19,8 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._communication import CommunicationSettings, HttpUrl
+    from beekeepy._communication.settings import CommunicationSettings
+    from beekeepy._communication.url import HttpUrl
     from beekeepy._interface.abc.asynchronous.session import (
         Session as SessionInterface,
     )

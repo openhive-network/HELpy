@@ -11,8 +11,8 @@ from beekeepy._interface.abc.asynchronous.wallet import (
 from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._interface.validators import validate_digest, validate_private_keys, validate_public_keys
 from beekeepy._interface.wallets_common import WalletCommons
-from beekeepy._remote_handle import AsyncBeekeeperTemplate as AsyncRemoteBeekeeper
-from beekeepy._runnable_handle import AsyncWalletLocked
+from beekeepy._remote_handle.async_beekeeper import AsyncBeekeeper as AsyncRemoteBeekeeper
+from beekeepy._runnable_handle.callbacks_protocol import AsyncWalletLocked
 from beekeepy._utilities.delay_guard import AsyncDelayGuard
 from beekeepy.exceptions import (
     InvalidPasswordError,

@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
 
 from loguru import logger as default_logger
 
-from beekeepy._communication import HttpUrl, P2PUrl, WsUrl
-from beekeepy._executable import ArgumentT, ConfigT, Executable
-from beekeepy._remote_handle import AppStatusProbe
+from beekeepy._communication.url import HttpUrl, P2PUrl, WsUrl
+from beekeepy._executable.abc.executable import ArgumentT, ConfigT, Executable
+from beekeepy._remote_handle.app_status_probe import AppStatusProbe
 from beekeepy._runnable_handle.match_ports import PortMatchingResult, match_ports
-from beekeepy._runnable_handle.settings import Settings
+from beekeepy._runnable_handle.settings import RunnableHandleSettings
 from beekeepy.exceptions import (
     ApiNotFoundError,
     FailedToDetectReservedPortsError,
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 ExecutableT = TypeVar("ExecutableT", bound=Executable[Any, Any])
-SettingsT = TypeVar("SettingsT", bound=Settings)
+SettingsT = TypeVar("SettingsT", bound=RunnableHandleSettings)
 T = TypeVar("T")
 
 
@@ -208,7 +208,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             return discovered_ports
         raise TimeoutError(f"Timeout after {stopwatch.seconds_delta :2f} waiting for application to start")
 
-    def __choose_working_directory(self, settings: Settings) -> Path:
+    def __choose_working_directory(self, settings: SettingsT) -> Path:
         return self.__choose_value(
             default_value=Path.cwd(),
             argument_value=self._get_working_directory_from_cli_arguments(),
@@ -216,7 +216,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
             settings_value=settings.working_directory,
         )
 
-    def __choose_http_endpoint(self, settings: Settings) -> HttpUrl:
+    def __choose_http_endpoint(self, settings: SettingsT) -> HttpUrl:
         return self.__choose_value(
             default_value=HttpUrl("http://0.0.0.0:0"),
             argument_value=self._get_http_endpoint_from_cli_arguments(),
@@ -254,7 +254,7 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
 
         settings = self._get_settings()
         handle = AppStatusProbe(
-            settings=Settings(
+            settings=RunnableHandleSettings(
                 http_endpoint=matched_ports.http,
                 timeout=settings.timeout,
                 max_retries=settings.max_retries,

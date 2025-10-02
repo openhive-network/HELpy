@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from beekeepy import Beekeeper
+from beekeepy import Beekeeper, close_already_running_beekeeper
 from beekeepy.exceptions import (
     CommunicationError,
     FailedToDetectRunningBeekeeperError,
     UndistinguishableBeekeeperInstancesError,
 )
-from beekeepy.handle.runnable import close_already_running_beekeeper
 
 if TYPE_CHECKING:
     from local_tools.beekeepy.models import SettingsFactory

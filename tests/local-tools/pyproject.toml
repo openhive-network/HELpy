@@ -89,6 +89,13 @@ select = ["ALL"]
   "FBT001", # api definitions have own argument restrictions
   "FBT002", # api definitions have own argument restrictions
 ]
+"beekeepy/beekeepy/__init__.py"             = ["TCH004"]
+"beekeepy/beekeepy/interfaces.py"           = ["TCH004"]
+"beekeepy/beekeepy/exceptions.py"           = ["TCH004"]
+"beekeepy/beekeepy/service.py"              = ["TCH004"]
+"beekeepy/beekeepy/communication/**.py"     = ["TCH004"]
+"beekeepy/beekeepy/handle/**.py"            = ["TCH004"]
+
 
 [tool.ruff.lint.isort]
 known-first-party = ["schemas"]

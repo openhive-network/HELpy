@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
 
-from beekeepy._communication import HttpUrl, WsUrl
+from beekeepy._communication.url import HttpUrl, WsUrl
 from beekeepy._executable.abc.config import Config
 from beekeepy._executable.defaults import BeekeeperDefaults, ExportKeysWalletParams
 from schemas.base import field

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from beekeepy._communication import (
-    AbstractCommunicator,
-    AbstractOverseer,
-    CommonOverseer,
-    CommunicationSettings,
-    HttpUrl,
-)
+from beekeepy._communication.abc.overseer import AbstractOverseer
+from beekeepy._communication.overseers import CommonOverseer
+from beekeepy._communication.settings import CommunicationSettings
+
+if TYPE_CHECKING:
+    from beekeepy._communication.abc.communicator import (
+        AbstractCommunicator,
+    )
+    from beekeepy._communication.url import HttpUrl
 
 
 class RemoteHandleSettings(CommunicationSettings):

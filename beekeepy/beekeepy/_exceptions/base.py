@@ -8,7 +8,7 @@ from beekeepy._utilities.context import ContextSync
 if TYPE_CHECKING:
     from types import TracebackType
 
-    from beekeepy._communication import Url
+    from beekeepy._communication.url import Url
 
 Json = dict[str, Any]
 CommunicationResponseT = str | Json | list[Json]

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar, Literal
 
-from beekeepy._communication import HttpUrl
+from beekeepy._communication.url import HttpUrl
 from beekeepy._executable.abc.arguments import Arguments
 
 

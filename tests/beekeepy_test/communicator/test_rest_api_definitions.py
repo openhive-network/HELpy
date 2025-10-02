@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from local_tools.beekeepy.simple_api import InputTypeSchema, TestCaller, WitnessesVotersResponseSchema
 
-from beekeepy.handle.remote import RemoteHandleSettings
+from beekeepy.handle.settings import RemoteHandleSettings
 
 if TYPE_CHECKING:
     from beekeepy._communication.url import HttpUrl

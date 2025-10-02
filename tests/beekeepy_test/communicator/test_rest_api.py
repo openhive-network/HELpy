@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from requests.status_codes import codes
 
-from beekeepy.communication import Callbacks, CommunicationSettings, get_communicator_cls
+from beekeepy.communication import get_communicator_cls
+from beekeepy.communication.communicator import Callbacks, CommunicationSettings
 from beekeepy.interfaces import HttpUrl
 
 if TYPE_CHECKING:
-    from beekeepy.communication import Request, Response
+    from beekeepy.communication.communicator import Request, Response
 
 
 @pytest.fixture

@@ -8,14 +8,14 @@ from beekeepy import AsyncBeekeeper, AsyncSession, AsyncUnlockedWallet
 
 
 @dataclass
-class BeekeepyService:
+class AsyncBeekeepyService:
     wallet: AsyncUnlockedWallet
     session: AsyncSession
     beekeeper: AsyncBeekeeper
 
 
 @asynccontextmanager
-async def create_beekeeper_service(*, wallet_name: str, password: str) -> AsyncGenerator[BeekeepyService, None]:
+async def create_async_beekeeper_service(*, wallet_name: str, password: str) -> AsyncGenerator[AsyncBeekeepyService]:
     """
     Create a beekeepy service with a wallet, session and beekeeper instance.
 
@@ -33,4 +33,4 @@ async def create_beekeeper_service(*, wallet_name: str, password: str) -> AsyncG
             else await (await session.open_wallet(name=wallet_name)).unlock(password=password)
         )
 
-        yield BeekeepyService(wallet=wallet, session=session, beekeeper=beekeeper)
+        yield AsyncBeekeepyService(wallet=wallet, session=session, beekeeper=beekeeper)

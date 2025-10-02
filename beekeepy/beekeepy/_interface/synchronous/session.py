@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         Wallet as WalletInterface,
     )
     from beekeepy._interface.settings import InterfaceSettings
-    from beekeepy._remote_handle import BeekeeperTemplate as SyncRemoteBeekeeper
+    from beekeepy._remote_handle.sync_beekeeper import Beekeeper as SyncRemoteBeekeeper
     from beekeepy._utilities.delay_guard import SyncDelayGuard
     from schemas.apis.beekeeper_api import GetInfo
     from schemas.fields.basic import PublicKey

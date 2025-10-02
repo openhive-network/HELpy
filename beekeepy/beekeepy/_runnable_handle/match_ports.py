@@ -5,7 +5,7 @@ import ssl
 from dataclasses import dataclass, field
 from typing import Final
 
-from beekeepy._communication import HttpUrl, P2PUrl, WsUrl
+from beekeepy._communication.url import HttpUrl, P2PUrl, WsUrl
 
 __all__ = ["PortMatchingResult", "match_ports"]
 

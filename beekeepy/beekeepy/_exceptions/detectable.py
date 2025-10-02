@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from beekeepy.exceptions import overseer as overseer_errors
-from beekeepy.exceptions.base import DetectableError, SchemaDetectableError
+from beekeepy._exceptions import overseer as overseer_errors
+from beekeepy.exceptions import DetectableError, SchemaDetectableError
 
 
 class NoWalletWithSuchNameError(DetectableError):

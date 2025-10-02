@@ -8,7 +8,7 @@ from schemas.fields.basic import PublicKey
 if TYPE_CHECKING:
     from loguru import Logger
 
-    from beekeepy import Settings
+    from beekeepy.handle.settings import InterfaceSettings
     from local_tools.beekeepy.account_credentials import AccountCredentials
 
 
@@ -33,8 +33,8 @@ class WalletsGeneratorT(Protocol):
 
 
 class SettingsFactory(Protocol):
-    def __call__(self, settings_update: Settings | None = None) -> Settings: ...
+    def __call__(self, settings_update: InterfaceSettings | None = None) -> InterfaceSettings: ...
 
 
 class SettingsLoggerFactory(Protocol):
-    def __call__(self, settings_update: Settings | None = None) -> tuple[Settings, Logger]: ...
+    def __call__(self, settings_update: InterfaceSettings | None = None) -> tuple[InterfaceSettings, Logger]: ...

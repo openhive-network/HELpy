@@ -4,11 +4,11 @@ from pathlib import Path
 
 import loguru
 
-from beekeepy import Settings
 from beekeepy.handle.runnable import BeekeeperExecutable
+from beekeepy.handle.settings import RunnableHandleSettings
 
 if __name__ == "__main__":
-    settings = Settings()
+    settings = RunnableHandleSettings()
     help_text = BeekeeperExecutable(
         executable_path=settings.binary_path, working_directory=settings.ensured_working_directory, logger=loguru.logger
     ).get_help_text()

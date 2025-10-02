@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Sequence
 
-from beekeepy.exceptions.base import BeekeepyError, CommunicationResponseT, Json, OverseerError
+from beekeepy.exceptions import BeekeepyError, CommunicationResponseT, Json, OverseerError
 
 if TYPE_CHECKING:
-    from beekeepy._communication import Url
+    from beekeepy._communication.url import Url
 
 
 class UnableToAcquireDatabaseLockError(OverseerError):

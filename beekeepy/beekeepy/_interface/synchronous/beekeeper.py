@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 from loguru import logger
 
@@ -8,8 +8,6 @@ from beekeepy._interface.abc.packed_object import PackedSyncBeekeeper
 from beekeepy._interface.abc.synchronous.beekeeper import Beekeeper as BeekeeperInterface
 from beekeepy._interface.settings import InterfaceSettings
 from beekeepy._interface.synchronous.session import Session
-from beekeepy._remote_handle import BeekeeperTemplate as SynchronousRemoteBeekeeperHandle
-from beekeepy._runnable_handle import BeekeeperTemplate as SynchronousBeekeeperHandle
 from beekeepy._utilities.delay_guard import SyncDelayGuard
 from beekeepy._utilities.state_invalidator import StateInvalidator
 from beekeepy.exceptions import (
@@ -19,10 +17,19 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._communication import CommunicationSettings, HttpUrl
+    from beekeepy._communication.settings import CommunicationSettings
+    from beekeepy._communication.url import HttpUrl
     from beekeepy._interface.abc.synchronous.session import (
         Session as SessionInterface,
     )
+    from beekeepy._remote_handle.sync_beekeeper import Beekeeper as SynchronousRemoteBeekeeperHandle
+    from beekeepy._runnable_handle.runnable_sync_beekeeper import Beekeeper as SynchronousBeekeeperHandle
+
+
+def _is_sync_beekeeper_handle(instance: Any) -> TypeGuard[SynchronousBeekeeperHandle[Any]]:
+    from beekeepy._runnable_handle.runnable_sync_beekeeper import Beekeeper as SynchronousBeekeeperHandle
+
+    return isinstance(instance, SynchronousBeekeeperHandle)
 
 
 class Beekeeper(BeekeeperInterface, StateInvalidator):
@@ -52,12 +59,12 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @StateInvalidator.empty_call_after_invalidation(None)
     def teardown(self) -> None:
-        if isinstance(self.__instance, SynchronousBeekeeperHandle):
+        if _is_sync_beekeeper_handle(self.__instance):
             self.__instance.teardown()
         self.invalidate(InvalidatedStateByClosingBeekeeperError())
 
     def detach(self) -> int:
-        if not isinstance(self.__instance, SynchronousBeekeeperHandle):
+        if not _is_sync_beekeeper_handle(self.__instance):
             raise DetachRemoteBeekeeperError
         return self.__instance.detach()
 
@@ -96,7 +103,11 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
             if isinstance(url_or_settings, InterfaceSettings)
             else InterfaceSettings(http_endpoint=url_or_settings)
         )
+
+        from beekeepy._remote_handle.sync_beekeeper import Beekeeper as SynchronousRemoteBeekeeperHandle
+
         handle = SynchronousRemoteBeekeeperHandle(settings=settings)
+
         cls.__apply_existing_session_token(settings=settings, handle=handle)
         return cls(handle=handle)
 
@@ -109,6 +120,8 @@ class Beekeeper(BeekeeperInterface, StateInvalidator):
 
     @classmethod
     def __create_local_handle(cls, settings: InterfaceSettings) -> SynchronousBeekeeperHandle[InterfaceSettings]:
+        from beekeepy._runnable_handle.runnable_sync_beekeeper import Beekeeper as SynchronousBeekeeperHandle
+
         return SynchronousBeekeeperHandle(settings=settings, logger=logger)
 
     def _enter(self) -> BeekeeperInterface:

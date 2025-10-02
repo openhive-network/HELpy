@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Final
 
-from beekeepy._communication import Url
+from beekeepy._communication.url import Url
 from beekeepy._runnable_handle.settings import strtobool
 from schemas._preconfigured_base_model import PreconfiguredBaseModel
 

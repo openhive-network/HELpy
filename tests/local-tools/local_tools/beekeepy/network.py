@@ -4,8 +4,8 @@ import socket
 from json import loads
 from typing import TYPE_CHECKING, Any
 
-from beekeepy._communication import get_communicator_cls
-from beekeepy.handle.remote import RemoteHandleSettings
+from beekeepy.communication import get_communicator_cls
+from beekeepy.handle.settings import RemoteHandleSettings
 
 if TYPE_CHECKING:
     from beekeepy.interfaces import HttpUrl

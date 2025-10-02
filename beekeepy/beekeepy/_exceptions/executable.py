@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from beekeepy.exceptions.base import ExecutableError, ProcessSearchError
+from beekeepy.exceptions import ExecutableError, ProcessSearchError
 
 
 class TimeoutReachWhileCloseError(ExecutableError):

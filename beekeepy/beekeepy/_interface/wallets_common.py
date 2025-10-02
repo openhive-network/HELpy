@@ -7,13 +7,12 @@ from functools import wraps
 from typing import TYPE_CHECKING, Any, Generic, NoReturn, ParamSpec, TypeVar, overload
 
 from beekeepy._interface.settings import InterfaceSettings
-from beekeepy._remote_handle import AsyncBeekeeperTemplate as AsyncRemoteBeekeeper
-from beekeepy._remote_handle import BeekeeperTemplate as SyncRemoteBeekeeper
-from beekeepy._runnable_handle import AsyncWalletLocked, SyncWalletLocked
+from beekeepy._remote_handle.async_beekeeper import AsyncBeekeeper as AsyncRemoteBeekeeper
+from beekeepy._remote_handle.sync_beekeeper import Beekeeper as SyncRemoteBeekeeper
+from beekeepy._runnable_handle.callbacks_protocol import AsyncWalletLocked, SyncWalletLocked
 from beekeepy._utilities.delay_guard import AsyncDelayGuard, SyncDelayGuard
 from beekeepy._utilities.state_invalidator import StateInvalidator
-from beekeepy.exceptions import WalletIsLockedError
-from beekeepy.exceptions.overseer import UnlockIsNotAccessibleError
+from beekeepy.exceptions import UnlockIsNotAccessibleError, WalletIsLockedError
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

@@ -16,8 +16,9 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self
 
-    from beekeepy._communication import AbstractOverseer, HttpUrl
     from beekeepy._communication.abc.communicator_models import AsyncCallbacks, Callbacks, Methods
+    from beekeepy._communication.abc.overseer import AbstractOverseer
+    from beekeepy._communication.url import HttpUrl
 
 
 class _DelayedResponseWrapper:

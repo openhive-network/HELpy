@@ -1,0 +1,6 @@
+from __future__ import annotations
+
+from beekeepy._remote_handle.async_beekeeper import AsyncBeekeeperTemplate
+from beekeepy._remote_handle.settings import RemoteHandleSettings
+
+AsyncBeekeeper = AsyncBeekeeperTemplate[RemoteHandleSettings]

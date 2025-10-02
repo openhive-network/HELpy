@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
-from beekeepy.exceptions.base import (
+from beekeepy.exceptions import (
     BeekeeperExecutableError,
     BeekeeperFailedToStartError,
     BeekeeperHandleError,
@@ -13,7 +13,7 @@ from beekeepy.exceptions.base import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy._communication import Url
+    from beekeepy._communication.url import Url
 
 
 class BatchRequestError(BeekeepyError):

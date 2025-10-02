@@ -4,8 +4,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import ClassVar
 
-from beekeepy._communication import HttpUrl  # noqa: TCH001
-from beekeepy._remote_handle import RemoteHandleSettings
+from beekeepy._communication.url import HttpUrl  # noqa: TCH001
+from beekeepy._remote_handle.settings import RemoteHandleSettings
 from beekeepy.exceptions import UnknownValueForBooleanConversionError
 
 
@@ -25,7 +25,7 @@ def strtobool(value: str) -> bool:
     raise UnknownValueForBooleanConversionError(value)
 
 
-class Settings(RemoteHandleSettings):
+class RunnableHandleSettings(RemoteHandleSettings):
     """Defines parameters for runnable handles how to start and behave."""
 
     class EnvironNames(RemoteHandleSettings.EnvironNames):
@@ -54,7 +54,7 @@ class Settings(RemoteHandleSettings):
 
     propagate_sigint: bool = Defaults.default_factory(
         EnvironNames.PROPAGATE_SIGINT,
-        lambda x: (Settings.Defaults.PROPAGATE_SIGINT if x is None else strtobool(x)),
+        lambda x: (RunnableHandleSettings.Defaults.PROPAGATE_SIGINT if x is None else strtobool(x)),
     )
     """If set to True (default), sigint will be sent to beekeeper without control of this library."""
 
@@ -63,13 +63,13 @@ class Settings(RemoteHandleSettings):
 
     close_timeout: timedelta = Defaults.default_factory(
         EnvironNames.CLOSE_TIMEOUT,
-        lambda x: (Settings.Defaults.CLOSE_TIMEOUT if x is None else timedelta(seconds=int(x))),
+        lambda x: (RunnableHandleSettings.Defaults.CLOSE_TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
     """Affects time handle waits before beekeepy closes."""
 
     initialization_timeout: timedelta = Defaults.default_factory(
         EnvironNames.INITIALIZATION_TIMEOUT,
-        lambda x: (Settings.Defaults.INITIALIZATION_TIMEOUT if x is None else timedelta(seconds=int(x))),
+        lambda x: (RunnableHandleSettings.Defaults.INITIALIZATION_TIMEOUT if x is None else timedelta(seconds=int(x))),
     )
     """Affects time handle waits for beekeeper to start."""
 
@@ -79,7 +79,7 @@ class Settings(RemoteHandleSettings):
 
         Note: If Settings.working_directory is not set, Path.cwd() is returned.
         """
-        return self.working_directory or Settings.Defaults.WORKING_DIRECTORY
+        return self.working_directory or RunnableHandleSettings.Defaults.WORKING_DIRECTORY
 
     @property
     def ensured_http_endpoint(self) -> HttpUrl:
