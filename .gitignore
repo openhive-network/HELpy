@@ -286,3 +286,7 @@ pyrightconfig.json
 **/generated_*
 **.tmp
 beekeepy/beekeepy/beekeeper
+# ignore tmp directory where binaries are extracted from hived image
+hived-binaries
+# ignore env files downloaded from artifacts: docker_image_name.env, build_wheel.env
+*.env
