@@ -34,7 +34,7 @@ psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
 
-hiveio-schemas = "0.0.1.dev431+2255381"
+hiveio-schemas = "1.27.12rc0"
 
 [tool.poetry-dynamic-versioning]
 enable = true
