@@ -38,6 +38,7 @@ hiveio-schemas = "0.0.1.dev431+2255381"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+pattern = '''v?(?P<base>\d+\.\d+\.\d+)\-?(?:(?P<stage>[a-zA-Z0-9]+)(?P<revision>\d+))?$'''
 format-jinja = """
     {%- if distance == 0 and not dirty -%}
         {{ serialize_pep440(base, stage, revision) }}
