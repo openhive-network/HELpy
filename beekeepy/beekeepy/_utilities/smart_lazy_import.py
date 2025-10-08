@@ -15,10 +15,7 @@ Użycie:
 from __future__ import annotations
 
 import importlib
-from typing import TYPE_CHECKING, Any, Callable
-
-if TYPE_CHECKING:
-    from types import ModuleType
+from typing import Any, Callable, get_args
 
 __all__ = [
     "smart_lazy_getattr",
@@ -27,21 +24,33 @@ __all__ = [
 ]
 
 
-ModuleInterfaceMapping = dict[str, str]
-ModuleInterface = list[str]
+ModuleComponent = str
+ModulePath = str
+Alias = str
+
+ImportInput = tuple[ModulePath, ModuleComponent]
+AliasedImportInput = tuple[ModulePath, ModuleComponent, Alias]
+AggregatedAliasedImportInput = tuple[ModuleComponent, Alias]
+
+ModuleInterfaceMappingInput = ImportInput | AliasedImportInput
+AggregatedModuleInterfaceMappingInput = ModuleComponent | AggregatedAliasedImportInput
+
+ModuleInterfaceMapping = dict[ModuleComponent, ModulePath]
+AliasMapping = dict[Alias, ModuleComponent]
+
+ModuleGlobals = dict[str, Any]
 GetattrProtocol = Callable[[str], Any]
-AliasMapping = dict[str, str]
 
 
 def smart_lazy_getattr(
-    name: str, current_module: ModuleType, name_module_translation: ModuleInterfaceMapping, aliases: AliasMapping
+    name: str, module_globals: ModuleGlobals, name_module_translation: ModuleInterfaceMapping, aliases: AliasMapping
 ) -> Any:
     """
     Intelligent lazy loading with automatic module detection.
 
     Args:
         name: Name of the attribute to import
-        current_module: Reference to the current module (sys.modules[__name__])
+        module_globals: Reference to the current module (use: `globals()`)
         aliases: Mapping of alias names to target names
 
     Returns:
@@ -49,70 +58,60 @@ def smart_lazy_getattr(
 
     Raises:
         AttributeError: If the attribute was not found
-
-    Example:
-    ```python
-    # In __init__.py
-    import sys
-
-    def __getattr__(name: str) -> Any:
-        return smart_lazy_getattr(name, sys.modules[__name__])
-    ```
     """
-    if name in ("__path__", "__file__"):
-        return current_module.__file__
+    if name in ("__path__", "__file__", "__all__", "__name__"):
+        if name == "__path__":
+            name = "__file__"
+        return module_globals[name]
 
     if name not in name_module_translation:
         if name in aliases:
             name = aliases[name]
         else:
-            raise ImportError(f"Module '{current_module.__name__}' has no attribute '{name}'")
+            raise ImportError(f"Module '{module_globals['__name__']}' has no attribute '{name}'")
 
     return importlib.import_module(name_module_translation[name]).__getattribute__(name)
 
 
 def lazy_module_factory(
-    current_module: ModuleType,
-    type_checking_all: ModuleInterface,
-    /,
-    aliases: AliasMapping | None = None,
-    **translations: str,
+    module_globals: ModuleGlobals, /, *translations: ModuleInterfaceMappingInput
 ) -> GetattrProtocol:
     """
     Factory function for creating __getattr__ with lazy loading.
 
     Args:
-        current_module: Reference to the current module (sys.modules[__name__])
-        type_checking_all: List of all attribute names for TYPE_CHECKING validation
-        aliases: Optional mapping of alias names to target names
-        **translations: Mapping of attribute names to their respective modules
+        module_globals: Reference to the current module (pass `globals()`)
+        *translations: Mapping of attribute names to their respective modules
     Usage:
     ```python
     import sys
 
-    __getattr__, __all__ = create_smart_getattr(
-        sys.modules[__name__],
+    __getattr__ = create_smart_getattr(
+        globals(),
 
         # Translations
-        Beekeeper="beekeepy._interface.abc.synchronous",
-        Session="beekeepy._interface.abc.synchronous",
-        Settings="beekeepy._interface.settings",
-        aliases={ # alias_name -> target
-            "AsyncBeekeeper": "Beekeeper",  # Alias example
-        },
+        # ("module.path", "AttributeName"),
+        ("beekeepy._interface.abc.synchronous", "Session"),
+        ("beekeepy._interface.settings", "Settings")
+
+        # Aliasing
+        # ("module.path", "AttributeName", "AliasName"),
+        ("beekeepy._interface.abc.synchronous", "Beekeeper", "AsyncBeekeeper"),
     )
     ```
     """
-    aliases = aliases or {}
-    _validate_all_in_translations(type_checking_all, translations, aliases)
+    translations_no_alias, aliases = _extract_aliases(translations)
+    _validate_all_in_translations(module_globals, translations_no_alias, aliases)
 
     def new_getattr(name: str) -> Any:
-        return smart_lazy_getattr(name, current_module, translations, aliases)
+        return smart_lazy_getattr(name, module_globals, translations_no_alias, aliases)
 
     return new_getattr
 
 
-def aggregate_same_import(*attributes: str, module: str) -> ModuleInterfaceMapping:
+def aggregate_same_import(
+    *attributes: AggregatedModuleInterfaceMappingInput, module: ModulePath
+) -> tuple[ModuleInterfaceMappingInput, ...]:
     """
     Helper function to aggregate multiple attributes from the same module.
 
@@ -123,12 +122,36 @@ def aggregate_same_import(*attributes: str, module: str) -> ModuleInterfaceMappi
     Returns:
         A mapping of attribute names to their module paths
     """
-    return {attr: module for attr in attributes}
+    result: list[ModuleInterfaceMappingInput] = []
+    for attribute in attributes:
+        if isinstance(attribute, str):
+            result.append((module, attribute))
+        else:
+            result.append((module, *attribute))
+    return tuple(result)
 
 
 def _validate_all_in_translations(
-    all_names: ModuleInterface, translations: ModuleInterfaceMapping, aliases: AliasMapping
+    module_globals: ModuleGlobals, translations: ModuleInterfaceMapping, aliases: AliasMapping
 ) -> None:
-    missing = set(all_names) - (set(translations.keys()) | set(aliases.keys()))
+    missing = set(module_globals["__all__"]) - (set(translations.keys()) | set(aliases.keys()))
     if missing:
         raise ImportError(f"Missing translations for: {', '.join(missing)}")
+
+
+def _extract_aliases(
+    translation: tuple[ModuleInterfaceMappingInput, ...],
+) -> tuple[ModuleInterfaceMapping, AliasMapping]:
+    translations: ModuleInterfaceMapping = {}
+    aliases: AliasMapping = {}
+
+    for item in translation:
+        if len(item) == len(get_args(ImportInput)):  # simple import
+            translations[item[1]] = item[0]
+        elif len(item) == len(get_args(AliasedImportInput)):  # aliased import
+            translations[item[1]] = item[0]
+            aliases[item[2]] = item[1]  # type: ignore[misc]
+        else:
+            raise ImportError(f"Invalid input during lazy import definition: {item}")
+
+    return translations, aliases
