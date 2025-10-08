@@ -40,13 +40,10 @@ if TYPE_CHECKING:
     from beekeepy._communication.is_url_reachable import async_is_url_reachable, sync_is_url_reachable
     from beekeepy._communication.settings import CommunicationSettings
 else:
-    from sys import modules
-
     from beekeepy._utilities.smart_lazy_import import aggregate_same_import, lazy_module_factory
 
     __getattr__ = lazy_module_factory(
-        modules[__name__],
-        __all__,
+        globals(),
         # Translations
         **aggregate_same_import(
             "async_is_url_reachable",

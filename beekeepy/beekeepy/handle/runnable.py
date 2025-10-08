@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from beekeepy._utilities.smart_lazy_import import aggregate_same_import, lazy_module_factory
+
 __all__ = [
     "Arguments",
     "ArgumentT",
@@ -36,36 +38,31 @@ if TYPE_CHECKING:
     from beekeepy._runnable_handle.runnable_handle import RunnableHandle
     from beekeepy._runnable_handle.runnable_sync_beekeeper import BeekeeperTemplate
     from beekeepy._runnable_handle.settings import RunnableHandleSettings
-else:
-    from sys import modules
 
-    from beekeepy._utilities.smart_lazy_import import aggregate_same_import, lazy_module_factory
-
-    __getattr__ = lazy_module_factory(
-        modules[__name__],
-        __all__,
-        # Translations
-        **aggregate_same_import(
-            "PortMatchingResult",
-            "match_ports",
-            module="beekeepy._runnable_handle.match_ports",
-        ),
-        **aggregate_same_import(
-            "ArgumentT",
-            "AutoCloser",
-            "ConfigT",
-            "Executable",
-            module="beekeepy._executable.abc.executable",
-        ),
-        Arguments="beekeepy._executable.abc.arguments",
-        AsyncBeekeeper="beekeepy._runnable_handle._async_additional_definition",
-        AsyncBeekeeperTemplate="beekeepy._runnable_handle.runnable_async_beekeeper",
-        Beekeeper="beekeepy._runnable_handle._sync_additional_definition",
-        BeekeeperArguments="beekeepy._executable.beekeeper_arguments",
-        BeekeeperConfig="beekeepy._executable.beekeeper_config",
-        BeekeeperExecutable="beekeepy._executable.beekeeper_executable",
-        BeekeeperTemplate="beekeepy._runnable_handle.runnable_sync_beekeeper",
-        Config="beekeepy._executable.abc.config",
-        RunnableHandle="beekeepy._runnable_handle.runnable_handle",
-        RunnableHandleSettings="beekeepy._runnable_handle.settings",
-    )
+__getattr__ = lazy_module_factory(
+    globals(),
+    # Translations
+    *aggregate_same_import(
+        "PortMatchingResult",
+        "match_ports",
+        module="beekeepy._runnable_handle.match_ports",
+    ),
+    *aggregate_same_import(
+        "ArgumentT",
+        "AutoCloser",
+        "ConfigT",
+        "Executable",
+        module="beekeepy._executable.abc.executable",
+    ),
+    ("beekeepy._executable.abc.arguments", "Arguments"),
+    ("beekeepy._runnable_handle._async_additional_definition", "AsyncBeekeeper"),
+    ("beekeepy._runnable_handle.runnable_async_beekeeper", "AsyncBeekeeperTemplate"),
+    ("beekeepy._runnable_handle._sync_additional_definition", "Beekeeper"),
+    ("beekeepy._executable.beekeeper_arguments", "BeekeeperArguments"),
+    ("beekeepy._executable.beekeeper_config", "BeekeeperConfig"),
+    ("beekeepy._executable.beekeeper_executable", "BeekeeperExecutable"),
+    ("beekeepy._runnable_handle.runnable_sync_beekeeper", "BeekeeperTemplate"),
+    ("beekeepy._executable.abc.config", "Config"),
+    ("beekeepy._runnable_handle.runnable_handle", "RunnableHandle"),
+    ("beekeepy._runnable_handle.settings", "RunnableHandleSettings"),
+)

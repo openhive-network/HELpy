@@ -14,13 +14,10 @@ if TYPE_CHECKING:
     from beekeepy._communication.abc.overseer import AbstractOverseer
     from beekeepy._communication.overseers import CommonOverseer, StrictOverseer
 else:
-    from sys import modules
-
     from beekeepy._utilities.smart_lazy_import import aggregate_same_import, lazy_module_factory
 
     __getattr__ = lazy_module_factory(
-        modules[__name__],
-        __all__,
+        globals(),
         # Translations
         **aggregate_same_import(
             "CommonOverseer",
