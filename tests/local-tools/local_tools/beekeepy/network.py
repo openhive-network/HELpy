@@ -5,7 +5,7 @@ from json import loads
 from typing import TYPE_CHECKING, Any
 
 from beekeepy.communication import get_communicator_cls
-from beekeepy.handle.settings import RemoteHandleSettings
+from beekeepy.settings import RemoteHandleSettings
 
 if TYPE_CHECKING:
     from beekeepy.interfaces import HttpUrl

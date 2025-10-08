@@ -8,7 +8,7 @@ from schemas.fields.basic import PublicKey
 if TYPE_CHECKING:
     from loguru import Logger
 
-    from beekeepy.handle.settings import InterfaceSettings
+    from beekeepy.settings import InterfaceSettings
     from local_tools.beekeepy.account_credentials import AccountCredentials
 
 

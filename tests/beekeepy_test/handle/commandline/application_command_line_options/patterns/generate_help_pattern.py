@@ -5,7 +5,7 @@ from pathlib import Path
 import loguru
 
 from beekeepy.handle.runnable import BeekeeperExecutable
-from beekeepy.handle.settings import RunnableHandleSettings
+from beekeepy.settings import RunnableHandleSettings
 
 if __name__ == "__main__":
     settings = RunnableHandleSettings()

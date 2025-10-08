@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Iterator
 import pytest
 from loguru import logger
 
-from beekeepy.handle.settings import InterfaceSettings
+from beekeepy.settings import InterfaceSettings
 
 if TYPE_CHECKING:
     from pathlib import Path

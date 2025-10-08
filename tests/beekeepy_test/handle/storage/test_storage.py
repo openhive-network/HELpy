@@ -9,7 +9,7 @@ from loguru import logger
 
 from beekeepy.exceptions import BeekeeperFailedToStartError, FailedToStartExecutableError
 from beekeepy.handle.runnable import Beekeeper
-from beekeepy.handle.settings import RunnableHandleSettings
+from beekeepy.settings import RunnableHandleSettings
 
 if TYPE_CHECKING:
     from pathlib import Path
