@@ -17,6 +17,8 @@ __all__ = [
     "Response",
     "ResponseCallback",
     "SyncCallback",
+    "async_is_url_reachable",
+    "sync_is_url_reachable",
 ]
 
 if TYPE_CHECKING:
@@ -35,6 +37,7 @@ if TYPE_CHECKING:
         ResponseCallback,
         SyncCallback,
     )
+    from beekeepy._communication.is_url_reachable import async_is_url_reachable, sync_is_url_reachable
     from beekeepy._communication.settings import CommunicationSettings
 else:
     from sys import modules
@@ -45,6 +48,11 @@ else:
         modules[__name__],
         __all__,
         # Translations
+        **aggregate_same_import(
+            "async_is_url_reachable",
+            "sync_is_url_reachable",
+            module="beekeepy._communication.is_url_reachable",
+        ),
         **aggregate_same_import(
             "AsyncCallback",
             "AsyncCallbacks",
