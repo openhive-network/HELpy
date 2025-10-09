@@ -93,7 +93,7 @@ select = ["ALL"]
 "beekeepy/beekeepy/interfaces.py"           = ["TCH004"]
 "beekeepy/beekeepy/exceptions.py"           = ["TCH004"]
 "beekeepy/beekeepy/service.py"              = ["TCH004"]
-"beekeepy/beekeepy/communication/**.py"     = ["TCH004"]
+"beekeepy/beekeepy/communication.py"        = ["TCH004"]
 "beekeepy/beekeepy/handle/**.py"            = ["TCH004"]
 
 

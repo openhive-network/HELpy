@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING, Final
 
 import pytest
 
-from beekeepy.communication import get_communicator_cls
-from beekeepy.communication.communicator import Callbacks, CommunicationSettings
+from beekeepy.communication import Callbacks, CommunicationSettings, get_communicator_cls
 
 if TYPE_CHECKING:
-    from beekeepy.communication.communicator import Request, Response
+    from beekeepy.communication import Request, Response
     from beekeepy.interfaces import HttpUrl
 
 SIMPLE_DATA: Final[str] = """{"id": 0, "jsonrpc": "2.0", "method": "database_api.get_config"}"""

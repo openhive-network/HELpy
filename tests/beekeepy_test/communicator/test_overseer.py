@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, Final
 import pytest
 from local_tools.beekeepy.testing_server import run_simple_server
 
-from beekeepy.communication import get_communicator_cls
-from beekeepy.communication.communicator import CommunicationSettings
-from beekeepy.communication.overseer import (
+from beekeepy.communication import (
     CommonOverseer,
+    CommunicationSettings,
     StrictOverseer,
+    get_communicator_cls,
 )
 from beekeepy.exceptions import (
     ApiNotFoundError,
@@ -20,8 +20,7 @@ from beekeepy.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from beekeepy.communication.communicator import AbstractCommunicator
-    from beekeepy.communication.overseer import AbstractOverseer
+    from beekeepy.communication import AbstractCommunicator, AbstractOverseer
 
 
 ERRORS_TO_DETECT: Final[list[tuple[type[OverseerError], str]]] = [
