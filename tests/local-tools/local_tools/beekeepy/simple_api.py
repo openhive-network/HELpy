@@ -28,7 +28,6 @@ class VoterSchema(PreconfiguredBaseModel):
 class WitnessesVotersResponseSchema(PreconfiguredBaseModel):
     total_votes: int
     total_pages: int
-    votes_updated_at: str
     voters: list[VoterSchema]
 
 
