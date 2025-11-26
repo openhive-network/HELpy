@@ -14,7 +14,7 @@ from beekeepy._executable.abc.arguments import Arguments
 from beekeepy._executable.abc.config import Config
 from beekeepy._executable.abc.streams import StreamsHolder
 from beekeepy._utilities.context import ContextSync
-from beekeepy.exceptions import ExecutableIsNotRunningError, TimeoutReachWhileCloseError
+from beekeepy.exceptions import ExecutableIsNotRunningError, FailedToStartExecutableError, TimeoutReachWhileCloseError
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -245,7 +245,8 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
         return self.run_and_get_output(arguments=self.__arguments.just_get_version())
 
     def reserved_ports(self, *, timeout_seconds: int = 10) -> list[int]:
-        assert self.is_running(), "Cannot obtain reserved ports for not started executable"
+        if not self.is_running():
+            raise FailedToStartExecutableError("Executable is not running, cannot get reserved ports")
         start = time.perf_counter()
         while start + timeout_seconds >= time.perf_counter():
             connections = psutil.net_connections("inet4")

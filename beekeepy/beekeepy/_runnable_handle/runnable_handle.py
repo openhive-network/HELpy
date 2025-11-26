@@ -17,6 +17,7 @@ from beekeepy._runnable_handle.match_ports import PortMatchingResult, match_port
 from beekeepy._runnable_handle.settings import RunnableHandleSettings
 from beekeepy.exceptions import (
     ApiNotFoundError,
+    CommunicationError,
     FailedToDetectReservedPortsError,
     FailedToStartExecutableError,
 )
@@ -269,6 +270,8 @@ class RunnableHandle(ABC, Generic[ExecutableT, ConfigT, ArgumentT, SettingsT]):
                 "HTTP port detected, but cannot obtain further information. app_status_api plugin is not enabled!"
             )
             return matched_ports
+        except CommunicationError as e:
+            raise FailedToStartExecutableError("Cannot communicate with application on detected HTTP port") from e
 
         assert status is not None, "Error has not been caught and further port discovery started"
         http = status.webservers.HTTP
