@@ -12,8 +12,8 @@ Application Options:
   --webserver-ws-deflate arg (=0)
           Enable the RFC-7692 permessage-deflate extension for the WebSocket server (only used if the client requests 
           it).  This may save bandwidth at the expense of CPU
-  --webserver-thread-pool-size arg (=32)
-          Number of threads used to handle queries. Default: 32.
+  --webserver-thread-pool-size arg (=16)
+          Number of threads used to handle queries. Default: 16.
   --webserver-https-certificate-file-name arg
           File name with a server's certificate.
   --webserver-https-key-file-name arg
