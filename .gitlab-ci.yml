@@ -133,6 +133,7 @@ build_beekeepy_wheel:
       junit: $PATH_TO_REPORT
   tags:
     - data-cache-storage
+    - hive-builder-9
 
 run_beekeepy_tests:
   stage: beekeepy
