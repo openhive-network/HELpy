@@ -87,6 +87,7 @@ prepare_hived_image:
   tags:
     - public-runner-docker
     - hived-for-tests
+    - hived
 
 build_beekeepy_wheel:
   stage: beekeepy
