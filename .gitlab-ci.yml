@@ -86,8 +86,7 @@ prepare_hived_image:
     HIVE_NETWORK_TYPE: mainnet
   tags:
     - public-runner-docker
-    - hived-for-tests
-    - hived
+    - build-mainnet
 
 build_beekeepy_wheel:
   stage: beekeepy
