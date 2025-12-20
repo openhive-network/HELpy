@@ -294,17 +294,22 @@ files = [
 
 [[package]]
 name = "hiveio-schemas"
-version = "1.28.0"
+version = "1.28.1.dev1+f5ee29e"
 description = "Tools for checking if message fits expected format"
 optional = false
-python-versions = "<4.0,>=3.12"
+python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "hiveio_schemas-1.28.0-py3-none-any.whl", hash = "sha256:a81fdc704028c15c5ce72c3404cadbb898c10d51ba4f8ab4e37da24f668bddd0"},
+    {file = "hiveio_schemas-1.28.1.dev1+f5ee29e-py3-none-any.whl", hash = "sha256:8894ae2eee31b4da2197debcfc1fb4716f253caa3826bfdb87a8e6aca0c0e9bb"},
 ]
 
 [package.dependencies]
 msgspec = "0.18.6"
+
+[package.source]
+type = "legacy"
+url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple"
+reference = "gitlab-schemas"
 
 [[package]]
 name = "idna"
@@ -793,4 +798,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "94d8f7da7472e914ac5bc9308a5f3efd8489a795ba385b6bddce73aa680026a4"
+content-hash = "30226e3a2e81d773eeffbca37b7e4ba1c45e7806465dc43174fbb43c4b59d296"
