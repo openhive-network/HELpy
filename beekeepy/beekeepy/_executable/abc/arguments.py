@@ -109,7 +109,9 @@ class Arguments(PreconfiguredBaseModel):
             if isinstance(v, list) and len(v) == 0:
                 continue
             cli_arguments.append(pattern.format(self.__convert_member_name_to_cli_value(k)))
-            cli_arguments.append(self.__convert_member_value_to_string(v))
+            value_str = self.__convert_member_value_to_string(v)
+            if value_str:  # Don't append empty strings (e.g., for boolean flags)
+                cli_arguments.append(value_str)
         return cli_arguments
 
     def process(self, *, with_prefix: bool = True) -> list[str]:
