@@ -70,7 +70,7 @@ fetch_beekeeper:
   needs: []
   image: alpine:latest
   variables:
-    BEEKEEPER_REF: "develop"
+    BEEKEEPER_REF: "master"
   script:
     - apk add --no-cache curl unzip
     - 'curl -L -H "JOB-TOKEN: $CI_JOB_TOKEN"
