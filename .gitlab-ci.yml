@@ -8,28 +8,20 @@ stages:
 variables:
   GIT_STRATEGY: clone
   GIT_DEPTH: 1
-  GIT_SUBMODULE_STRATEGY: none
-  GIT_SUBMODULE_DEPTH: 1
 
   PACKAGES_TO_CHECK: "tests/ beekeepy/"
   # colors:
   TXT_BLUE: "\e[1;34m"
   TXT_CLEAR: "\e[0m"
 
-  DATA_CACHE_HIVE_PREFIX: "/cache/replay_data_hive"
-  BLOCK_LOG_SOURCE_DIR_5M: /blockchain/block_log_5m
-  BLOCK_LOG_SOURCE_DIR_MIRRORNET_5M: /blockchain/block_log_5m_mirrornet
-
   BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
   LOCAL_TOOLS_DIR: ${CI_PROJECT_DIR}/tests/local-tools
 
 include:
-  - project: 'hive/hive'
-    # This has to be the same as the commit checked out in the submodule
-    ref: 40e7d1e8bb7d6f7df5cfb070d808cb387a9adc9f
-    file: '/scripts/ci-helpers/prepare_data_image_job.yml'
-  # DO NOT include ccc here. It will be indirectly included by above yaml file.
-  #- project: 'hive/common-ci-configuration'
+  - project: 'hive/common-ci-configuration'
+    ref: develop
+    file:
+      - '/templates/python_projects.gitlab-ci.yml'
 
 image: ${PYTHON_IMAGE}
 
@@ -73,20 +65,27 @@ type_check_with_mypy:
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| BUILD |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-prepare_hived_image:
-  extends: .prepare_hived_image
-  needs: []
+fetch_beekeeper:
   stage: build
+  needs: []
+  image: alpine:latest
   variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    SUBMODULE_DIR: "$CI_PROJECT_DIR/hive"
-    REGISTRY_USER: "$HIVED_CI_IMGBUILDER_USER"
-    REGISTRY_PASS: $HIVED_CI_IMGBUILDER_PASSWORD
-    BINARY_CACHE_PATH: "$CI_PROJECT_DIR/hived-binaries"
-    HIVE_NETWORK_TYPE: mainnet
+    BEEKEEPER_REF: "develop"
+  script:
+    - apk add --no-cache curl unzip
+    - 'curl -L -H "JOB-TOKEN: $CI_JOB_TOKEN"
+       "https://gitlab.syncad.com/api/v4/projects/hive%2Fbeekeeper/jobs/artifacts/${BEEKEEPER_REF}/download?job=beekeeper_native_build"
+       -o beekeeper.zip'
+    - unzip beekeeper.zip
+    - mkdir -p hived-binaries
+    - cp build/programs/beekeeper/beekeeper/beekeeper hived-binaries/
+    - chmod +x hived-binaries/beekeeper
+  artifacts:
+    paths:
+      - hived-binaries/
+    expire_in: 1 week
   tags:
     - public-runner-docker
-    - build-mainnet
 
 build_beekeepy_wheel:
   stage: beekeepy
@@ -94,7 +93,7 @@ build_beekeepy_wheel:
   needs:
     - job: pre_commit_checks
     - job: run_beekeepy_tests
-    - job: prepare_hived_image
+    - job: fetch_beekeeper
       artifacts: true
   variables:
     PYPROJECT_DIR: "$BEEKEEPY_DIR"
@@ -110,11 +109,9 @@ build_beekeepy_wheel:
 .run_tests_template:
   extends: .project_develop_configuration_template
   needs:
-    - job: prepare_hived_image
+    - job: fetch_beekeeper
       artifacts: true
   variables:
-    HIVED_COMMIT: $HIVED_COMMIT
-    HIVED_UID: $HIVED_UID
     PATH_TO_REPORT: "$CI_PROJECT_DIR/report.xml"
     PYPROJECT_DIR: "$LOCAL_TOOLS_DIR"
     SUBPROJECT_TEST_TARGET: ""
