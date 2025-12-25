@@ -76,6 +76,7 @@ fetch_beekeeper:
     - 'curl -L -H "JOB-TOKEN: $CI_JOB_TOKEN"
        "https://gitlab.syncad.com/api/v4/projects/hive%2Fbeekeeper/jobs/artifacts/${BEEKEEPER_REF}/download?job=beekeeper_native_build"
        -o beekeeper.zip'
+    - if [ $(stat -c%s beekeeper.zip) -lt 1000 ]; then echo "Download failed:"; cat beekeeper.zip; exit 1; fi
     - unzip beekeeper.zip
     - mkdir -p hived-binaries
     - cp build/programs/beekeeper/beekeeper/beekeeper hived-binaries/
