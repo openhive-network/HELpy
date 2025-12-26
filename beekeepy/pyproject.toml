@@ -26,14 +26,14 @@ source = [
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-python = ">=3.14,<4"
+python = ">=3.12,<4"
 aiohttp = "3.11.15"
 loguru = "0.7.2"
 psutil = "7.0.0"
 python-dateutil = "2.8.2"
 requests = "2.32.3"
 
-hiveio-schemas = "1.28.1.dev1+8407ecd.dirty"
+hiveio-schemas = "1.28.1.dev3+ae54493"
 
 [tool.poetry-dynamic-versioning]
 enable = true
