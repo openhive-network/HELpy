@@ -26,7 +26,7 @@ source = [
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.14,<4"
 aiohttp = "3.11.15"
 loguru = "0.7.2"
 psutil = "7.0.0"
