@@ -433,14 +433,13 @@ files = [
 
 [[package]]
 name = "hiveio-schemas"
-version = "1.28.1.dev3+ae54493"
+version = "1.28.1.dev8+cc9d4bb"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.12,<4"
 groups = ["main"]
 files = [
-    {file = "hiveio_schemas-1.28.1.dev3+ae54493-py3-none-any.whl", hash = "sha256:4bef1f9a096610ffa9bdd7d63b4a53a3fee01b1083266acf19ea2da0c197439f"},
-    {file = "hiveio_schemas-1.28.1.dev3+ae54493.tar.gz", hash = "sha256:425437fc83293aaac6c478ef48b14c7f4e06c136a599bc1a5c2e5d93c6f3dd75"},
+    {file = "hiveio_schemas-1.28.1.dev8+cc9d4bb-py3-none-any.whl", hash = "sha256:3b57548a3547c07e70ce6957d069712e921a8f95a76e1600f2b1903f50d4136d"},
 ]
 
 [package.dependencies]
@@ -1112,4 +1111,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "b6a83324da55a65178a02190d836f8112ef039276a6b972df3b36314cc95c764"
+content-hash = "6c187971eba43cc521316163e3db578c2c5305296cff0f48c89d81ba17fe09f9"
