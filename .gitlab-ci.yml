@@ -4,6 +4,12 @@ stages:
   - tests
   - beekeepy
 
+workflow:
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
 
 variables:
   GIT_STRATEGY: clone
@@ -17,14 +23,15 @@ variables:
   BEEKEEPY_DIR: ${CI_PROJECT_DIR}/beekeepy
   LOCAL_TOOLS_DIR: ${CI_PROJECT_DIR}/tests/local-tools
 
-  # Override Python image to use Python 3.14
-  # uses registry.gitlab.syncad.com/hive/common-ci-configuration/ci-base-image:ubuntu24.04-py3.14-1
-  PYTHON_IMAGE_TAG: ":ubuntu24.04-py3.14-1"
-  PYTHON_IMAGE: "registry.gitlab.syncad.com/hive/common-ci-configuration/ci-base-image${PYTHON_IMAGE_TAG}"
+  PYTHON_IMAGE_312: "registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu24.04-3"
+  PYTHON_IMAGE_314: "registry.gitlab.syncad.com/hive/hive/ci-base-image:ubuntu24.04-py3.14-1"
+
+  # Default Python image
+  PYTHON_IMAGE: $PYTHON_IMAGE_314
 
 include:
   - project: 'hive/common-ci-configuration'
-    ref: develop
+    ref: 1f2247a35b7115a316cbb2283242ab4669928c69
     file:
       - '/templates/python_projects.gitlab-ci.yml'
 
@@ -164,6 +171,17 @@ build_beekeepy_wheel:
 run_beekeepy_tests:
   stage: beekeepy
   extends: .run_tests_template
+  image: ${PYTHON_IMAGE}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.12", "3.14"]
+  rules:
+    - if: $PYTHON_VERSION == "3.12"
+      variables:
+        PYTHON_IMAGE: "${PYTHON_IMAGE_312}"
+    - if: $PYTHON_VERSION == "3.14"
+      variables:
+        PYTHON_IMAGE: "${PYTHON_IMAGE_314}"
   variables:
     SUBPROJECT_TEST_TARGET: "beekeepy"
 
