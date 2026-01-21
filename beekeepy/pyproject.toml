@@ -43,7 +43,7 @@ format-jinja = """
     {%- if distance == 0 and not dirty -%}
         {{ serialize_pep440(base, stage, revision) }}
     {%- elif revision is not none -%}
-        {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit]) }}{{ dirty_postfix }}
+        {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}{{ dirty_postfix }}
     {%- else -%}
         {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}{{ dirty_postfix }}
     {%- endif -%}
