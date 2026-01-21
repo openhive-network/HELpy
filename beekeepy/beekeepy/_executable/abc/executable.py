@@ -123,6 +123,7 @@ class Executable(Closeable, Generic[ConfigT, ArgumentT]):
                     stdout=stdout,
                     stderr=stderr,
                     timeout=timeout,
+                    start_new_session=(not propagate_sigint),
                 )
                 return AutoCloser(None)
 
