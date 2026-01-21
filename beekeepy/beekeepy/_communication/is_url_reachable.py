@@ -27,9 +27,7 @@ def _get_default_settings() -> CommunicationSettings:
     return CommunicationSettings(timeout=timedelta(seconds=1))
 
 
-def sync_is_url_reachable(
-    url: HttpUrl, *, settings: CommunicationSettings | None = None
-) -> bool:
+def sync_is_url_reachable(url: HttpUrl, *, settings: CommunicationSettings | None = None) -> bool:
     """
     Check if the given url is reachable.
 
@@ -39,18 +37,14 @@ def sync_is_url_reachable(
         True if the URL is reachable, False otherwise.
     """
     try:
-        get_communicator_cls("sync")(
-            settings=(settings or _get_default_settings())
-        ).get(url=url)
+        get_communicator_cls("sync")(settings=(settings or _get_default_settings())).get(url=url)
     except EXCEPTIONS_TO_CATCH:
         return False
     else:
         return True
 
 
-async def async_is_url_reachable(
-    url: HttpUrl, *, settings: CommunicationSettings | None = None
-) -> bool:
+async def async_is_url_reachable(url: HttpUrl, *, settings: CommunicationSettings | None = None) -> bool:
     """
     Check if the given url is reachable.
 
@@ -61,9 +55,7 @@ async def async_is_url_reachable(
         True if the URL is reachable, False otherwise.
     """
     try:
-        await get_communicator_cls("async")(
-            settings=(settings or _get_default_settings())
-        ).async_get(url=url)
+        await get_communicator_cls("async")(settings=(settings or _get_default_settings())).async_get(url=url)
     except EXCEPTIONS_TO_CATCH:
         return False
     else:
