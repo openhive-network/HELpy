@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
@@ -8,6 +7,8 @@ from beekeepy._communication.communicator_getter import get_communicator_cls
 from beekeepy.exceptions import CommunicationError
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from beekeepy._communication.settings import CommunicationSettings
     from beekeepy._communication.url import HttpUrl
 
