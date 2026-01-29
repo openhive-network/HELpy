@@ -29,9 +29,16 @@ variables:
   # Default Python image
   PYTHON_IMAGE: $PYTHON_IMAGE_314
 
+  # Set to "true" to run `poetry update` before tests (tests with latest dependency versions).
+  # Useful for detecting compatibility issues with newer dependency versions early.
+  # Set to "false" to use pinned versions from poetry.lock for stable, reproducible builds.
+  TEST_WITH_LATEST_DEPENDENCIES: "false"
+  # Same as above but for static code analysis jobs (ruff, mypy, pre-commit).
+  STATIC_ANALYSIS_WITH_LATEST_DEPENDENCIES: "false"
+
 include:
   - project: 'hive/common-ci-configuration'
-    ref: 1f2247a35b7115a316cbb2283242ab4669928c69
+    ref: 07fdf2c2bf8155477e7e1229e0bcc77852c9aa84
     file:
       - '/templates/python_projects.gitlab-ci.yml'
 
@@ -48,23 +55,12 @@ default:
     PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
     PYPROJECT_CONFIG_PATH: "${CI_PROJECT_DIR}/tests/local-tools/pyproject.toml"
 
-# Override before_script to regenerate poetry.lock for Python 3.14 compatibility
-.regenerate_lock_before_script: &regenerate_lock_before_script
-  before_script:
-    - echo "Using Python project directory - ${PYPROJECT_DIR}"
-    - poetry -C "${PYPROJECT_DIR}" env use python3
-    - source $(poetry -C "${PYPROJECT_DIR}" env info --path)/bin/activate
-    - python3 -V
-    - poetry -C "${PYPROJECT_DIR}" -V
-    - pip list
-    - poetry -C "${PYPROJECT_DIR}" lock --no-update 2>/dev/null || poetry -C "${PYPROJECT_DIR}" lock
-    - poetry -C "${PYPROJECT_DIR}" install
-    - pip list
-
 pre_commit_checks:
   stage: static_code_analysis
   extends: .pre_commit_checks_template
-  <<: *regenerate_lock_before_script
+  before_script:
+    - !reference [.pre_commit_checks_template, before_script]
+    - !reference [.update_deps_for_static_analysis, script]
   variables:
     PYPROJECT_DIR: "${LOCAL_TOOLS_DIR}"
     PRE_COMMIT_CONFIG: "${CI_PROJECT_DIR}/.pre-commit-config.yaml"
@@ -73,7 +69,9 @@ formatting_with_ruff_check:
   stage: static_code_analysis
   extends: .project_develop_configuration_template
   <<: *static_code_analysis_vars
-  <<: *regenerate_lock_before_script
+  before_script:
+    - !reference [.project_develop_configuration_template, before_script]
+    - !reference [.update_deps_for_static_analysis, script]
   script:
     - echo -e "${TXT_BLUE}Checking code formatting with Ruff...${TXT_CLEAR}" &&
       ruff format --config "${PYPROJECT_CONFIG_PATH}" --check --diff ${PACKAGES_TO_CHECK}
@@ -82,13 +80,17 @@ lint_code_with_ruff:
   stage: static_code_analysis
   extends: .lint_code_with_ruff_template
   <<: *static_code_analysis_vars
-  <<: *regenerate_lock_before_script
+  before_script:
+    - !reference [.lint_code_with_ruff_template, before_script]
+    - !reference [.update_deps_for_static_analysis, script]
 
 type_check_with_mypy:
   stage: static_code_analysis
   extends: .type_check_with_mypy_template
   <<: *static_code_analysis_vars
-  <<: *regenerate_lock_before_script
+  before_script:
+    - !reference [.type_check_with_mypy_template, before_script]
+    - !reference [.update_deps_for_static_analysis, script]
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<| STATIC CODE ANALYSIS |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -147,15 +149,8 @@ build_beekeepy_wheel:
     HIVED_HTTP_ENDPOINT: "https://api.hive.blog"
   before_script:
     - cp $CI_PROJECT_DIR/hived-binaries/beekeeper $BEEKEEPY_DIR/beekeepy/beekeeper
-    - echo "Using Python project directory - ${PYPROJECT_DIR}"
-    - poetry -C "${PYPROJECT_DIR}" env use python3
-    - source $(poetry -C "${PYPROJECT_DIR}" env info --path)/bin/activate
-    - python3 -V
-    - poetry -C "${PYPROJECT_DIR}" -V
-    - pip list
-    - poetry -C "${PYPROJECT_DIR}" lock --no-update 2>/dev/null || poetry -C "${PYPROJECT_DIR}" lock
-    - poetry -C "${PYPROJECT_DIR}" install
-    - pip list
+    - !reference [.project_develop_configuration_template, before_script]
+    - !reference [.update_deps_for_tests, script]
   script:
     - if [ -z "${HIVED_HTTP_ENDPOINT}" ]; then HIVED_HTTP_ENDPOINT=""; else HIVED_HTTP_ENDPOINT="--hived-http-endpoint=${HIVED_HTTP_ENDPOINT}"; fi
     - echo -e "${TXT_BLUE}Launching tests...${TXT_CLEAR}"
