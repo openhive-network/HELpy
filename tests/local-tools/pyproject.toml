@@ -19,7 +19,7 @@ packages = [
 repository = "https://gitlab.syncad.com/hive/helpy"
 source = [
   {name = "PyPI", priority = "primary"},
-  {name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental"},
+  {name = "gitlab-hive", url = "https://gitlab.syncad.com/api/v4/groups/136/-/packages/pypi/simple", priority = "supplemental"},
 ]
 version = "0.0.0"
 

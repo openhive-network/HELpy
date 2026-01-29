@@ -21,7 +21,7 @@ include = [
 repository = "https://gitlab.syncad.com/hive/helpy"
 source = [
   {name = "PyPI", priority = "primary"},
-  {name = "gitlab-schemas", url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple", priority = "supplemental"},
+  {name = "gitlab-hive", url = "https://gitlab.syncad.com/api/v4/groups/136/-/packages/pypi/simple", priority = "supplemental"},
 ]
 version = "0.0.0"
 
@@ -33,7 +33,7 @@ psutil = ">=7.0.0"
 python-dateutil = ">=2.8.2"
 requests = ">=2.32.3"
 
-hiveio-schemas = ">=1.28.0"
+hiveio-schemas = {version = ">=1.28.0", source = "gitlab-hive"}
 
 [tool.poetry-dynamic-versioning]
 enable = true

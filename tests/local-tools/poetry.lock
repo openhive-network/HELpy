@@ -471,22 +471,22 @@ url = "../../beekeepy"
 
 [[package]]
 name = "hiveio-schemas"
-version = "1.28.1.dev14+16dc964"
+version = "1.28.0.post20260129143806"
 description = "Tools for checking if message fits expected format"
 optional = false
 python-versions = ">=3.12,<4"
 groups = ["main"]
 files = [
-    {file = "hiveio_schemas-1.28.1.dev14+16dc964-py3-none-any.whl", hash = "sha256:6c7625b2b6a626f9a4b056c81748b2f2546d721a5f88db2491f663c85f69a9f4"},
+    {file = "hiveio_schemas-1.28.0.post20260129143806-py3-none-any.whl", hash = "sha256:1f3babbd09596d44b05176d945e66bfd6933eb5565b2170b829b0bf521a7073d"},
 ]
 
 [package.dependencies]
-msgspec = "0.20.0"
+msgspec = ">=0.20.0"
 
 [package.source]
 type = "legacy"
-url = "https://gitlab.syncad.com/api/v4/projects/362/packages/pypi/simple"
-reference = "gitlab-schemas"
+url = "https://gitlab.syncad.com/api/v4/groups/136/-/packages/pypi/simple"
+reference = "gitlab-hive"
 
 [[package]]
 name = "identify"
@@ -1567,4 +1567,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "0cb047c9e35b9809fca88603bb06d9dd427a9baa7f3a81c30e1ccf5ab05fd7e6"
+content-hash = "8d56cec77cf2b45553034b8d5ee3b3af67f440633b605a13c63b55d8828e8725"
